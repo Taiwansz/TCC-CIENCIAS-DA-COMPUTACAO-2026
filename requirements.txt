@@ -1,0 +1,7 @@
+# Dependencias da Bancada Experimental e Pipeline do TCC II (TokLang)
+matplotlib>=3.8.0
+seaborn>=0.13.0
+numpy>=1.26.0
+pandas>=2.2.0
+python-docx>=1.1.0
+requests>=2.31.0

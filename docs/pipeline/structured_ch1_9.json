@@ -1,0 +1,342 @@
+[
+  {
+    "type": "h1",
+    "text": "1 INTRODUÇÃO"
+  },
+  {
+    "type": "h2",
+    "text": "1.1 Contextualização e Motivação"
+  },
+  {
+    "type": "p",
+    "text": "Os Modelos de Linguagem de Grande Escala (LLMs) transformaram profundamente o cenário da computação contemporânea ao longo da última década. Ferramentas como ChatGPT, Claude e Gemini popularizaram aplicações baseadas em linguagem natural em escala global, criando novas demandas relacionadas ao custo computacional, à escalabilidade de infraestrutura e à eficiência energética. Estima-se que a inferência de um único prompt complexo em modelos da escala do GPT-4 possa consumir centenas de vezes mais energia do que uma pesquisa convencional em mecanismos de busca, o que torna a questão da otimização não apenas econômica, mas também ambiental."
+  },
+  {
+    "type": "p",
+    "text": "Cada token processado por um LLM exige operações matemáticas de alta intensidade computacional, especialmente em razão do mecanismo de self-attention presente na arquitetura Transformer. Nesse mecanismo, a relação entre todos os pares de tokens de uma sequência é calculada, resultando em complexidade de tempo e memória quadrática em relação ao comprimento do prompt. Como consequência direta, prompts extensos elevam exponencialmente o custo computacional e financeiro de sistemas em produção, tornando a eficiência na formulação de prompts uma variável crítica para qualquer organização que opere com LLMs em escala."
+  },
+  {
+    "type": "p",
+    "text": "Nesse contexto emerge a compressão de prompts como estratégia de otimização: uma família de técnicas algorítmicas capazes de identificar e remover elementos redundantes ou de baixa relevância semântica em prompts textuais, mantendo a qualidade das respostas geradas pelo modelo. Ao reduzir o volume de tokens processados sem comprometer a informação essencial, essas técnicas impactam positivamente o custo financeiro, a latência de resposta, o consumo energético e a pegada ambiental dos sistemas de IA."
+  },
+  {
+    "type": "h2",
+    "text": "1.2 Objetivos"
+  },
+  {
+    "type": "p",
+    "text": "O objetivo geral deste trabalho é analisar as principais abordagens de compressão de prompts para LLMs, compreender seus fundamentos teóricos e avaliar seus impactos sobre qualidade semântica, custo computacional e sustentabilidade ambiental. Para tanto, os seguintes objetivos específicos foram delimitados:"
+  },
+  {
+    "type": "bullet",
+    "text": "•  Realizar revisão sistemática da literatura sobre técnicas de compressão de prompts publicadas entre 2022 e 2026;"
+  },
+  {
+    "type": "bullet",
+    "text": "•  Compreender os fundamentos matemáticos e computacionais que justificam a compressão, com ênfase na Teoria da Informação de Shannon e na arquitetura Transformer;"
+  },
+  {
+    "type": "bullet",
+    "text": "•  Analisar comparativamente os principais métodos — LLMLingua, LLMLingua‑2, LongLLMLingua, Selective Context e AutoCompressor — em termos de eficiência, qualidade e aplicabilidade;"
+  },
+  {
+    "type": "bullet",
+    "text": "•  Avaliar o impacto da compressão na preservação semântica por meio da métrica BERTScore;"
+  },
+  {
+    "type": "bullet",
+    "text": "•  Discutir as implicações ambientais e econômicas da compressão de prompts no contexto do movimento Green AI."
+  },
+  {
+    "type": "h2",
+    "text": "1.3 Justificativa e Relevância"
+  },
+  {
+    "type": "p",
+    "text": "A relevância deste estudo se justifica pelo crescimento acelerado do uso de LLMs em ambientes produtivos. Segundo estimativas recentes, o mercado global de IA generativa deve superar US$ 1 trilhão até 2030, impulsionando um crescimento expressivo na demanda por inferência em grande escala. Paralelamente, a preocupação com o consumo energético de datacenters tornou-se pauta estratégica para governos e grandes corporações, com metas de neutralidade de carbono diretamente ameaçadas pelo crescimento da demanda computacional associada à IA."
+  },
+  {
+    "type": "p",
+    "text": "No plano técnico, a compressão de prompts representa uma lacuna ainda subestimada na literatura de otimização de LLMs. Grande parte dos esforços de eficiência se concentra no lado do modelo — quantização, destilação, pruning — enquanto a otimização da entrada, isto é, do prompt em si, permanece menos explorada. Este trabalho busca contribuir para o preenchimento dessa lacuna ao sistematizar e analisar criticamente as principais abordagens disponíveis."
+  },
+  {
+    "type": "h1",
+    "text": "2 FUNDAMENTOS DOS MODELOS DE LINGUAGEM DE GRANDE ESCALA"
+  },
+  {
+    "type": "h2",
+    "text": "2.1 Evolução Histórica"
+  },
+  {
+    "type": "p",
+    "text": "Os modelos de linguagem têm raízes históricas que precedem a era do aprendizado profundo. Os primeiros sistemas estatísticos de linguagem utilizavam modelos de n-gramas para estimar a probabilidade de uma sequência de palavras a partir da frequência observada em grandes corpora textuais. Embora computacionalmente eficientes para tarefas simples, esses modelos apresentavam limitações fundamentais: a esparsidade de dados para n-gramas de ordem elevada e a incapacidade de capturar dependências de longa distância tornavam-nos inadequados para tarefas linguísticas complexas."
+  },
+  {
+    "type": "p",
+    "text": "Um avanço qualitativo ocorreu com a introdução dos word embeddings na década de 2010. Modelos como Word2Vec (Mikolov et al., 2013) e GloVe (Pennington et al., 2014) demonstraram que palavras poderiam ser representadas em espaços vetoriais densos de forma que relações semânticas e sintáticas fossem preservadas geometricamente. Essa representação distribuída tornou possível operações analógicas como 'rei − homem + mulher = rainha', evidenciando a capacidade de codificação de significado em vetores de baixa dimensionalidade."
+  },
+  {
+    "type": "p",
+    "text": "As Redes Neurais Recorrentes (RNNs) e suas variantes, como as Long Short-Term Memory (LSTM) e as Gated Recurrent Units (GRU), introduziram a capacidade de processar sequências com memória de longo prazo. Contudo, a natureza sequencial dessas arquiteturas impedia a paralelização eficiente durante o treinamento, limitando a escala dos modelos e o tamanho dos corpora utilizados."
+  },
+  {
+    "type": "h2",
+    "text": "2.2 Arquitetura Transformer e Mecanismo de Atenção"
+  },
+  {
+    "type": "p",
+    "text": "A publicação de 'Attention is All You Need' por Vaswani et al. (2017) representou uma ruptura paradigmática no campo do processamento de linguagem natural. A arquitetura Transformer eliminou a dependência de recorrência ao substituí-la integralmente pelo mecanismo de atenção multi-cabeça, permitindo que o modelo considerasse simultaneamente todas as posições da sequência durante o cálculo de representações contextuais. Essa mudança possibilitou paralelização massiva durante o treinamento, viabilizando o escalonamento para centenas de bilhões de parâmetros."
+  },
+  {
+    "type": "p",
+    "text": "O mecanismo de self-attention calcula, para cada token, uma representação ponderada de todos os demais tokens da sequência. Formalmente, dado um conjunto de queries Q, keys K e values V, a atenção é calculada como Attention(Q, K, V) = softmax(QKᵀ / √dk)V, onde dk é a dimensão dos vetores de key. Essa operação é computacionalmente custosa: sua complexidade é O(n²·d), onde n é o comprimento da sequência e d é a dimensão do modelo. Para sequências longas, esse custo quadrático torna-se o principal gargalo de desempenho e o principal alvo das técnicas de otimização."
+  },
+  {
+    "type": "p",
+    "text": "Modelos como BERT (Devlin et al., 2018), GPT-2, GPT-3 (Brown et al., 2020) e seus sucessores demonstraram que o escalonamento de parâmetros, dados e computação produz emergência de capacidades não previamente observadas. Fenômenos como raciocínio em múltiplas etapas, resolução de analogias complexas e geração de código surgem espontaneamente em modelos de escala suficientemente elevada, sem treinamento específico para essas tarefas."
+  },
+  {
+    "type": "h2",
+    "text": "2.3 Tokenização e Janela de Contexto"
+  },
+  {
+    "type": "p",
+    "text": "Um aspecto crítico para a compreensão da compressão de prompts é o processo de tokenização. LLMs modernos não operam diretamente sobre palavras ou caracteres, mas sobre subpalavras geradas por algoritmos como Byte-Pair Encoding (BPE) ou SentencePiece. Esses algoritmos constroem vocabulários de tamanho fixo que equilibram granularidade semântica e eficiência computacional. Uma palavra em português, dependendo de sua frequência e morfologia, pode ser representada por um único token ou por múltiplos fragmentos, o que impacta diretamente a contagem de tokens de qualquer prompt."
+  },
+  {
+    "type": "p",
+    "text": "A janela de contexto define o número máximo de tokens que um modelo pode processar simultaneamente. Modelos iniciais como o GPT-2 possuíam janelas de 1.024 tokens. Versões posteriores expandiram progressivamente esse limite: GPT-4 alcançou 128.000 tokens em configurações estendidas, enquanto modelos como o Gemini 1.5 Pro atingiram janelas de até 1 milhão de tokens. Essa expansão, embora amplie a capacidade de raciocínio sobre documentos longos, também multiplica os custos computacionais, tornando a compressão de prompts ainda mais relevante em contextos de uso intensivo."
+  },
+  {
+    "type": "h1",
+    "text": "3 ENGENHARIA DE PROMPT"
+  },
+  {
+    "type": "h2",
+    "text": "3.1 Principais Técnicas"
+  },
+  {
+    "type": "p",
+    "text": "A engenharia de prompt consiste na elaboração estratégica de instruções textuais para orientar o comportamento de LLMs sem modificar os pesos do modelo. Essa área emergiu como disciplina prática a partir da observação de que a qualidade e a estrutura dos prompts têm impacto direto e mensurável sobre a precisão, a coerência e a relevância das respostas geradas. Em sistemas de larga escala, onde o custo de fine-tuning é proibitivo, a engenharia de prompt frequentemente representa a principal alavanca de otimização acessível ao desenvolvedor."
+  },
+  {
+    "type": "p",
+    "text": "O zero-shot prompting representa a abordagem mais direta: o modelo recebe apenas a instrução da tarefa, sem exemplos demonstrativos. Estudos demonstram que modelos de escala suficiente são capazes de realizar tarefas complexas em regime zero-shot, desde que a instrução seja clara e bem estruturada. Já o few-shot prompting introduz exemplos demonstrativos (shots) no corpo do prompt, orientando o padrão de resposta esperado e aumentando significativamente a precisão em tarefas específicas."
+  },
+  {
+    "type": "p",
+    "text": "O Chain-of-Thought (CoT) prompting, proposto por Wei et al. (2022), induz o modelo a explicitar o raciocínio passo a passo antes de emitir a resposta final. Essa técnica mostrou ganhos expressivos de precisão em benchmarks de raciocínio matemático e lógico. Sua variante zero-shot, demonstrada por Kojima et al. (2022) com a simples instrução 'Let's think step by step', evidencia que modelos de grande escala possuem capacidade latente de raciocínio estruturado que pode ser ativada sem exemplos explícitos."
+  },
+  {
+    "type": "h2",
+    "text": "3.2 Relação entre Estrutura do Prompt e Qualidade da Resposta"
+  },
+  {
+    "type": "p",
+    "text": "A relação entre estrutura do prompt e qualidade da resposta é não-linear e dependente do modelo utilizado. Prompts excessivamente detalhados podem introduzir ruído semântico e desviar a atenção do modelo dos elementos mais relevantes da tarefa. Por outro lado, prompts excessivamente concisos podem omitir contexto essencial, degradando a qualidade da saída. Existe, portanto, um equilíbrio ótimo cuja localização depende da natureza da tarefa, do modelo e das técnicas de compressão aplicadas."
+  },
+  {
+    "type": "p",
+    "text": "Liu et al. (2021) demonstraram que a posição dos exemplos e instruções dentro de um prompt influencia a distribuição de atenção do modelo sobre os diferentes segmentos. Elementos posicionados no início ou no final da sequência tendem a receber maior peso atencional, fenômeno conhecido como viés posicional. Esse comportamento tem implicações diretas para o design de sistemas de compressão: a preservação de tokens em posições privilegiadas pode ser mais crítica do que a preservação de tokens em posições intermediárias."
+  },
+  {
+    "type": "h1",
+    "text": "4 TEORIA DA INFORMAÇÃO E REDUNDÂNCIA LINGUÍSTICA"
+  },
+  {
+    "type": "h2",
+    "text": "4.1 Entropia de Shannon e Linguagem Natural"
+  },
+  {
+    "type": "p",
+    "text": "A Teoria da Informação, formulada por Claude Shannon em 1948, estabeleceu fundamentos matemáticos para quantificar e transmitir informação de forma eficiente. O conceito central de entropia H mede a quantidade média de informação contida em uma fonte probabilística: quanto maior a incerteza sobre o próximo símbolo de uma sequência, maior sua entropia e, consequentemente, maior a quantidade de informação carregada por cada símbolo."
+  },
+  {
+    "type": "p",
+    "text": "Shannon demonstrou empiricamente que a língua inglesa possui entropia aproximada de 1 a 1,5 bits por caractere, muito abaixo do máximo teórico de cerca de 4,7 bits para um alfabeto de 26 caracteres. Essa discrepância evidencia a elevada redundância da linguagem natural: aproximadamente metade das informações em um texto pode ser prevista a partir do contexto anterior sem perda substancial de significado. Experimentos com humanos mostraram taxas de acerto superiores a 70% na predição do próximo caractere em textos em inglês, confirmando a previsibilidade estrutural da linguagem."
+  },
+  {
+    "type": "p",
+    "text": "Esse princípio é diretamente aplicável à compressão de prompts enviados para LLMs. Tokens funcionais como artigos, preposições e conjunções em excesso, estruturas sintáticas excessivamente verbosas e repetições semânticas consomem capacidade de contexto e computação sem necessariamente adicionar informação relevante para a tarefa. A compressão algorítmica busca identificar e remover exatamente esses elementos redundantes, preservando o núcleo semântico da instrução."
+  },
+  {
+    "type": "h2",
+    "text": "4.2 Perplexidade como Métrica de Relevância Textual"
+  },
+  {
+    "type": "p",
+    "text": "No contexto dos LLMs, a perplexidade é a principal métrica operacional derivada da Teoria da Informação. Formalmente, a perplexidade de um modelo de linguagem sobre uma sequência de tokens é definida como PP(W) = P(w₁, w₂, ..., wN)^(−1/N), onde N é o comprimento da sequência e P é a probabilidade atribuída pelo modelo. Intuitivamente, a perplexidade representa o grau de surpresa do modelo ao encontrar uma determinada sequência: valores baixos indicam que a sequência era altamente previsível, enquanto valores elevados indicam surpresa."
+  },
+  {
+    "type": "p",
+    "text": "Algoritmos de compressão como o LLMLingua exploram a perplexidade de forma operacional: um modelo de linguagem auxiliar de menor porte calcula a perplexidade de cada token no prompt original. Tokens com baixa perplexidade são considerados altamente previsíveis — e, portanto, de baixa informatividade — tornando-se candidatos prioritários para remoção. Tokens com alta perplexidade são interpretados como informativamente densos e são preferencialmente preservados. Essa heurística alinha-se diretamente com os princípios de Shannon: remover os elementos mais previsíveis maximiza a densidade informacional do prompt comprimido."
+  },
+  {
+    "type": "p",
+    "text": "É importante distinguir dois sentidos de perplexidade no contexto da compressão: a perplexidade do token no prompt original, que orienta a seleção dos tokens a remover, e a perplexidade da resposta gerada pelo LLM alvo após a compressão, que funciona como indicador de qualidade da compressão realizada. Sistemas bem projetados buscam minimizar o aumento da segunda enquanto maximizam a taxa de compressão medida pela primeira."
+  },
+  {
+    "type": "h1",
+    "text": "5 IMPACTO COMPUTACIONAL DOS TOKENS"
+  },
+  {
+    "type": "h2",
+    "text": "5.1 Complexidade Quadrática do Mecanismo de Atenção"
+  },
+  {
+    "type": "p",
+    "text": "A complexidade quadrática do mecanismo de self-attention é o principal fator que torna a redução do número de tokens uma alavanca de otimização de alto impacto. Para um prompt de n tokens, o mecanismo de atenção requer O(n²) operações de produto interno para calcular as matrizes de scores de atenção. Isso significa que dobrar o comprimento de um prompt quadruplica o custo das operações de atenção, e reduzi-lo à metade reduz esse custo em 75%. Essa não-linearidade amplifica desproporcionalmente os ganhos de qualquer técnica capaz de reduzir o comprimento efetivo da sequência processada."
+  },
+  {
+    "type": "p",
+    "text": "Para ilustrar a magnitude prática desse efeito: um prompt reduzido de 1.000 para 250 tokens — uma taxa de compressão de 4x — gera uma redução de aproximadamente 93,75% nos cálculos de atenção [(250² / 1000²) = 0,0625]. Além das operações de atenção, a redução de tokens impacta positivamente o uso de memória KV-cache, a largura de banda de memória GPU, o tempo de prefill durante a inicialização da geração e o consumo de energia ao longo de toda a cadeia de inferência."
+  },
+  {
+    "type": "p",
+    "text": "Em sistemas de inferência contínua com muitos usuários simultâneos, como APIs comerciais de LLMs, esses ganhos se traduzem diretamente em maior throughput, menor latência por requisição e redução de custos de infraestrutura. Organizações que processam milhões de requisições diárias podem observar economias substanciais simplesmente pela aplicação sistemática de compressão de prompts em sua camada de preparação de entradas."
+  },
+  {
+    "type": "h2",
+    "text": "5.2 Custos Financeiros em APIs Comerciais"
+  },
+  {
+    "type": "p",
+    "text": "O modelo de precificação predominante entre fornecedores de APIs de LLMs é baseado em contagem de tokens. OpenAI, Anthropic, Google e demais provedores cobram separadamente pelos tokens de entrada (input tokens, correspondentes ao prompt) e pelos tokens de saída (output tokens, correspondentes à resposta gerada). Em modelos de fronteira, os preços de entrada variam tipicamente entre US$ 2,50 e US$ 15,00 por milhão de tokens, com os tokens de saída frequentemente precificados a valores duas a três vezes superiores."
+  },
+  {
+    "type": "p",
+    "text": "Nesse modelo econômico, a compressão de prompts impacta diretamente o custo financeiro de qualquer aplicação baseada em LLMs. Uma taxa de compressão de 4x no prompt de entrada reduz proporcionalmente o custo de inferência da componente de input em 75%. Para sistemas em produção que processam volumes elevados, a economia acumulada pode ser expressiva. Considere um sistema que processa 1 milhão de prompts por dia com comprimento médio de 1.000 tokens, utilizando um modelo precificado a US$ 10 por milhão de tokens de entrada: o custo diário de entrada é de US$ 10.000. Aplicando compressão de 4x, esse custo cai para US$ 2.500, uma economia de US$ 7.500 por dia ou US$ 2,7 milhões por ano."
+  },
+  {
+    "type": "p",
+    "text": "Esse cálculo, embora simplificado, demonstra que a compressão de prompts não é apenas uma otimização técnica, mas uma decisão estratégica de negócios com impacto mensurável na estrutura de custos de produtos baseados em IA. A democratização dessas técnicas pode ainda reduzir a barreira de entrada para organizações de menor porte que, de outra forma, seriam inviabilizadas pelos custos de inferência em escala."
+  },
+  {
+    "type": "h1",
+    "text": "6 MÉTODOS DE COMPRESSÃO DE PROMPTS"
+  },
+  {
+    "type": "h2",
+    "text": "6.1 LLMLingua e LLMLingua‑2"
+  },
+  {
+    "type": "p",
+    "text": "O LLMLingua, proposto por Jiang et al. (2023), representa o trabalho inaugural da linha de compressão de prompts baseada em perplexidade e tornou-se referência central da área. Sua arquitetura utiliza um modelo de linguagem auxiliar de menor porte — como o Llama-2 7B ou similares — para calcular a perplexidade de cada token no prompt original, sem necessidade de acesso aos pesos do modelo alvo. A abordagem é dividida em dois estágios sequenciais que operam em granularidades distintas."
+  },
+  {
+    "type": "p",
+    "text": "No primeiro estágio, denominado coarse-grained compression (compressão de granularidade grossa), o algoritmo opera no nível de frases e segmentos lógicos do prompt, identificando e removendo unidades completas de texto que contribuem pouco para a informação geral da instrução. Esse estágio é particularmente eficaz em prompts de few-shot learning, onde exemplos completos de menor relevância podem ser eliminados sem degradação perceptível. No segundo estágio, denominado fine-grained compression (compressão de granularidade fina), o algoritmo opera no nível de tokens individuais, aplicando um orçamento de compressão por segmento para preservar os tokens de maior perplexidade dentro de cada parte do prompt."
+  },
+  {
+    "type": "p",
+    "text": "O LLMLingua‑2, publicado por Pan et al. (2024), reformulou o problema de compressão como uma tarefa de classificação binária supervisionada. Em vez de utilizar perplexidade como proxy de relevância, o LLMLingua‑2 treina um classificador dedicado sobre dados anotados para distinguir tokens que devem ser preservados dos que devem ser removidos. Essa abordagem apresenta vantagens práticas significativas: maior velocidade de inferência durante a compressão (já que o classificador é mais leve que um modelo de linguagem completo), melhor generalização para diferentes tipos de prompt e desempenho superior em benchmarks de qualidade semântica pós-compressão, especialmente em regime de altas taxas de compressão."
+  },
+  {
+    "type": "h2",
+    "text": "6.2 LongLLMLingua"
+  },
+  {
+    "type": "p",
+    "text": "O LongLLMLingua foi desenvolvido especificamente para endereçar as limitações dos métodos anteriores em contextos de prompts muito longos e aplicações de Retrieval- Augmented Generation (RAG). Enquanto o LLMLingua original trata todos os segmentos do prompt de forma relativamente uniforme, o LongLLMLingua introduz um mecanismo de compressão sensível à pergunta do usuário: os segmentos do prompt são priorizados com base em sua relevância para a consulta específica que o LLM deverá responder."
+  },
+  {
+    "type": "p",
+    "text": "Esse ajuste tem implicações profundas para sistemas RAG, nos quais o prompt frequentemente combina uma instrução de sistema, múltiplos documentos recuperados de bases de conhecimento e a pergunta do usuário. O LongLLMLingua identifica os trechos dos documentos recuperados que são semanticamente mais relevantes para a pergunta e aplica taxas de compressão diferenciadas: trechos altamente relevantes são preservados com maior fidelidade, enquanto trechos de baixa relevância são agressivamente comprimidos ou eliminados. Experimentos publicados demonstram que essa estratégia pode inclusive melhorar a qualidade das respostas ao eliminar ruído informacional que distrai o modelo dos elementos relevantes."
+  },
+  {
+    "type": "h2",
+    "text": "6.3 Selective Context e AutoCompressor"
+  },
+  {
+    "type": "p",
+    "text": "O Selective Context, proposto por Li et al. (2023), adota uma perspectiva complementar às abordagens baseadas em perplexidade de token. O método opera em nível de frases e parágrafos, avaliando a informação mútua entre segmentos do prompt e removendo aqueles com menor contribuição informacional para o contexto geral. Sua principal vantagem reside na simplicidade computacional e na interpretabilidade: os segmentos eliminados são unidades linguísticas completas, tornando o prompt resultante mais coeso e legível do que os produzidos por métodos de compressão a nível de token."
+  },
+  {
+    "type": "p",
+    "text": "O AutoCompressor, desenvolvido por Chevalier et al. (2023), representa uma abordagem fundamentalmente diferente das demais: em vez de remover tokens do prompt original, ele utiliza um mecanismo de soft tokens e representações latentes comprimidas. O modelo é fine-tuned para condensar um segmento longo de texto em um conjunto reduzido de vetores que encapsulam a informação semântica essencial. Esses vetores são então passados como prefixo do prompt efetivo, substituindo o texto original por uma representação densa."
+  },
+  {
+    "type": "p",
+    "text": "A principal limitação do AutoCompressor é sua dependência de acesso direto aos pesos do modelo alvo e a necessidade de fine-tuning específico, o que o torna inadequado para uso com APIs fechadas. Contudo, em cenários onde esses requisitos são satisfeitos — como deployments privados de modelos open-source — o AutoCompressor pode alcançar taxas de compressão superiores às dos métodos lexicais com menor degradação semântica, especialmente para tarefas que dependem fortemente de contexto de longo alcance."
+  },
+  {
+    "type": "h1",
+    "text": "7 COMPRESSÃO EM SISTEMAS RAG"
+  },
+  {
+    "type": "p",
+    "text": "Retrieval-Augmented Generation (RAG) é um paradigma arquitetural que combina recuperação de informações de bases de conhecimento externas com geração textual por LLMs. Introduzido por Lewis et al. (2020), o RAG surgiu como solução para as limitações de LLMs estáticos em tarefas que exigem conhecimento atualizado ou especializado: em vez de depender exclusivamente do conhecimento codificado nos pesos durante o treinamento, o modelo é alimentado com documentos relevantes recuperados dinamicamente em tempo de inferência."
+  },
+  {
+    "type": "p",
+    "text": "A arquitetura típica de um sistema RAG consiste em três componentes principais: um indexador que processa e armazena documentos em uma base vetorial, um recuperador que identifica os documentos mais relevantes para uma consulta específica por meio de similaridade semântica, e um gerador que integra os documentos recuperados ao prompt e produz a resposta final. O prompt efetivo enviado ao LLM tipicamente concatena uma instrução de sistema, os documentos recuperados e a pergunta do usuário, resultando em sequências que frequentemente alcançam dezenas de milhares de tokens."
+  },
+  {
+    "type": "p",
+    "text": "Esse volume elevado de tokens tem consequências diretas sobre custo e desempenho. Em sistemas RAG em produção, os custos de inferência são dominados pelos tokens de entrada, que incluem os documentos recuperados. Um sistema que recupera dez documentos de 500 tokens cada processa 5.000 tokens apenas de contexto por requisição. Aplicando uma taxa de compressão de 4x sobre os documentos recuperados, esse número cai para 1.250 tokens, reduzindo o custo de entrada em 75% e diminuindo significativamente a latência de prefill."
+  },
+  {
+    "type": "p",
+    "text": "O LongLLMLingua demonstrou que a compressão orientada pela pergunta em sistemas RAG não apenas reduz custos, mas pode melhorar a qualidade das respostas. Em benchmarks de pergunta e resposta sobre documentos longos, como HotpotQA e NaturalQuestions, o método obteve ganhos de precisão em relação ao baseline sem compressão, evidenciando que a remoção de ruído informacional pode aumentar o sinal relevante para o modelo. Esse resultado contraintuitivo tem implicações práticas importantes: a compressão não precisa ser tratada apenas como um trade-off entre custo e qualidade, mas pode configurar uma situação de ganha-ganha quando bem aplicada."
+  },
+  {
+    "type": "p",
+    "text": "É importante, contudo, reconhecer os limites dessa abordagem. Para tarefas que exigem síntese de informações distribuídas por múltiplos documentos ou raciocínio sobre relações entre segmentos distantes, a compressão agressiva pode eliminar conexões contextuais essenciais. A determinação da taxa ótima de compressão para cada tipo de tarefa em sistemas RAG permanece um problema aberto, com pesquisas ativas buscando métodos adaptativos que calibrem o nível de compressão com base na complexidade da consulta."
+  },
+  {
+    "type": "h1",
+    "text": "8 AVALIAÇÃO SEMÂNTICA COM BERTSCORE"
+  },
+  {
+    "type": "p",
+    "text": "A avaliação rigorosa da qualidade de sistemas de compressão de prompts exige métricas capazes de capturar equivalência semântica entre respostas geradas com e sem compressão. Métricas tradicionais de geração de texto, como BLEU (Papineni et al., 2002) e ROUGE (Lin, 2004), foram projetadas originalmente para avaliação de tradução automática e sumarização, respectivamente. Ambas dependem da sobreposição lexical entre a hipótese e a referência — contagem de n-gramas coincidentes — o que as torna inadequadas para cenários onde respostas semanticamente equivalentes diferem substancialmente em escolha lexical."
+  },
+  {
+    "type": "p",
+    "text": "O BERTScore, proposto por Zhang et al. (2020), representa um avanço metodológico significativo para avaliação semântica. O método utiliza representações contextuais geradas por modelos BERT pré-treinados para calcular a similaridade entre tokens das respostas candidata e de referência. Diferentemente das métricas lexicais, o BERTScore captura equivalência semântica mesmo quando palavras diferentes são utilizadas para expressar o mesmo conceito, tornando-o especialmente adequado para avaliação de compressão."
+  },
+  {
+    "type": "p",
+    "text": "Formalmente, o BERTScore calcula três métricas complementares: precisão (P), cobertura (R) e F1. Para cada token da resposta candidata, calcula-se o máximo de similaridade cossenoidal com qualquer token da resposta de referência, usando os embeddings contextuais do BERT. A precisão mede a qualidade da candidata; a cobertura mede quão completamente a candidata captura a referência; e o F1 representa a média harmônica das duas. Na literatura de compressão de prompts, o BERTScore F1 consolidou-se como o indicador de referência para qualidade semântica, adotando-se o limiar crítico de 0,80 como piso de aceitação acadêmica para modelos compactos sob poda severa e valores acima de 0,85 como faixa de excelência para aplicações corporativas."
+  },
+  {
+    "type": "p",
+    "text": "Estudos comparativos entre os principais métodos de compressão utilizando BERTScore revelam padrões consistentes. Em taxas de compressão de até 2x, praticamente todos os métodos mantêm BERTScore acima de 0,90, com degradação semântica imperceptível para avaliadores humanos. Em taxas de 4x, métodos orientados por perplexidade como LLMLingua mantêm tipicamente F1 entre 0,85 e 0,88, enquanto o LLMLingua‑2 alcança valores consistentemente superiores a 0,87 devido ao treinamento supervisionado. Para taxas acima de 6x, todos os métodos apresentam degradação crescente, com quedas mais acentuadas em tarefas que exigem raciocínio preciso sobre detalhes específicos do contexto."
+  },
+  {
+    "type": "h1",
+    "text": "9 SUSTENTABILIDADE E GREEN AI"
+  },
+  {
+    "type": "p",
+    "text": "O impacto ambiental do treinamento e da inferência de LLMs tornou-se uma das principais preocupações do campo desde meados da década de 2020. Strubell et al. (2019) foram pioneiros na quantificação desse impacto ao demonstrar que o treinamento de modelos de linguagem de grande escala pode emitir o equivalente a cinco vezes as emissões de carbono ao longo de toda a vida útil de um automóvel. Embora estudos subsequentes tenham debatido as metodologias específicas, o consenso acadêmico é inequívoco: a escala crescente dos modelos tem implicações ambientais que não podem ser ignoradas."
+  },
+  {
+    "type": "p",
+    "text": "Patterson et al. (2021), em estudo publicado em colaboração com pesquisadores do Google, estimaram que o treinamento do GPT-3 consumiu aproximadamente 1.287 MWh de energia elétrica, com emissões de CO₂ estimadas entre 502 e 552 toneladas, dependendo da fonte energética utilizada pelo datacenter. Para modelos da geração seguinte, como o GPT-4, as estimativas públicas sugerem custos energéticos e de carbono ainda mais elevados, embora dados precisos não sejam divulgados pelos provedores."
+  },
+  {
+    "type": "p",
+    "text": "O movimento Green AI, popularizado por Schwartz et al. (2020), propõe que a eficiência computacional seja incorporada como critério primário de avaliação do progresso em IA, ao lado das métricas de desempenho em tarefas. O argumento central é que o foco exclusivo em ganhos de performance, sem consideração pelo custo computacional associado, cria incentivos perversos que levam ao crescimento insustentável da demanda energética do setor. A compressão de prompts encaixa-se naturalmente nessa agenda por reduzir o número de operações realizadas em inferência sem exigir modificações no modelo ou novos processos de treinamento."
+  },
+  {
+    "type": "p",
+    "text": "A economia energética gerada pela compressão de prompts é diretamente proporcional à redução de tokens. Considerando que o consumo energético da atenção escala com O(n²), uma redução de 4x no comprimento do prompt pode resultar em economia de até 93,75% nas operações de atenção, com impacto correspondente no consumo de energia durante a fase de prefill. Para operações de geração de tokens (decoding), onde a complexidade é O(n) por passo, a economia é menor mas ainda significativa, especialmente em prompts longos onde o cache de chave-valor ocupa parcela expressiva da memória."
+  },
+  {
+    "type": "p",
+    "text": "É relevante, contudo, discutir o Paradoxo de Jevons no contexto da eficiência em IA. O paradoxo, originalmente formulado pelo economista William Stanley Jevons em 1865 no contexto da eficiência de máquinas a vapor, postula que aumentos de eficiência em uma tecnologia frequentemente levam ao aumento do seu consumo total, pois a redução de custo estimula maior demanda. No campo da IA, esse fenômeno já é observável: a redução de custos de inferência proporcionada por modelos mais eficientes e técnicas de otimização tem impulsionado a proliferação de aplicações e o aumento do volume de requisições, potencialmente compensando parte da economia energética obtida por requisição individual."
+  },
+  {
+    "type": "h1",
+    "text": "10 RESULTADOS E DISCUSSÃO"
+  },
+  {
+    "type": "p",
+    "text": "A análise sistemática da literatura sobre compressão de prompts para LLMs revela um panorama consolidado em relação às taxas de compressão e seus impactos sobre qualidade semântica. Os resultados convergem em torno de um perfil consistente: taxas moderadas de compressão oferecem excelente relação entre redução de custo e preservação de qualidade, enquanto taxas extremas comprometem progressivamente a integridade das respostas."
+  },
+  {
+    "type": "p",
+    "text": "Compressões de 2x (50% de redução de tokens) apresentam degradação semântica praticamente imperceptível em praticamente todos os benchmarks avaliados. O BERTScore F1 para esse nível de compressão tipicamente excede 0,90, e avaliações humanas raramente identificam diferenças de qualidade entre respostas geradas com e sem compressão. Essa faixa"
+  }
+]

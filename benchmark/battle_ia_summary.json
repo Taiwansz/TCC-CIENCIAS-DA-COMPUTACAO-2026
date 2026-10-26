@@ -1,0 +1,73 @@
+{
+  "total_records": 18,
+  "successful_records": 11,
+  "failed_records": 7,
+  "aggregated_by_model_and_technique": [
+    {
+      "model_id": "z-ai/glm-5.3",
+      "technique": "zero_shot",
+      "samples_count": 3,
+      "mean_latency_ms": 21862.31,
+      "std_latency_ms": 10742.41,
+      "mean_prompt_tokens": 318.0,
+      "mean_completion_tokens": 967.0,
+      "mean_compression_ratio": 0.88,
+      "total_cost_usd": 0.004828
+    },
+    {
+      "model_id": "z-ai/glm-5.3",
+      "technique": "few_shot",
+      "samples_count": 2,
+      "mean_latency_ms": 13740.33,
+      "std_latency_ms": 842.02,
+      "mean_prompt_tokens": 221.5,
+      "mean_completion_tokens": 887.0,
+      "mean_compression_ratio": 1.46,
+      "total_cost_usd": 0.002883
+    },
+    {
+      "model_id": "z-ai/glm-5.3",
+      "technique": "compressed_llmlingua",
+      "samples_count": 3,
+      "mean_latency_ms": 23277.35,
+      "std_latency_ms": 9870.5,
+      "mean_prompt_tokens": 121.0,
+      "mean_completion_tokens": 963.0,
+      "mean_compression_ratio": 2.34,
+      "total_cost_usd": 0.004515
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-flash-0731",
+      "technique": "zero_shot",
+      "samples_count": 1,
+      "mean_latency_ms": 35167.97,
+      "std_latency_ms": 0.0,
+      "mean_prompt_tokens": 355.0,
+      "mean_completion_tokens": 676.0,
+      "mean_compression_ratio": 0.86,
+      "total_cost_usd": 0.000612
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-flash-0731",
+      "technique": "few_shot",
+      "samples_count": 1,
+      "mean_latency_ms": 56576.52,
+      "std_latency_ms": 0.0,
+      "mean_prompt_tokens": 189.0,
+      "mean_completion_tokens": 564.0,
+      "mean_compression_ratio": 1.62,
+      "total_cost_usd": 0.000489
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-flash-0731",
+      "technique": "compressed_llmlingua",
+      "samples_count": 1,
+      "mean_latency_ms": 38014.17,
+      "std_latency_ms": 0.0,
+      "mean_prompt_tokens": 113.0,
+      "mean_completion_tokens": 673.0,
+      "mean_compression_ratio": 2.72,
+      "total_cost_usd": 0.000561
+    }
+  ]
+}
