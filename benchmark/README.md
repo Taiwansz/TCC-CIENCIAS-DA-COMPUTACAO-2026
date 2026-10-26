@@ -21,9 +21,9 @@ A Bancada Experimental Battle IA foi concebida para quantificar em ambiente real
 
 A bancada foi submetida a tres cenarios de alta complexidade tecnica em engenharia de software e ciencia da computacao:
 
-1. **Caso 1 — Engenharia de Dados & SQL (DDL e Query Complexa):** Esquema relacional com 4 tabelas, restricoes de integridade e requisitos analiticos.
-2. **Caso 2 — Auditoria Regulatoria & Seguranca (LGPD / Art. 46):** Politica de conformidade corporativa para deteccao de vulnerabilidades e fluxo de dados.
-3. **Caso 3 — Arquitetura de Sistemas Distribuidos (Consenso Raft & Concorrencia):** Diagnostico de particionamento de rede (*Split-Brain*), quorum e eleicao de lider.
+1. **Caso 1 — Raciocinio em Sistemas Distribuidos (Consenso Raft & Concorrencia):** Diagnostico de particionamento de rede (*Split-Brain*), quorum e eleicao de lider.
+2. **Caso 2 — Engenharia de Dados & SQL sob DDL:** Esquema relacional em 3FN com 4 tabelas, restricoes de integridade, Common Table Expressions (CTE) e Window Functions (`DENSE_RANK()`).
+3. **Caso 3 — Governanca e Auditoria Regulatoria (LGPD):** Auditoria juridico-tecnica sobre telemetria de IP (Legitimo Interesse, Art. 7, IX) versus biometria facial (Dado Sensivel, Art. 5, II e Art. 11).
 
 ---
 

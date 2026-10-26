@@ -64,19 +64,19 @@ Empirical evaluations conducted on the **Meta Llama 3.2 11B Vision Instruct** mo
 Os dados abaixo foram extraidos diretamente da execucao real via streaming SSE sobre o cluster NVIDIA NIM (`benchmark/battle_ia_resultados_brutos.json`):
 
 | Dominio / Caso de Teste | Tecnica Avaliada | Tokens Entrada | Tokens Saida | TTFT (ms) | Tempo Total (s) | BERTScore F1 | Reducao FLOPs O(n²) | Custo Lote (100k req) |
-|---|---|---|---|---|---|---|---|---|
-| **Caso 1: SQL & DDL** | Zero-shot | 200 | 171 | 754.2 ms | 3.51 s | 0.8144 | 0.0% (Ref.) | US$ 316.50 |
-| | Few-shot | 387 | 158 | 703.1 ms | 3.21 s | 0.8653 | -274.5% | US$ 353.10 |
-| | TokLang 2x | 239 | 179 | 583.5 ms | 3.42 s | 0.8359 | -42.8% | US$ 340.20 |
-| | **TokLang 4x** | **165** | 163 | **636.7 ms** | 3.32 s | **0.8524** | **+31.9%** | **US$ 294.00** |
-| **Caso 2: LGPD Art. 46** | Zero-shot | 208 | 199 | 569.1 ms | 3.73 s | 0.7916 | 0.0% (Ref.) | US$ 360.90 |
-| | Few-shot | 396 | 185 | 693.3 ms | 3.65 s | 0.8406 | -262.5% | US$ 396.30 |
-| | TokLang 2x | 244 | 183 | 682.3 ms | 3.53 s | 0.8378 | -37.4% | US$ 347.70 |
-| | **TokLang 4x** | **169** | 190 | **538.0 ms** | 3.55 s | **0.8279** | **+34.0%** | **US$ 335.70** |
-| **Caso 3: Sistemas Dist.** | Zero-shot | 196 | 321 | 4330.1 ms | 7.97 s | 0.7963 | 0.0% (Ref.) | US$ 540.30 |
-| | Few-shot | 369 | 203 | 821.3 ms | 4.14 s | 0.8374 | -254.4% | US$ 415.20 |
-| | TokLang 2x | 230 | 258 | 830.4 ms | 5.09 s | 0.8166 | -37.5% | US$ 456.00 |
-| | **TokLang 4x** | **171** | 207 | **588.6 ms** | 3.99 s | **0.7912** | **+24.0%** | **US$ 361.80** |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| **Caso 1: Sistemas Distribuidos (Raft)** | Few-shot (Baseline) | 340 | 260 | 585.2 ms | 7.05 s | 0.8105 | Baseline (0.0%) | US$ 492.00 |
+| | Zero-shot | 262 | 260 | 536.7 ms | 5.62 s | 0.8115 | 40.6% | US$ 468.60 |
+| | TokLang 2x | 206 | 260 | 914.3 ms | 7.48 s | 0.7917 | 63.3% | US$ 451.80 |
+| | **TokLang 4x** | **149** | **260** | **538.0 ms** | **17.96 s** | **0.7912** | **80.8%** | **US$ 434.70** |
+| **Caso 2: Engenharia de Dados (SQL & DDL)** | Few-shot (Baseline) | 434 | 260 | 548.0 ms | 6.59 s | 0.8922 | Baseline (0.0%) | US$ 520.20 |
+| | Zero-shot | 361 | 260 | 2032.7 ms | 13.91 s | 0.8786 | 30.8% | US$ 498.30 |
+| | TokLang 2x | 267 | 260 | 611.4 ms | 9.22 s | 0.8623 | 62.2% | US$ 470.10 |
+| | **TokLang 4x** | **185** | **260** | **636.7 ms** | **6.65 s** | **0.8524** | **81.8%** | **US$ 445.50** |
+| **Caso 3: Governanca de Dados (LGPD)** | Few-shot (Baseline) | 378 | 260 | 711.6 ms | 7.16 s | 0.7916 | Baseline (0.0%) | US$ 503.40 |
+| | Zero-shot | 305 | 260 | 4418.7 ms | 18.33 s | 0.7955 | 34.9% | US$ 481.50 |
+| | TokLang 2x | 230 | 260 | 1344.7 ms | 9.54 s | 0.8037 | 63.0% | US$ 459.00 |
+| | **TokLang 4x** | **171** | **260** | **548.2 ms** | **12.89 s** | **0.8279** | **79.5%** | **US$ 441.30** |
 
 ---
 
@@ -139,7 +139,7 @@ TCC-CIENCIAS-DA-COMPUTACAO-2026/
     ├── figura_10_2_latencia_ttft.png   # Comparativo de TTFT e tempo total de resposta
     ├── figura_10_3_bertscore_f1.png    # BERTScore F1 vs Compressao (limiar 0.80)
     ├── figura_10_4_custo_flops.png     # Reducao de FLOPs O(n²) e projecao financeira
-    └── dashboard_executivo_battle_ia.png # Painel sintetico consolidado da bancada
+    └── painel_consolidado_battle_ia.png # Painel sintetico consolidado da bancada
 ```
 
 ---
