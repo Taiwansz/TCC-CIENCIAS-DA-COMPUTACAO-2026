@@ -1,6 +1,13 @@
 # Documentacao Oficial e Manuscrito do TCC II
 
-Este diretorio contem a monografia completa, bibliografia auditada e o pipeline automatizado de compilacao ABNT.
+> **Centro Universitario Max Planck (UniMAX) — Bacharelado em Ciencia da Computacao (2026)**  
+> **Tema:** Compressao de Prompts, Otimizacao de Tokens e Sustentabilidade da IA  
+> **Autores:**  
+> - Matheus Sousa dos Santos (RA: 52319400)  
+> - Felipe Guarnieri Pinete (RA: 52319337)  
+> - Guilherme Gustavo Weber (RA: 52420339)  
+> - Juan Pedro (RA: 52319411)  
+> **Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
 
 ---
 
@@ -14,7 +21,20 @@ Este diretorio contem a monografia completa, bibliografia auditada e o pipeline 
 
 ---
 
-## 2. Pipeline Automatizado de Compilacao (`pipeline/`)
+## 2. Divisao de Responsabilidades na Bancada e Monografia
+
+* **Matheus Sousa dos Santos (RA: 52319400) — Dev Core & Pipeline de Testes:**
+  * Engenharia do compilador TokLang, automacao dos testes contra a API NVIDIA NIM e medicao de telemetria HTTPS SSE.
+* **Felipe Guarnieri Pinete (RA: 52319337) — Engenharia de Prompt & Avaliacao Semantica:**
+  * Formalizacao dos prompts tecnicos (Zero-shot, Few-shot e TokLang) e auditoria de fidelidade semantica via BERTScore Proxy F1.
+* **Guilherme Gustavo Weber (RA: 52420339) — Tabulacao de Dados & Figuras Cientificas:**
+  * Tabulacao dos dados brutos, geracao dos graficos a 300 DPI (tokens, TTFT, BERTScore e custos) e formatacao de estilo ABNT.
+* **Juan Pedro (RA: 52319411) — Pesquisa, Problematizacao & Green AI:**
+  * Fundamentacao teorica de Teoria da Informacao (Shannon), analise de sustentabilidade (Green AI) e redacao analitica das conclusoes.
+
+---
+
+## 3. Pipeline Automatizado de Compilacao (`pipeline/`)
 
 A monografia foi estruturada atraves de um pipeline deterministico em Python:
 

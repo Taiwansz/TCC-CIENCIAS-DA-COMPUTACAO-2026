@@ -1,8 +1,14 @@
-# TokLang: Compilador e Bancada Experimental de Otimizacao de Prompts, Compressao de Tokens e Sustentabilidade Computacional em LLMs
+# TCC Ciencia da Computacao 2026: Compressao de Prompts, Otimizacao de Tokens e Sustentabilidade Computacional em LLMs
 
 > **Repositorio Oficial de Artefatos, Codigo-Fonte, Bancada Empirica e Manuscrito do Trabalho de Conclusao de Curso (TCC II)**  
 > **Centro Universitario Max Planck (UniMAX) — Bacharelado em Ciencia da Computacao (2026)**  
-> **Autor:** Matheus Sousa dos Santos (RA: 52319400)  
+> 
+> **Autores:**  
+> - **Matheus Sousa dos Santos** (RA: 52319400)  
+> - **Felipe Guarnieri Pinete** (RA: 52319337)  
+> - **Guilherme Gustavo Weber** (RA: 52420339)  
+> - **Juan Pedro** (RA: 52319411)  
+> 
 > **Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
 
 ---
@@ -15,7 +21,18 @@
 
 ---
 
-## 1. Resumo Executivo
+## 1. Integrantes e Divisao de Responsabilidades
+
+| Integrante | RA | Frente Principal de Atuacao | Entregaveis e Responsabilidades |
+|---|---|---|---|
+| **Matheus Sousa dos Santos** | 52319400 | Dev Core, Compilador & Pipeline | Engenharia da arquitetura do compilador TokLang, automacao dos scripts de inferencia na nuvem NVIDIA NIM e medicao HTTPS SSE streaming. |
+| **Felipe Guarnieri Pinete** | 52319337 | Engenharia de Prompt & Avaliacao | Modelagem das tecnicas tecnicas de prompting (Zero-shot, Few-shot e TokLang), analise semantica e calculo de BERTScore Proxy F1. |
+| **Guilherme Gustavo Weber** | 52420339 | Ciencia de Dados & Visualizacao | Tabulacao dos dados brutos em CSV/JSON, plotagem das figuras cientificas a 300 DPI e padronizacao das normas graficas ABNT. |
+| **Juan Pedro** | 52319411 | Pesquisa, Fundamentacao & Green AI | Pesquisa teorica sobre Teoria da Informacao (Shannon), analise de sustentabilidade energetica (Green AI) e redacao analitica de conclusao. |
+
+---
+
+## 2. Resumo Executivo
 
 O aumento exponencial das janelas de contexto nos Modelos de Linguagem de Grande Porte (*Large Language Models* — LLMs) transferiu o gargalo computacional das aplicacoes inteligentes para a fase de *prefill* do mecanismo de autoatencao, cuja complexidade computacional e quadratica $O(n^2)$ em relacao a quantidade de tokens de entrada. Em pipelines corporativos e sistemas de geracao aumentada por recuperacao (*Retrieval-Augmented Generation* — RAG), o envio rotineiro de contextos verbosos, esquemas relacionais integrais e historicos de conversa acarreta degradacao acentuada da latencia de primeiro token (*Time-to-First-Token* — TTFT), custos financeiros proibitivos e consumo energetico desproporcional.
 
@@ -31,7 +48,7 @@ Experimentos conduzidos em ambiente real de nuvem utilizando o modelo **Meta Lla
 
 ---
 
-## 2. Abstract
+## 3. Abstract
 
 The exponential growth of context windows in Large Language Models (LLMs) has shifted the computational bottleneck of intelligent applications to the prefill phase of the self-attention mechanism, characterized by quadratic computational complexity $O(n^2)$ relative to the input sequence length. In enterprise pipelines and Retrieval-Augmented Generation (RAG) architectures, the recurring transmission of verbose documentation, database schemas, and dialogue history leads to substantial degradation of Time-to-First-Token (TTFT), prohibitive operational costs, and disproportionate energy dissipation.
 
@@ -41,7 +58,7 @@ Empirical evaluations conducted on the **Meta Llama 3.2 11B Vision Instruct** mo
 
 ---
 
-## 3. Tabela Consolidada de Evidencias Empiricas
+## 4. Tabela Consolidada de Evidencias Empiricas
 
 Os dados abaixo foram extraidos diretamente da execucao real via streaming SSE sobre o cluster NVIDIA NIM (`benchmark/battle_ia_resultados_brutos.json`):
 
@@ -62,12 +79,12 @@ Os dados abaixo foram extraidos diretamente da execucao real via streaming SSE s
 
 ---
 
-## 4. Estrutura do Repositorio
+## 5. Estrutura do Repositorio
 
 ```
-TokLang-TCC/
-├── README.md                           # Visao geral, resultados, reproducao e BibTeX
-├── LICENSE                             # Licenca de codigo aberto MIT (Matheus Santos, 2026)
+TCC-CIENCIAS-DA-COMPUTACAO-2026/
+├── README.md                           # Visao geral, resultados, integrantes, reproducao e BibTeX
+├── LICENSE                             # Licenca de codigo aberto MIT (2026)
 ├── requirements.txt                    # Dependencias Python exatas para reproducao
 ├── .gitignore                          # Regras de exclusao de arquivos e credenciais
 ├── .env.example                        # Modelo de configuracao para chave da NVIDIA NIM
@@ -112,13 +129,13 @@ TokLang-TCC/
 
 ---
 
-## 5. Como Reproduzir os Experimentos
+## 6. Como Reproduzir os Experimentos
 
-### 5.1. Clonagem e Instalacao de Dependencias
+### 6.1. Clonagem e Instalacao de Dependencias
 
 ```bash
-git clone https://github.com/Taiwansz/TokLang-TCC.git
-cd TokLang-TCC
+git clone https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026.git
+cd TCC-CIENCIAS-DA-COMPUTACAO-2026
 
 python -m venv venv
 # Windows
@@ -129,7 +146,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5.2. Compilacao de Prompts via TokLang Engine
+### 6.2. Compilacao de Prompts via TokLang Engine
 
 ```python
 from engine import TokLangLexer, TokLangParser, TokLangCompiler
@@ -159,7 +176,7 @@ print("Prompt Otimizado:", prompt_otimizado.text)
 print("Tokens Estimados:", prompt_otimizado.token_count)
 ```
 
-### 5.3. Execucao da Bancada Experimental (Requer Chave NVIDIA NIM)
+### 6.3. Execucao da Bancada Experimental (Requer Chave NVIDIA NIM)
 
 ```bash
 # Definir variavel de ambiente
@@ -174,7 +191,7 @@ cd benchmark
 python battle_ia_benchmark.py
 ```
 
-### 5.4. Regeneracao dos Graficos Cientificos
+### 6.4. Regeneracao dos Graficos Cientificos
 
 ```bash
 cd figures
@@ -183,13 +200,13 @@ python generate_tcc_charts.py
 
 ---
 
-## 6. Citacao Academica (BibTeX)
+## 7. Citacao Academica (BibTeX)
 
 Caso utilize este trabalho, dados da bancada ou o compilador TokLang em sua pesquisa ou artigo derivado, utilize a seguinte citacao:
 
 ```bibtex
 @monography{santos2026toklang,
-  author    = {Matheus Sousa dos Santos},
+  author    = {Matheus Sousa dos Santos and Felipe Guarnieri Pinete and Guilherme Gustavo Weber and Juan Pedro},
   title     = {TokLang: Compress{\~a}o de Prompts, Otimiza{\c{c}}{\~a}o de Tokens e Sustentabilidade Computacional em Large Language Models},
   school    = {Centro Universit{\'a}rio Max Planck (UniMAX)},
   year      = {2026},
@@ -197,16 +214,16 @@ Caso utilize este trabalho, dados da bancada ou o compilador TokLang em sua pesq
   type      = {Trabalho de Conclus{\~a}o de Curso (Bacharelado em Ci{\^e}ncia da Computa{\c{c}}{\~a}o)},
   advisor   = {Luiz Claudio Chiavini Oliveira Junior},
   pages     = {30},
-  url       = {https://github.com/Taiwansz/TokLang-TCC}
+  url       = {https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026}
 }
 ```
 
 Formato ABNT NBR 6023:2018:
 
-> SANTOS, Matheus Sousa dos. **TokLang: Compressão de Prompts, Otimização de Tokens e Sustentabilidade Computacional em Large Language Models**. Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior. 2026. 30 f. Trabalho de Conclusão de Curso (Bacharelado em Ciência da Computação) – Centro Universitário Max Planck (UniMAX), Indaiatuba, 2026. Disponível em: <https://github.com/Taiwansz/TokLang-TCC>.
+> SANTOS, Matheus Sousa dos; PINETE, Felipe Guarnieri; WEBER, Guilherme Gustavo; PEDRO, Juan. **TokLang: Compressão de Prompts, Otimização de Tokens e Sustentabilidade Computacional em Large Language Models**. Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior. 2026. 30 f. Trabalho de Conclusão de Curso (Bacharelado em Ciência da Computação) – Centro Universitário Max Planck (UniMAX), Indaiatuba, 2026. Disponível em: <https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026>.
 
 ---
 
-## 7. Licenca
+## 8. Licenca
 
 Este projeto e distribuido sob os termos da licenca **MIT**. Consulte o arquivo [`LICENSE`](LICENSE) para mais detalhes.

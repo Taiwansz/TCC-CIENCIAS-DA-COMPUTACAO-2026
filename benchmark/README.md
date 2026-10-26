@@ -1,5 +1,9 @@
 # Bancada Experimental Battle IA
 
+> **Trabalho de Conclusao de Curso (TCC II) — Ciencia da Computacao (UniMAX 2026)**  
+> **Autores:** Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro  
+> **Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
+
 A Bancada Experimental Battle IA foi concebida para quantificar em ambiente real de nuvem o impacto da compressao algoritmica de prompts frente a tecnicas convencionais de engenharia de prompt (Zero-shot e Few-shot).
 
 ---

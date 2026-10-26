@@ -1,7 +1,7 @@
 """
 =============================================================================
 Bancada Experimental Battle IA Benchmark — TCC II (Ciência da Computação)
-Autor: Matheus Sousa dos Santos (RA: 52319400)
+Autores: Matheus Sousa dos Santos (RA: 52319400), Felipe Guarnieri Pinete (RA: 52319337), Guilherme Gustavo Weber (RA: 52420339), Juan Pedro (RA: 52319411)
 Orientador: Prof. Luiz Claudio Chiavini Oliveira Junior
 Centro Universitário Max Planck (UniMAX) - Indaiatuba, 2026
 =============================================================================
@@ -528,7 +528,7 @@ def executar_bancada(
     print("=" * 80)
     print("      BANCADA EXPERIMENTAL BATTLE IA — TESTES REAIS COM NVIDIA NIM")
     print("      Centro Universitário Max Planck (UniMAX) | Ciência da Computação")
-    print("      Autor: Matheus Sousa dos Santos | Orientador: Prof. Luiz Claudio Chiavini")
+    print("      Autores: Matheus Sousa, Felipe Pinete, Guilherme Weber, Juan Pedro | Orientador: Prof. Luiz Claudio Chiavini")
     print("=" * 80)
     print(f"Modelo Ativo na Nuvem : {modelo}")
     print(f"Endpoint da API       : {NVIDIA_ENDPOINT}")
