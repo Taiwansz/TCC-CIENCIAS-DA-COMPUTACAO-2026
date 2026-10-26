@@ -33,7 +33,7 @@
 
 ---
 
-## 2. Resumo Executivo
+## 2. Resumo do Trabalho
 
 O aumento exponencial das janelas de contexto nos Modelos de Linguagem de Grande Porte (*Large Language Models* — LLMs) transferiu o gargalo computacional das aplicacoes inteligentes para a fase de *prefill* do mecanismo de autoatencao, cuja complexidade computacional e quadratica $O(n^2)$ em relacao a quantidade de tokens de entrada. Em pipelines corporativos e sistemas de geracao aumentada por recuperacao (*Retrieval-Augmented Generation* — RAG), o envio rotineiro de contextos verbosos, esquemas relacionais integrais e historicos de conversa acarreta degradacao acentuada da latencia de primeiro token (*Time-to-First-Token* — TTFT), custos financeiros proibitivos e consumo energetico desproporcional.
 
@@ -139,7 +139,7 @@ TCC-CIENCIAS-DA-COMPUTACAO-2026/
     ├── figura_10_2_latencia_ttft.png   # Comparativo de TTFT e tempo total de resposta
     ├── figura_10_3_bertscore_f1.png    # BERTScore F1 vs Compressao (limiar 0.80)
     ├── figura_10_4_custo_flops.png     # Reducao de FLOPs O(n²) e projecao financeira
-    └── dashboard_executivo_battle_ia.png # Painel executivo consolidado da bancada
+    └── dashboard_executivo_battle_ia.png # Painel sintetico consolidado da bancada
 ```
 
 ---
