@@ -35,9 +35,15 @@ plt.rcParams['grid.linestyle'] = '--'
 plt.rcParams['grid.linewidth'] = 0.5
 
 base_dir = Path(__file__).parent
-out_dir = base_dir.parent / "04 - Figuras"
+out_dir = base_dir
 out_dir.mkdir(parents=True, exist_ok=True)
-json_path = base_dir / "battle_ia_resultados_brutos.json"
+candidatos_json = [
+    base_dir / "battle_ia_resultados_brutos.json",
+    base_dir.parent / "benchmark" / "battle_ia_resultados_brutos.json",
+    Path.cwd() / "benchmark" / "battle_ia_resultados_brutos.json",
+    Path.cwd() / "battle_ia_resultados_brutos.json",
+]
+json_path = next((p for p in candidatos_json if p.exists()), base_dir / "battle_ia_resultados_brutos.json")
 
 # =============================================================================
 # CARGA RIGOROSA DE DADOS REAIS (ZERO FALLBACK)

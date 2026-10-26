@@ -11,20 +11,29 @@
 
 ---
 
-## 1. Arquivos Oficiais de Avaliacao
+## 1. Arquivos Oficiais de Avaliacao e Manuscrito
 
 | Arquivo | Formato | Paginas | Descricao |
 |---|---|---|---|
-| `TCC_II_Monografia_Final_Matheus_Santos.pdf` | PDF (ABNT) | 30 paginas | Manuscrito oficial com 11 capitulos, 4 tabelas dinamicas, 4 figuras cientificas e 21 referencias auditadas. |
-| `TCC_II_Monografia_Final_Matheus_Santos.docx` | DOCX (Word) | 30 paginas | Documento fonte editavel formatado estritamente sob as diretrizes ABNT NBR 14724 e NBR 6023:2018. |
+| `TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf` | PDF (ABNT) | 30 paginas | **Manuscrito Institucional Canonico**: Contem os 11 capitulos completos, 4 tabelas dinamicas extraidas da bancada, 4 figuras cientificas a 300 DPI e 21 referencias auditadas. |
+| `TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx` | DOCX (Word) | 30 paginas | **Documento Fonte Editavel**: Formatado estritamente sob as diretrizes ABNT NBR 14724 e NBR 6023:2018 (margens 3/3/2/2 cm, Arial 12pt, entrelinhas 1,5, recuo 1,25 cm). |
+| `TCC_II.pdf` | PDF (ABNT) | 30 paginas | Espelho rapido de distribuicao da versao homologada. |
+| `TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf` | PDF (ABNT) | 30 paginas | Espelho historico de submissao protocolado no WebTCC no 1o ciclo. |
 | `bibliografia_oficial_auditada_abnt.md` | Markdown | - | 21 referencias seminais com DOIs, links e fundamentacao teorica. |
 
 ---
 
-## 2. Divisao de Responsabilidades na Bancada e Monografia
+## 2. Protocolo de Avaliacao Cega (Banca Virtual Anonima)
 
-* **Matheus Sousa dos Santos (RA: 52319400) — Dev Core & Pipeline de Testes:**
-  * Engenharia do compilador TokLang, automacao dos testes contra a API NVIDIA NIM e medicao de telemetria HTTPS SSE.
+> [!NOTE]  
+> Em estrita conformidade com o Regulamento Institucional de TCC do Centro Universitario Max Planck (UniMAX), a versao em PDF do manuscrito depositada para a Banca Examinadora Virtual e gerada com a **Capa Desidentificada (Avaliacao Cega / Double-Blind Review)**. Esse procedimento assegura a isencao de julgamento e elimina vieses cognitivos na correcao dos avaliadores externos. A autoria de **Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro** e atestada pela plataforma institucional WebTCC e pelo presente repositorio publico.
+
+---
+
+## 3. Divisao de Responsabilidades na Bancada e Monografia
+
+* **Matheus Sousa dos Santos (RA: 52319400) — Dev Core, Compilador & Pipeline:**
+  * Engenharia do compilador deterministico TokLang, automacao dos scripts de inferencia na nuvem NVIDIA NIM e medicao HTTPS SSE streaming em tempo real.
 * **Felipe Guarnieri Pinete (RA: 52319337) — Engenharia de Prompt & Avaliacao Semantica:**
   * Formalizacao dos prompts tecnicos (Zero-shot, Few-shot e TokLang) e auditoria de fidelidade semantica via BERTScore Proxy F1.
 * **Guilherme Gustavo Weber (RA: 52420339) — Tabulacao de Dados & Figuras Cientificas:**
@@ -34,11 +43,11 @@
 
 ---
 
-## 3. Pipeline Automatizado de Compilacao (`pipeline/`)
+## 4. Pipeline Automatizado de Compilacao (`pipeline/`)
 
 A monografia foi estruturada atraves de um pipeline deterministico em Python:
 
-* `build_monograph.py`: Realiza a injecao dos dados brutos experimentais (`benchmark/battle_ia_resultados_brutos.json`) diretamente nas tabelas da monografia e orquestra a formatacao de estilos via Microsoft Word COM em duas passadas para calibracao de sumario e paginacao sem paginas orfas.
+* `build_monograph.py`: Realiza a injecao dos dados brutos experimentais (`benchmark/battle_ia_resultados_brutos.json`) diretamente nas tabelas da monografia e orquestra a formatacao de estilos via Microsoft Word COM em duas passadas para calibracao automatica de sumario e paginacao sem paginas orfas.
 * `structured_ch1_9.json`: Armazena a estrutura integral textual dos Capitulos 1 ao 9.
 * `tcc_humanizer.py`: Motor de auditoria estilistica e densidade textual academica.
 

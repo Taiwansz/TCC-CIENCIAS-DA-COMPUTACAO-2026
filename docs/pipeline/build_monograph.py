@@ -164,7 +164,9 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         r_s.font.size = Pt(9)
         r_s.font.italic = True
 
-    figs_dir = Path(__file__).parent.parent / "04 - Figuras"
+    pipeline_dir = Path(__file__).resolve().parent
+    repo_root = pipeline_dir.parent.parent
+    figs_dir = repo_root / "figures" if (repo_root / "figures").exists() else pipeline_dir.parent / "figures"
 
     # =========================================================================
     # 1. CAPA RÍGIDA DE 1 PÁGINA (Com INDAIATUBA 2026 no rodapé)
@@ -850,9 +852,11 @@ def scan_heading_pages(pdf_path: Path):
 
 
 def main():
-    manuscrito_dir = Path(__file__).parent.parent / "01 - Manuscrito"
-    docx_file = manuscrito_dir / "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.docx"
-    pdf_file = manuscrito_dir / "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf"
+    pipeline_dir = Path(__file__).resolve().parent
+    repo_root = pipeline_dir.parent.parent
+    manuscrito_dir = pipeline_dir.parent # docs/
+    docx_file = manuscrito_dir / "TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx"
+    pdf_file = manuscrito_dir / "TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf"
     pdf_short = manuscrito_dir / "TCC_II.pdf"
 
     # 1ª Passada: Construir com sumário aproximado
@@ -871,9 +875,11 @@ def main():
     build_monograph(docx_file, sumario_page_map=exact_map)
     convert_to_pdf(docx_file, pdf_file)
 
-    # Sincronizar cópias espelho no cofre acadêmico
+    # Sincronizar copias espelho institucionais e historicas
     shutil.copy2(pdf_file, pdf_short)
-    print(f"[OK] Espelho atualizado: {pdf_short}")
+    shutil.copy2(docx_file, manuscrito_dir / "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.docx")
+    shutil.copy2(pdf_file, manuscrito_dir / "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf")
+    print(f"[OK] Espelhos atualizados em {manuscrito_dir}")
 
     vault_root = Path(__file__).resolve().parents[3]
     mirror_dir = vault_root / "02 - TCC II" / "01 - Manuscrito"

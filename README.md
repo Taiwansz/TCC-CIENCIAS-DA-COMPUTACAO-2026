@@ -13,11 +13,12 @@
 
 ---
 
+[![CI Pipeline](https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026/actions/workflows/ci.yml/badge.svg)](https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026/actions)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![ABNT NBR 14724](https://img.shields.io/badge/ABNT-NBR_14724-green.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![NVIDIA NIM](https://img.shields.io/badge/Hardware-NVIDIA_A100_SXM4-76B900.svg)](https://build.nvidia.com/)
-[![Status](https://img.shields.io/badge/Status-Pronto_para_Avaliacao_Final-success.svg)](docs/TCC_II_Monografia_Final_Matheus_Santos.pdf)
+[![Status](https://img.shields.io/badge/Status-Pronto_para_Avaliacao_Final-success.svg)](docs/TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf)
 
 ---
 
@@ -26,7 +27,7 @@
 | Integrante | RA | Frente Principal de Atuacao | Entregaveis e Responsabilidades |
 |---|---|---|---|
 | **Matheus Sousa dos Santos** | 52319400 | Dev Core, Compilador & Pipeline | Engenharia da arquitetura do compilador TokLang, automacao dos scripts de inferencia na nuvem NVIDIA NIM e medicao HTTPS SSE streaming. |
-| **Felipe Guarnieri Pinete** | 52319337 | Engenharia de Prompt & Avaliacao | Modelagem das tecnicas tecnicas de prompting (Zero-shot, Few-shot e TokLang), analise semantica e calculo de BERTScore Proxy F1. |
+| **Felipe Guarnieri Pinete** | 52319337 | Engenharia de Prompt & Avaliacao | Modelagem das tecnicas de prompting (Zero-shot, Few-shot e TokLang), analise semantica e calculo de BERTScore Proxy F1. |
 | **Guilherme Gustavo Weber** | 52420339 | Ciencia de Dados & Visualizacao | Tabulacao dos dados brutos em CSV/JSON, plotagem das figuras cientificas a 300 DPI e padronizacao das normas graficas ABNT. |
 | **Juan Pedro** | 52319411 | Pesquisa, Fundamentacao & Green AI | Pesquisa teorica sobre Teoria da Informacao (Shannon), analise de sustentabilidade energetica (Green AI) e redacao analitica de conclusao. |
 
@@ -89,11 +90,19 @@ TCC-CIENCIAS-DA-COMPUTACAO-2026/
 ├── .gitignore                          # Regras de exclusao de arquivos e credenciais
 ├── .env.example                        # Modelo de configuracao para chave da NVIDIA NIM
 │
+├── .github/workflows/                  # Automacao de Integracao Continua (CI)
+│   └── ci.yml                          # Testes unitarios automatizados em Python 3.10, 3.11 e 3.12
+│
+├── tests/                              # Suite de Testes Automatizados Unitarios
+│   ├── __init__.py
+│   └── test_toklang_engine.py          # Testes de Lexer, Parser, Compilador e Integridade dos Dados
+│
 ├── docs/                               # Manuscrito oficial da monografia e ABNT
-│   ├── README.md                       # Diretrizes de formatacao e catalogacao
-│   ├── TCC_II_Monografia_Final_Matheus_Santos.pdf   # Manuscrito homologado (30 paginas)
-│   ├── TCC_II_Monografia_Final_Matheus_Santos.docx  # Manuscrito fonte editavel ABNT
-│   ├── bibliografia_oficial_auditada_abnt.md        # 21 referencias seminais catalogadas
+│   ├── README.md                       # Protocolo de avaliacao cega e diretrizes ABNT
+│   ├── TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf   # Manuscrito oficial canonico (30 paginas)
+│   ├── TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx  # Documento fonte editavel ABNT
+│   ├── TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf        # Espelho de acompanhamento protocolado
+│   ├── bibliografia_oficial_auditada_abnt.md                    # 21 referencias seminais catalogadas
 │   └── pipeline/
 │       ├── build_monograph.py          # Script de orquestracao ABNT via Word COM
 │       ├── structured_ch1_9.json       # Conteudo textual estruturado dos Caps. 1 ao 9
@@ -146,7 +155,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 6.2. Compilacao de Prompts via TokLang Engine
+### 6.2. Execucao da Suite de Testes Automatizados
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+### 6.3. Compilacao de Prompts via TokLang Engine
 
 ```python
 from engine import TokLangLexer, TokLangParser, TokLangCompiler
@@ -176,7 +191,7 @@ print("Prompt Otimizado:", prompt_otimizado.text)
 print("Tokens Estimados:", prompt_otimizado.token_count)
 ```
 
-### 6.3. Execucao da Bancada Experimental (Requer Chave NVIDIA NIM)
+### 6.4. Execucao da Bancada Experimental (Requer Chave NVIDIA NIM)
 
 ```bash
 # Definir variavel de ambiente
@@ -191,7 +206,7 @@ cd benchmark
 python battle_ia_benchmark.py
 ```
 
-### 6.4. Regeneracao dos Graficos Cientificos
+### 6.5. Regeneracao dos Graficos Cientificos
 
 ```bash
 cd figures
