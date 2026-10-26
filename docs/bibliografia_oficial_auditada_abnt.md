@@ -42,7 +42,7 @@
     -  [arXiv:1301.3781](https://arxiv.org/abs/1301.3781) | Artigo original do *Word2Vec* que iniciou os embeddings densos no NLP moderno.
 
 12. **PAN, Zhuoshi et al.** LLMLingua-2: data distillation for efficient and faithful task-agnostic prompt compression. In: *FINDINGS OF THE ASSOCIATION FOR COMPUTATIONAL LINGUISTICS: ACL 2024*, 2024, Bangkok. **Proceedings [...]**. Stroudsburg: Association for Computational Linguistics, 2024. p. 949–967.  
-    -  [DOI: 10.18653/v1/2024.findings-acl.57](https://doi.org/10.18653/v1/2024.findings-acl.57/) | Versão baseada em classificação supervisionada e destilação de dados do LLMLingua.
+    -  [DOI: 10.18653/v1/2024.findings-acl.57](https://doi.org/10.18653/v1/2024.findings-acl.57) | Versão baseada em classificação supervisionada e destilação de dados do LLMLingua.
 
 13. **PAPINENI, Kishore et al.** BLEU: a method for automatic evaluation of machine translation. In: *ANNUAL MEETING OF THE ASSOCIATION FOR COMPUTATIONAL LINGUISTICS (ACL)*, 40., 2002, Philadelphia. **Proceedings [...]**. Stroudsburg: Association for Computational Linguistics, 2002. p. 311–318.  
     -  [DOI: 10.3115/1073083.1073135](https://doi.org/10.3115/1073083.1073135) | Métrica n-gram tradicional de tradução automática avaliada e contraposta no Capítulo 8.
@@ -66,7 +66,7 @@
     -  [NeurIPS Proceedings](https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html) | O artigo seminal da arquitetura *Transformer* e da fórmula de autoatenção $\text{Softmax}(QK^T / \sqrt{d_k})V$.
 
 20. **WEI, Jason et al.** Chain-of-thought prompting elicits reasoning in large language models. In: *ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS (NeurIPS)*, 35., 2022, New Orleans. **Proceedings [...]**. Red Hook: Curran Associates, 2022. v. 35, p. 24824–24837.  
-    -  [NeurIPS Proceedings](https://proceedings.neurips.cc/paper_files/paper/2022/hash/9d56096ce5236ab6591c4866b4477d88-Abstract-Conference.html) | Proposição formal do raciocínio em cadeia (*Chain-of-Thought*).
+    -  [NeurIPS Proceedings](https://proceedings.neurips.cc/paper_files/paper/2022/hash/9d5609613524ecf4f15af0f7b31abca4-Abstract-Conference.html) | Proposição formal do raciocínio em cadeia (*Chain-of-Thought*).
 
 21. **ZHANG, Tianyi et al.** BERTScore: evaluating text generation with BERT. In: *INTERNATIONAL CONFERENCE ON LEARNING REPRESENTATIONS (ICLR)*, 8., 2020, Addis Ababa. **Proceedings [...]**. Addis Ababa: ICLR, 2020. p. 1–43.  
     -  [OpenReview Forum](https://openreview.net/forum?id=SkeHuCVFDr) | Artigo oficial da métrica *BERTScore* adotada na bancada experimental do TCC.

@@ -85,10 +85,16 @@ Os dados abaixo foram extraidos diretamente da execucao real via streaming SSE s
 ```
 TCC-CIENCIAS-DA-COMPUTACAO-2026/
 ├── README.md                           # Visao geral, resultados, integrantes, reproducao e BibTeX
-├── LICENSE                             # Licenca de codigo aberto MIT (2026)
+├── LICENSE                             # Licenca de codigo aberto MIT (2026) - Credito aos 4 autores
+├── pyproject.toml                      # Empacotamento moderno PEP 517/621 com metadados dos autores
 ├── requirements.txt                    # Dependencias Python exatas para reproducao
 ├── .gitignore                          # Regras de exclusao de arquivos e credenciais
 ├── .env.example                        # Modelo de configuracao para chave da NVIDIA NIM
+│
+├── article/                            # Artigo cientifico derivado no padrao SBC (10-12 paginas)
+│   ├── README.md                       # Diretrizes de submissao e compilacao LaTeX SBC
+│   ├── artigo_toklang_sbc.md           # Manuscrito integral formatado para eventos da SBC
+│   └── referencias_sbc.bib             # Base bibliografica BibTeX canonica
 │
 ├── .github/workflows/                  # Automacao de Integracao Continua (CI)
 │   └── ci.yml                          # Testes unitarios automatizados em Python 3.10, 3.11 e 3.12

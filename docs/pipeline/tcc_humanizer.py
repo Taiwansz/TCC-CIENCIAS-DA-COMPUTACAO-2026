@@ -10,8 +10,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
-import fitz
-import win32com.client
+# Unused imports removed
 
 def set_cell_margins(cell, top=90, bottom=90, left=120, right=120):
     tcPr = cell._tc.get_or_add_tcPr()

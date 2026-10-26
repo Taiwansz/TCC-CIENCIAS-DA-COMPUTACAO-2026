@@ -93,7 +93,7 @@
   },
   {
     "type": "p",
-    "text": "Modelos como BERT (Devlin et al., 2018), GPT-2, GPT-3 (Brown et al., 2020) e seus sucessores demonstraram que o escalonamento de parâmetros, dados e computação produz emergência de capacidades não previamente observadas. Fenômenos como raciocínio em múltiplas etapas, resolução de analogias complexas e geração de código surgem espontaneamente em modelos de escala suficientemente elevada, sem treinamento específico para essas tarefas."
+    "text": "Modelos como BERT (Devlin et al., 2019), GPT-2, GPT-3 (Brown et al., 2020) e seus sucessores demonstraram que o escalonamento de parâmetros, dados e computação produz emergência de capacidades não previamente observadas. Fenômenos como raciocínio em múltiplas etapas, resolução de analogias complexas e geração de código surgem espontaneamente em modelos de escala suficientemente elevada, sem treinamento específico para essas tarefas."
   },
   {
     "type": "h2",
@@ -137,7 +137,7 @@
   },
   {
     "type": "p",
-    "text": "Liu et al. (2021) demonstraram que a posição dos exemplos e instruções dentro de um prompt influencia a distribuição de atenção do modelo sobre os diferentes segmentos. Elementos posicionados no início ou no final da sequência tendem a receber maior peso atencional, fenômeno conhecido como viés posicional. Esse comportamento tem implicações diretas para o design de sistemas de compressão: a preservação de tokens em posições privilegiadas pode ser mais crítica do que a preservação de tokens em posições intermediárias."
+    "text": "Liu et al. (2023) demonstraram que a posição dos exemplos e instruções dentro de um prompt influencia a distribuição de atenção do modelo sobre os diferentes segmentos. Elementos posicionados no início ou no final da sequência tendem a receber maior peso atencional, fenômeno conhecido como viés posicional. Esse comportamento tem implicações diretas para o design de sistemas de compressão: a preservação de tokens em posições privilegiadas pode ser mais crítica do que a preservação de tokens em posições intermediárias."
   },
   {
     "type": "h1",

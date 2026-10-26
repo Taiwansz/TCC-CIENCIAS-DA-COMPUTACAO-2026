@@ -12,15 +12,28 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
 import win32com.client
-import fitz
+try:
+    import fitz
+except ImportError:
+    fitz = None
+try:
+    import pypdf
+except ImportError:
+    pypdf = None
 
 from tcc_humanizer import set_cell_margins, set_cell_background, format_abnt_table, humanize_text
 
 
 def load_experimental_data() -> dict:
-    json_path = Path(__file__).parent / "battle_ia_resultados_brutos.json"
-    if not json_path.exists():
-        raise FileNotFoundError(f"ERRO FATAL: Base empírica não encontrada em {json_path}")
+    candidates = [
+        Path(__file__).parent / "battle_ia_resultados_brutos.json",
+        Path(__file__).resolve().parent.parent.parent / "benchmark" / "battle_ia_resultados_brutos.json",
+        Path(__file__).resolve().parent.parent / "battle_ia_resultados_brutos.json",
+        Path.cwd() / "benchmark" / "battle_ia_resultados_brutos.json",
+    ]
+    json_path = next((p for p in candidates if p.exists()), None)
+    if not json_path:
+        raise FileNotFoundError(f"ERRO FATAL: Base empírica não encontrada em nenhum dos caminhos: {candidates}")
     with open(json_path, "r", encoding="utf-8") as f:
         records = json.load(f)
     if len(records) < 12:
@@ -760,7 +773,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         "SHANNON, Claude E. A mathematical theory of communication. The Bell System Technical Journal, Murray Hill, v. 27, n. 3, p. 379–423, jul. 1948; v. 27, n. 4, p. 623–656, out. 1948. DOI: https://doi.org/10.1002/j.1538-7305.1948.tb01338.x. Disponível em: https://archive.org/details/bstj27-3-379. Acesso em: 16 set. 2026.",
         "STRUBELL, Emma; GANESH, Ananya; McCALLUM, Andrew. Energy and policy considerations for deep learning in NLP. In: ANNUAL MEETING OF THE ASSOCIATION FOR COMPUTATIONAL LINGUISTICS (ACL), 57., 2019, Florence. Proceedings [...]. Stroudsburg: Association for Computational Linguistics, 2019. p. 3645–3650. DOI: https://doi.org/10.18653/v1/P19-1355. Disponível em: https://aclanthology.org/P19-1355/. Acesso em: 16 set. 2026.",
         "VASWANI, Ashish et al. Attention is all you need. In: ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS (NeurIPS), 30., 2017, Long Beach. Proceedings [...]. Red Hook: Curran Associates, 2017. v. 30, p. 5998–6008. Disponível em: https://proceedings.neurips.cc/paper/2017/hash/3f5ee243547dee91fbd053c1c4a845aa-Abstract.html. Acesso em: 16 set. 2026.",
-        "WEI, Jason et al. Chain-of-thought prompting elicits reasoning in large language models. In: ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS (NeurIPS), 35., 2022, New Orleans. Proceedings [...]. Red Hook: Curran Associates, 2022. v. 35, p. 24824–24837. Disponível em: https://proceedings.neurips.cc/paper_files/paper/2022/hash/9d56096ce5236ab6591c4866b4477d88-Abstract-Conference.html. Acesso em: 16 set. 2026.",
+        "WEI, Jason et al. Chain-of-thought prompting elicits reasoning in large language models. In: ADVANCES IN NEURAL INFORMATION PROCESSING SYSTEMS (NeurIPS), 35., 2022, New Orleans. Proceedings [...]. Red Hook: Curran Associates, 2022. v. 35, p. 24824–24837. Disponível em: https://proceedings.neurips.cc/paper_files/paper/2022/hash/9d5609613524ecf4f15af0f7b31abca4-Abstract-Conference.html. Acesso em: 16 set. 2026.",
         "ZHANG, Tianyi et al. BERTScore: evaluating text generation with BERT. In: INTERNATIONAL CONFERENCE ON LEARNING REPRESENTATIONS (ICLR), 8., 2020, Addis Ababa. Proceedings [...]. Addis Ababa: ICLR, 2020. p. 1–43. Disponível em: https://openreview.net/forum?id=SkeHuCVFDr. Acesso em: 16 set. 2026."
     ]
 
@@ -795,7 +808,14 @@ def convert_to_pdf(docx_path: Path, pdf_path: Path):
 
 
 def scan_heading_pages(pdf_path: Path):
-    doc = fitz.open(pdf_path)
+    if fitz is not None:
+        doc = fitz.open(pdf_path)
+        pages_text = [p.get_text() for p in doc]
+    elif pypdf is not None:
+        reader = pypdf.PdfReader(str(pdf_path))
+        pages_text = [p.extract_text() or "" for p in reader.pages]
+    else:
+        return {}
     search_keys = [
         ("1 INTRODUÇÃO", "1 INTRODUÇÃO"),
         ("1.1 Contextualização e Motivação", "1.1 Contextualização"),
@@ -835,8 +855,8 @@ def scan_heading_pages(pdf_path: Path):
     mapping = {}
     for label, query in search_keys:
         found_pg = None
-        for p_idx, page in enumerate(doc):
-            txt_up = page.get_text().upper()
+        for p_idx, raw_txt in enumerate(pages_text):
+            txt_up = raw_txt.upper()
             if p_idx < 4 or "SUMÁRIO" in txt_up:  # Ignorar pré-textuais e a página do próprio sumário
                 continue
             if label == "REFERÊNCIAS":
@@ -888,30 +908,52 @@ def main():
         shutil.copy2(pdf_file, mirror_dir / pdf_file.name)
         print(f"[OK] Espelho 02 - TCC II atualizado em: {mirror_dir}")
 
-    # Validação visual final com PyMuPDF
-    doc = fitz.open(pdf_file)
-    print(f"\n==========================================")
-    print(f"     VALIDAÇÃO VISUAL DEFINITIVA DO PDF   ")
-    print(f"==========================================")
-    print(f"Total de páginas: {len(doc)}")
+    # Validação visual final com PyMuPDF ou pypdf
+    if fitz is not None:
+        doc = fitz.open(pdf_file)
+        print(f"\n==========================================")
+        print(f"     VALIDAÇÃO VISUAL DEFINITIVA DO PDF   ")
+        print(f"==========================================")
+        print(f"Total de páginas: {len(doc)}")
 
-    p1_lines = [l.strip() for l in doc[0].get_text().splitlines() if l.strip()]
-    has_city = any("INDAIATUBA" in l for l in p1_lines)
-    has_year = any("2026" in l for l in p1_lines)
-    print(f"Página 1 (Capa): {'PERFEITA (Contém INDAIATUBA 2026)' if (has_city and has_year) else 'ERRO: Vazou para página 2'}")
+        p1_lines = [l.strip() for l in doc[0].get_text().splitlines() if l.strip()]
+        has_city = any("INDAIATUBA" in l for l in p1_lines)
+        has_year = any("2026" in l for l in p1_lines)
+        print(f"Página 1 (Capa): {'PERFEITA (Contém INDAIATUBA 2026)' if (has_city and has_year) else 'ERRO: Vazou para página 2'}")
 
-    p2_txt = doc[1].get_text()
-    print(f"Página 2: {'RESUMO presente' if 'RESUMO' in p2_txt else 'ERRO no Resumo'}")
+        p2_txt = doc[1].get_text()
+        print(f"Página 2: {'RESUMO presente' if 'RESUMO' in p2_txt else 'ERRO no Resumo'}")
 
-    p3_txt = doc[2].get_text()
-    print(f"Página 3: {'ABSTRACT presente' if 'ABSTRACT' in p3_txt else 'ERRO no Abstract'}")
+        p3_txt = doc[2].get_text()
+        print(f"Página 3: {'ABSTRACT presente' if 'ABSTRACT' in p3_txt else 'ERRO no Abstract'}")
 
-    p4_txt = doc[3].get_text()
-    print(f"Página 4: {'SUMÁRIO presente' if 'SUMÁRIO' in p4_txt else 'ERRO no Sumário'}")
+        p4_txt = doc[3].get_text()
+        print(f"Página 4: {'SUMÁRIO presente' if 'SUMÁRIO' in p4_txt else 'ERRO no Sumário'}")
 
-    total_imgs = sum(len(p.get_images()) for p in doc)
-    print(f"Total de Figuras Científicas incorporadas: {total_imgs}")
-    print("==========================================")
+        total_imgs = sum(len(p.get_images()) for p in doc)
+        print(f"Total de Figuras Científicas incorporadas: {total_imgs}")
+        print("==========================================")
+    elif pypdf is not None:
+        reader = pypdf.PdfReader(str(pdf_file))
+        print(f"\n==========================================")
+        print(f"     VALIDAÇÃO VISUAL DEFINITIVA DO PDF   ")
+        print(f"==========================================")
+        print(f"Total de páginas: {len(reader.pages)}")
+
+        p1_lines = [l.strip() for l in (reader.pages[0].extract_text() or "").splitlines() if l.strip()]
+        has_city = any("INDAIATUBA" in l for l in p1_lines)
+        has_year = any("2026" in l for l in p1_lines)
+        print(f"Página 1 (Capa): {'PERFEITA (Contém INDAIATUBA 2026)' if (has_city and has_year) else 'ERRO: Vazou para página 2'}")
+
+        p2_txt = reader.pages[1].extract_text() or ""
+        print(f"Página 2: {'RESUMO presente' if 'RESUMO' in p2_txt else 'ERRO no Resumo'}")
+
+        p3_txt = reader.pages[2].extract_text() or ""
+        print(f"Página 3: {'ABSTRACT presente' if 'ABSTRACT' in p3_txt else 'ERRO no Abstract'}")
+
+        p4_txt = reader.pages[3].extract_text() or ""
+        print(f"Página 4: {'SUMÁRIO presente' if 'SUMÁRIO' in p4_txt else 'ERRO no Sumário'}")
+        print("==========================================")
 
 
 if __name__ == "__main__":

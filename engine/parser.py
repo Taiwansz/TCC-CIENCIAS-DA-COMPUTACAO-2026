@@ -80,7 +80,7 @@ class TokLangParser:
         while self._peek().type != TokenType.EOF:
             t = self._peek()
 
-            # Diretivas
+            # Diretivas declarativas (@compress, @budget, @constraint)
             if t.type == TokenType.DIRECTIVE:
                 dir_name = self._advance().value.lower()
                 kwargs = self._parse_kwargs()
@@ -106,37 +106,59 @@ class TokLangParser:
                     ))
                 continue
 
-            # Blocos context / instruction
+            # Blocos context / instruction com desvio unico e suporte a chaves aninhadas
             if t.type == TokenType.IDENTIFIER:
-                block_type = self._advance().value.lower()
+                block_type = t.value.lower()
 
                 # Bloco de contexto
                 if block_type == "context":
+                    self._advance()
                     name = "default"
                     if self._peek().type in (TokenType.STRING, TokenType.IDENTIFIER):
                         name = self._advance().value
                     self._expect(TokenType.LBRACE, "Esperado '{' para iniciar bloco context")
                     content_parts = []
-                    while not self._match(TokenType.RBRACE):
+                    brace_depth = 1
+                    while brace_depth > 0:
                         if self._peek().type == TokenType.EOF:
                             raise SyntaxError("Fim de arquivo inesperado dentro do bloco context.")
-                        content_parts.append(self._advance().value)
+                        tok = self._advance()
+                        if tok.type == TokenType.LBRACE:
+                            brace_depth += 1
+                            content_parts.append(tok.value)
+                        elif tok.type == TokenType.RBRACE:
+                            brace_depth -= 1
+                            if brace_depth > 0:
+                                content_parts.append(tok.value)
+                        else:
+                            content_parts.append(tok.value)
                     doc.contexts.append(ContextBlock(name=name, content=" ".join(content_parts)))
                     continue
 
                 # Bloco de instrucoes
                 if block_type == "instruction":
+                    self._advance()
                     self._expect(TokenType.LBRACE, "Esperado '{' para iniciar bloco instruction")
                     inst_parts = []
-                    while not self._match(TokenType.RBRACE):
+                    brace_depth = 1
+                    while brace_depth > 0:
                         if self._peek().type == TokenType.EOF:
                             raise SyntaxError("Fim de arquivo inesperado dentro do bloco instruction.")
                         tok = self._advance()
-                        if tok.type in (TokenType.STRING, TokenType.IDENTIFIER):
+                        if tok.type == TokenType.LBRACE:
+                            brace_depth += 1
+                            inst_parts.append(tok.value)
+                        elif tok.type == TokenType.RBRACE:
+                            brace_depth -= 1
+                            if brace_depth > 0:
+                                inst_parts.append(tok.value)
+                        else:
+                            # Preserva strings, identificadores, numeros e pontuacao
                             inst_parts.append(tok.value)
                     doc.instruction = InstructionBlock(instructions=inst_parts)
                     continue
 
+            # Token nao pertencente a bloco - avanco simples unico
             self._advance()
 
         return doc

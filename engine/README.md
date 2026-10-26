@@ -28,10 +28,10 @@ O fluxo de traducao e analise e estritamente deterministico, operando em tempo d
 | Modulo | Responsabilidade |
 |---|---|
 | `ast_nodes.py` | Definicoes dos nos da AST (`PromptDocument`, `CompressionDirective`, `AttentionConstraint`, `ContextBlock`, `InstructionBlock`). |
-| `lexer.py` | Tokenizador baseado em expressoes regulares com rastreamento de linha e coluna. |
-| `parser.py` | Parser preditivo LL(1) com suporte a diretivas declarativas. |
+| `lexer.py` | Tokenizador baseado em expressoes regulares com rastreamento posicional de linha e coluna. |
+| `parser.py` | Parser preditivo LL(1) com suporte a diretivas declarativas e profundidade de chaves. |
 | `estimator.py` | Calculo de autoinformacao lexical e projecao de economia de tokens. |
-| `compiler.py` | Tradutor de AST para prompt final comprimido sob orcamento de tokens (`max_tokens`). |
+| `compiler.py` | Tradutor de AST para prompt final comprimido com preservacao de quebras de linha e protecao de instrucoes sob orcamento. |
 
 ---
 
@@ -41,17 +41,17 @@ O fluxo de traducao e analise e estritamente deterministico, operando em tempo d
 from engine import TokLangLexer, TokLangParser, TokLangCompiler
 
 codigo_toklang = """
-@budget max_tokens: 120
-@compress ratio: 4x
+@compress(level="aggressive", target="semantic")
+@budget(max_tokens=120, reserve_completion=40)
+@constraint(name="schema", focus="transacoes, valor, conta_id")
 
-[context:sistema_bancario, priority: 1]
-Tabela transacoes: id INT, valor DECIMAL, data TIMESTAMP, conta_id INT.
+context sistema_bancario {
+    "Tabela transacoes: id INT, valor DECIMAL, data TIMESTAMP, conta_id INT."
+}
 
-[constraints]
-- schema: transacoes, valor, conta_id
-
-[instructions]
-- Retorne apenas a query SQL para saldo total por conta.
+instruction {
+    "Retorne apenas a query SQL para saldo total por conta."
+}
 """
 
 lexer = TokLangLexer(codigo_toklang)
@@ -61,7 +61,8 @@ documento = parser.parse()
 compiler = TokLangCompiler()
 prompt_compilado = compiler.compile(documento)
 
-print("Texto Comprimido:", prompt_compilado.text)
-print("Tokens Faturados:", prompt_compilado.token_count)
+print("Texto Comprimido:")
+print(prompt_compilado.text)
+print("\nTokens Faturados:", prompt_compilado.token_count)
 print("Truncamento Ocorrido:", prompt_compilado.truncated)
 ```
