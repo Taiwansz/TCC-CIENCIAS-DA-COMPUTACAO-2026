@@ -8,6 +8,7 @@ Testa:
 - Integridade Estrutural dos Dados Empiricos da Bancada Battle IA
 """
 
+import csv
 import json
 from pathlib import Path
 import unittest
@@ -20,6 +21,7 @@ from engine import (
     ContextBlock,
     InstructionBlock,
     PromptDocument,
+    ShannonPromptCompressor,
     Token,
     TokenBudgetDirective,
     TokLangCompiler,
@@ -99,6 +101,13 @@ class TestTokLangParser(unittest.TestCase):
         with self.assertRaises(SyntaxError):
             parser.parse()
 
+    def test_syntax_error_on_invalid_root_token_zero_fallback(self):
+        invalid_source = "@budget max_tokens: 150\n[context:db]"
+        lexer = TokLangLexer(invalid_source)
+        parser = TokLangParser(lexer.tokenize())
+        with self.assertRaises(SyntaxError):
+            parser.parse()
+
 
 class TestTokLangCompiler(unittest.TestCase):
     def test_deterministic_compilation_and_budget_truncation(self):
@@ -137,6 +146,58 @@ class TestTokLangCompiler(unittest.TestCase):
         compiler = TokLangCompiler()
         with self.assertRaises(ValueError):
             compiler.compile(doc)
+
+    def test_shannon_compression_directive_and_focus_protection(self):
+        source = """
+        @budget(max_tokens=150)
+        @compress(level="aggressive", ratio="4x")
+        @constraint(name="schema", focus="usuarios, saldo, DENSE_RANK")
+
+        context banco_dados {
+            "Por favor considere atentamente que de acordo com a especificacao detalhada do sistema corporativo a tabela usuarios armazena o saldo consolidado e requer o uso da funcao DENSE_RANK para classificacao."
+        }
+
+        instruction {
+            "Retorne apenas a query SQL."
+        }
+        """
+        lexer = TokLangLexer(source)
+        doc = TokLangParser(lexer.tokenize()).parse()
+        compiler = TokLangCompiler()
+        compiled = compiler.compile(doc)
+
+        self.assertGreater(compiled.raw_token_count, compiled.token_count)
+        self.assertIn("usuarios", compiled.text)
+        self.assertIn("saldo", compiled.text)
+        self.assertIn("DENSE_RANK", compiled.text)
+        self.assertNotIn("Por favor", compiled.text)
+        self.assertNotIn("acordo com", compiled.text)
+
+    def test_readme_example_compiles_accurately(self):
+        codigo = """
+        @budget(max_tokens=150)
+        @compress(level="aggressive", ratio="4x")
+        @constraint(name="schema", focus="usuarios, saldo")
+
+        context banco_dados {
+            "CREATE TABLE usuarios (id INT PRIMARY KEY, nome VARCHAR(100), saldo DECIMAL(10,2));"
+        }
+
+        instruction {
+            "Retorne apenas a query de saldo positivo agrupada por usuario."
+        }
+        """
+        lexer = TokLangLexer(codigo)
+        parser = TokLangParser(lexer.tokenize())
+        documento = parser.parse()
+
+        compiler = TokLangCompiler()
+        prompt_otimizado = compiler.compile(documento)
+
+        self.assertGreater(prompt_otimizado.token_count, 10)
+        self.assertLessEqual(prompt_otimizado.token_count, 150)
+        self.assertIn("CREATE TABLE usuarios", prompt_otimizado.text)
+        self.assertIn("[instructions]", prompt_otimizado.text)
 
 
 class TestCompressionEstimator(unittest.TestCase):
@@ -200,6 +261,30 @@ class TestBattleIABenchmarkDataIntegrity(unittest.TestCase):
 
         self.assertEqual(casos_encontrados, casos_esperados)
         self.assertEqual(tecnicas_encontrados, tecnicas_esperadas)
+
+    def test_csv_and_summary_synchronized_with_raw_json(self):
+        repo_root = Path(__file__).resolve().parent.parent
+        bench_dir = repo_root / "benchmark"
+        with open(bench_dir / "battle_ia_resultados_brutos.json", "r", encoding="utf-8") as f:
+            raw_data = json.load(f)
+        with open(bench_dir / "battle_ia_results.csv", "r", encoding="utf-8") as f:
+            csv_rows = list(csv.DictReader(f))
+        with open(bench_dir / "battle_ia_summary.json", "r", encoding="utf-8") as f:
+            summary_data = json.load(f)
+
+        self.assertEqual(len(csv_rows), len(raw_data))
+        for raw, row in zip(raw_data, csv_rows):
+            self.assertEqual(row["modelo_avaliado"], "meta/llama-3.2-11b-vision-instruct")
+            self.assertEqual(row["caso_id"], raw["caso_id"])
+            self.assertEqual(row["tecnica"], raw["tecnica"])
+            self.assertEqual(int(row["tokens_entrada"]), raw["tokens_entrada"])
+
+        self.assertEqual(summary_data["evaluated_model"], "meta/llama-3.2-11b-vision-instruct")
+        self.assertEqual(summary_data["total_records"], 12)
+        self.assertEqual(summary_data["failed_records"], 0)
+        by_tec = {item["technique"]: item for item in summary_data["aggregated_by_technique"]}
+        self.assertAlmostEqual(by_tec["LLMLingua (4x)"]["mean_prompt_tokens"], 168.3, places=1)
+        self.assertAlmostEqual(by_tec["Few-shot (Baseline)"]["mean_prompt_tokens"], 384.0, places=1)
 
 
 if __name__ == "__main__":

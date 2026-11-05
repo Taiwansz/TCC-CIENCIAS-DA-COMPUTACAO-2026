@@ -7,7 +7,7 @@
 > - **Matheus Sousa dos Santos** (RA: 52319400)  
 > - **Felipe Guarnieri Pinete** (RA: 52319337)  
 > - **Guilherme Gustavo Weber** (RA: 52420339)  
-> - **Juan Pedro** (RA: 52319411)  
+> - **Juan Pedro Souza de Oliveira** (RA: 52319411)  
 > 
 > **Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
 
@@ -29,7 +29,7 @@
 | **Matheus Sousa dos Santos** | 52319400 | Dev Core, Compilador & Pipeline | Engenharia da arquitetura do compilador TokLang, automacao dos scripts de inferencia na nuvem NVIDIA NIM e medicao HTTPS SSE streaming. |
 | **Felipe Guarnieri Pinete** | 52319337 | Engenharia de Prompt & Avaliacao | Modelagem das tecnicas de prompting (Zero-shot, Few-shot e TokLang), analise semantica e calculo de BERTScore Proxy F1. |
 | **Guilherme Gustavo Weber** | 52420339 | Ciencia de Dados & Visualizacao | Tabulacao dos dados brutos em CSV/JSON, plotagem das figuras cientificas a 300 DPI e padronizacao das normas graficas ABNT. |
-| **Juan Pedro** | 52319411 | Pesquisa, Fundamentacao & Green AI | Pesquisa teorica sobre Teoria da Informacao (Shannon), analise de sustentabilidade energetica (Green AI) e redacao analitica de conclusao. |
+| **Juan Pedro Souza de Oliveira** | 52319411 | Pesquisa, Fundamentacao & Green AI | Pesquisa teorica sobre Teoria da Informacao (Shannon), analise de sustentabilidade energetica (Green AI) e redacao analitica de conclusao. |
 
 ---
 
@@ -173,17 +173,17 @@ python -m unittest discover -s tests -v
 from engine import TokLangLexer, TokLangParser, TokLangCompiler
 
 codigo = """
-@budget max_tokens: 150
-@compress ratio: 4x
+@budget(max_tokens=150)
+@compress(level="aggressive", ratio="4x")
+@constraint(name="schema", focus="usuarios, saldo")
 
-[context:banco_dados, priority: 1]
-CREATE TABLE usuarios (id INT PRIMARY KEY, nome VARCHAR(100), saldo DECIMAL(10,2));
+context banco_dados {
+    "CREATE TABLE usuarios (id INT PRIMARY KEY, nome VARCHAR(100), saldo DECIMAL(10,2));"
+}
 
-[constraints]
-- schema: usuarios, saldo
-
-[instructions]
-- Retorne apenas a query de saldo positivo agrupada por usuario.
+instruction {
+    "Retorne apenas a query de saldo positivo agrupada por usuario."
+}
 """
 
 lexer = TokLangLexer(codigo)
@@ -227,7 +227,7 @@ Caso utilize este trabalho, dados da bancada ou o compilador TokLang em sua pesq
 
 ```bibtex
 @monography{santos2026toklang,
-  author    = {Matheus Sousa dos Santos and Felipe Guarnieri Pinete and Guilherme Gustavo Weber and Juan Pedro},
+  author    = {Matheus Sousa dos Santos and Felipe Guarnieri Pinete and Guilherme Gustavo Weber and Juan Pedro Souza de Oliveira},
   title     = {TokLang: Compress{\~a}o de Prompts, Otimiza{\c{c}}{\~a}o de Tokens e Sustentabilidade Computacional em Large Language Models},
   school    = {Centro Universit{\'a}rio Max Planck (UniMAX)},
   year      = {2026},
@@ -241,7 +241,7 @@ Caso utilize este trabalho, dados da bancada ou o compilador TokLang em sua pesq
 
 Formato ABNT NBR 6023:2018:
 
-> SANTOS, Matheus Sousa dos; PINETE, Felipe Guarnieri; WEBER, Guilherme Gustavo; PEDRO, Juan. **TokLang: Compressão de Prompts, Otimização de Tokens e Sustentabilidade Computacional em Large Language Models**. Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior. 2026. 30 f. Trabalho de Conclusão de Curso (Bacharelado em Ciência da Computação) – Centro Universitário Max Planck (UniMAX), Indaiatuba, 2026. Disponível em: <https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026>.
+> SANTOS, Matheus Sousa dos; PINETE, Felipe Guarnieri; WEBER, Guilherme Gustavo; OLIVEIRA, Juan Pedro Souza de. **TokLang: Compressão de Prompts, Otimização de Tokens e Sustentabilidade Computacional em Large Language Models**. Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior. 2026. 30 f. Trabalho de Conclusão de Curso (Bacharelado em Ciência da Computação) – Centro Universitário Max Planck (UniMAX), Indaiatuba, 2026. Disponível em: <https://github.com/Taiwansz/TCC-CIENCIAS-DA-COMPUTACAO-2026>.
 
 ---
 

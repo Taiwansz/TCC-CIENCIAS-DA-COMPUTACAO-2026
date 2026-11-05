@@ -6,7 +6,7 @@
 > - Matheus Sousa dos Santos (RA: 52319400)  
 > - Felipe Guarnieri Pinete (RA: 52319337)  
 > - Guilherme Gustavo Weber (RA: 52420339)  
-> - Juan Pedro (RA: 52319411)  
+> - Juan Pedro Souza de Oliveira (RA: 52319411)  
 > **Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
 
 ---
@@ -26,7 +26,7 @@
 ## 2. Protocolo de Avaliacao Cega (Banca Virtual Anonima)
 
 > [!NOTE]  
-> Em estrita conformidade com o Regulamento Institucional de TCC do Centro Universitario Max Planck (UniMAX), a versao em PDF do manuscrito depositada para a Banca Examinadora Virtual e gerada com a **Capa Desidentificada (Avaliacao Cega / Double-Blind Review)**. Esse procedimento assegura a isencao de julgamento e elimina vieses cognitivos na correcao dos avaliadores externos. A autoria de **Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro** e atestada pela plataforma institucional WebTCC e pelo presente repositorio publico.
+> Em estrita conformidade com o Regulamento Institucional de TCC do Centro Universitario Max Planck (UniMAX), a versao em PDF do manuscrito depositada para a Banca Examinadora Virtual e gerada com a **Capa Desidentificada (Avaliacao Cega / Double-Blind Review)**. Esse procedimento assegura a isencao de julgamento e elimina vieses cognitivos na correcao dos avaliadores externos. A autoria de **Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro Souza de Oliveira** e atestada pela plataforma institucional WebTCC e pelo presente repositorio publico.
 
 ---
 
@@ -38,7 +38,7 @@
   * Formalizacao dos prompts tecnicos (Zero-shot, Few-shot e TokLang) e auditoria de fidelidade semantica via BERTScore Proxy F1.
 * **Guilherme Gustavo Weber (RA: 52420339) — Tabulacao de Dados & Figuras Cientificas:**
   * Tabulacao dos dados brutos, geracao dos graficos a 300 DPI (tokens, TTFT, BERTScore e custos) e formatacao de estilo ABNT.
-* **Juan Pedro (RA: 52319411) — Pesquisa, Problematizacao & Green AI:**
+* **Juan Pedro Souza de Oliveira (RA: 52319411) — Pesquisa, Problematizacao & Green AI:**
   * Fundamentacao teorica de Teoria da Informacao (Shannon), analise de sustentabilidade (Green AI) e redacao analitica das conclusoes.
 
 ---

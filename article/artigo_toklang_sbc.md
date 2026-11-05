@@ -1,6 +1,6 @@
 # TokLang: Uma Linguagem de Programacao Orientada a Tokens para Compilacao, Otimizacao e Retencao Semantica em Modelos de Linguagem de Grande Porte
 
-**Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro, Luiz Claudio Chiavini**
+**Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro Souza de Oliveira, Luiz Claudio Chiavini Oliveira Junior**
 
 Colegiado de Ciencia da Computacao — Centro Universitario Max Planck (UniMAX)  
 Indaiatuba — SP — Brasil  
@@ -30,7 +30,7 @@ A consolidacao dos Modelos de Linguagem de Grande Porte (LLMs) como componentes 
 
 Apesar do dimensionamento das janelas de contexto para dezenas de milhares de tokens, a operacao de modelos autorregressivos enfrenta severos gargalos sistemicos. Do ponto de vista computacional, a fase de preenchimento (prefill) da camada de autoatencao matricial — responsavel por computar a correlacao entre todas as posicoes de entrada conforme formalizado por Vaswani et al. (2017) — apresenta complexidade computacional assintotica de ordem quadratica $O(n^2 \cdot d)$, onde $n$ corresponde ao numero de tokens de entrada e $d$ a dimensao oculta das cabecas de atencao. Em termos de engenharia de sistemas, essa sobrecarga quadratica reflete-se diretamente no aumento do Time-to-First-Token (TTFT), elevando a latencia percebida pelo usuario final e encarecendo a fatura operacional em provedores de computacao em nuvem tarifados por milhao de tokens (Dao et al., 2022).
 
-Adicionalmente, estudos epistemologicos como os de Liu et al. (2023) identificaram o fenomeno "Lost in the Middle", no qual a capacidade de recuperacao de fatos especificos pelo modelo se degrada acentuadamente quando a informacao relevante se localiza nas camadas intermediarias de contextos extensos. Prompts prolixos, redundantes ou mal estruturados nao apenas consomem orcamento de hardware, mas diluem a atencao do modelo, induzindo alucinacoes e falhas de raciocinio logico.
+Adicionalmente, estudos epistemologicos como os de Liu et al. (2024) identificaram o fenomeno "Lost in the Middle", no qual a capacidade de recuperacao de fatos especificos pelo modelo se degrada acentuadamente quando a informacao relevante se localiza nas camadas intermediarias de contextos extensos. Prompts prolixos, redundantes ou mal estruturados nao apenas consomem orcamento de hardware, mas diluem a atencao do modelo, induzindo alucinacoes e falhas de raciocinio logico.
 
 Para enderecar esse problema, surgiram tecnicas estatisticas de compressao de contexto, notadamente o LLMLingua (Jiang et al., 2023) e LongLLMLingua (Zhang et al., 2024), que empregam pequenos modelos de linguagem para calcular a autoinformacao de Shannon dos tokens e descartar sequencias probabilistica redundantes. Contudo, investigacoes preliminares evidenciam que a podagem puramente estatistica atua de maneira agnostica a estrutura logica do prompt. Ao descartar pontuacoes, operadores relacionais, conectivos condicionais e identificadores tecnicos rotulados como "estatisticamente improvaveis", essas abordagens frequentemente destroem a semantica de codigos-fonte, regras de negocio e restricoes normativas, reduzindo drasticamente o alinhamento semantico (comprovado por BERTScore F1 inferior a 0.58 em prompts tecnicos).
 
@@ -59,30 +59,33 @@ Nao obstante sua eficacia em textos literarios ou narrativas genericas, essas te
 A TokLang foi concebida como uma Domain-Specific Language (DSL) declarativa baseada no paradigma de compilacao estatica. Em vez de delegar a selecao de tokens a um modelo de linguagem estocastico secundario, o desenvolvedor expressa a estrutura conversacional por meio de blocos funcionais rigorosos.
 
 ### 3.1. Sintaxe e Gramatica Formal
-A gramatica formal da TokLang, expressa em Notacao de Backus-Naur Estendida (EBNF), define que um programa TokLang e composto por diretivas de orcamento opcionais seguidas por secoes estruturadas:
+A gramatica formal da TokLang, expressa em Notacao de Backus-Naur Estendida (EBNF), define que um programa TokLang e composto por diretivas declarativas parametrizadas seguidas por blocos estruturados:
 
 ```ebnf
-Program        ::= [ BudgetDirective ] { Section }
-BudgetDirective::= "#budget" INTEGER
-Section        ::= ContextSec | InstructionSec | ConstraintSec
-ContextSec     ::= "context" [ IDENTIFIER ] "{" TextContent "}"
-InstructionSec ::= "instruction" "{" TextContent "}"
-ConstraintSec  ::= "constraint" "{" TextContent "}"
-TextContent    ::= { CHARACTER | ESCAPED_BRACE }
+Program             ::= { Directive | Section }
+Directive           ::= BudgetDirective | CompressDirective | ConstraintDirective
+BudgetDirective     ::= "@budget" "(" "max_tokens" "=" INTEGER [ "," "reserve_completion" "=" INTEGER ] ")"
+CompressDirective   ::= "@compress" "(" "level" "=" STRING [ "," "ratio" "=" STRING ] [ "," "target" "=" STRING ] ")"
+ConstraintDirective ::= "@constraint" "(" "name" "=" STRING "," "focus" "=" STRING ")"
+Section             ::= ContextSec | InstructionSec | ConstraintSec
+ContextSec          ::= "context" [ IDENTIFIER ] [ "(" "priority" "=" INTEGER ")" ] "{" TextContent "}"
+InstructionSec      ::= "instruction" "{" TextContent "}"
+ConstraintSec       ::= "constraint" [ IDENTIFIER ] "{" TextContent "}"
+TextContent         ::= { STRING | IDENTIFIER | NUMBER | SYMBOL | NestedBraces }
 ```
 
-A separacao formal entre `context` (dados brutos, documentos e esquemas), `instruction` (o comando operacional solicitado ao LLM) e `constraint` (regras invariantes, como limites de formato, condicoes de seguranca e conformidade) estabelece uma hierarquia de prioridades inexistente em texto puro.
+A separacao formal entre `context` (dados brutos, documentos e esquemas), `instruction` (o comando operacional solicitado ao LLM) e `constraint` / `@constraint` (regras invariantes, como limites de formato, condicoes de seguranca e conformidade) estabelece uma hierarquia de prioridades inexistente em texto puro.
 
 ### 3.2. Analise Lexica e Construcao da AST
 O pipeline de compilacao do TokLang opera em quatro fases deterministicas:
 
-1. **Scanner Lexico (Lexer):** Decompone o codigo-fonte em tokens formais (`TOKEN_DIRECTIVE`, `TOKEN_SECTION_KEYWORD`, `TOKEN_LBRACE`, `TOKEN_RBRACE`, `TOKEN_CONTENT`), computando numeros de linha e coluna. O analisador mantem contagem de profundidade de escopo (`brace_depth`), permitindo que codigos-fonte, esquemas SQL ou objetos JSON contendo chaves `{}` sejam encapsulados no conteudo sem violar o fechamento sintatico da secao.
-2. **Parser Descendente Preditivo:** Constroi uma Arvore Sintatica Abstrata (AST) contendo nos tipados: `BudgetNode`, `ContextNode`, `InstructionNode` e `ConstraintNode`. Caso o desenvolvedor forneca sintaxe invalida, o compilador emite diagnosticos deterministicos antes que qualquer chamada de rede seja realizada.
-3. **Validador Semantico e Whitelisting:** Identifica secoes duplicadas ou contraditorias e aplica uma camada de preservacao lexica baseada em listas de termos tecnicos protegidos (entidades nominais, termos tecnicos de alta entropia e palavras-chave de linguagem).
-4. **Emissor e Compilador com Poda Hierarquica:** Quando uma diretiva de orcamento (`#budget <N>`) e declarada, o compilador calcula o orcamento disponivel utilizando um estimador deterministico de subpalavras (BPE). A politica de poda segue uma invariante estrita de engenharia:
+1. **Scanner Lexico (Lexer):** Decompoe o codigo-fonte em tokens formais (`DIRECTIVE`, `IDENTIFIER`, `STRING`, `NUMBER`, `LBRACE`, `RBRACE`, `LPAREN`, `RPAREN`, `EQUALS`, `COMMA`, `SYMBOL`), computando numeros de linha e coluna. O analisador mantem contagem de profundidade de escopo (`brace_depth`), permitindo que codigos-fonte, esquemas SQL ou objetos JSON contendo chaves `{}` sejam encapsulados no conteudo sem violar o fechamento sintatico da secao.
+2. **Parser Descendente Preditivo LL(1):** Constroi uma Arvore Sintatica Abstrata (AST) contendo nos tipados: `PromptDocument`, `TokenBudgetDirective`, `CompressionDirective`, `AttentionConstraint`, `ContextBlock` e `InstructionBlock`. Caso o desenvolvedor forneca sintaxe invalida, o compilador emite `SyntaxError` deterministico com linha e coluna antes que qualquer chamada de rede seja realizada.
+3. **Validador Semantico e Whitelisting:** Incorpora os termos declarados em `@constraint(focus=...)` a camada de preservacao lexica (`ShannonPromptCompressor`), garantindo protecao de entidades nominais, operadores SQL e palavras-chave de dominio.
+4. **Emissor e Compilador com Poda Hierarquica (`TokLangCompiler`):** Quando uma diretiva de orcamento (`@budget(max_tokens=N)`) e de compressao (`@compress(level="aggressive", ratio="4x")`) sao declaradas, o compilador contabiliza os tokens exatos via Byte-Pair Encoding (`tiktoken` `cl100k_base`) sob politica zero fallback. A politica de poda segue uma invariante estrita de engenharia:
    - **Prioridade 1 (Inviolavel):** Todas as secoes de `constraint` sao preservadas integralmente.
    - **Prioridade 2 (Inviolavel):** A secao de `instruction` e mantida com 100% de integridade.
-   - **Prioridade 3 (Elastica):** A secao de `context` absorve o corte de tokens. Tokens de menor autoinformacao de Shannon no contexto sao podados ate que o orcamento consolidado seja satisfeito, mantendo-se os termos do whitelist e preservando as quebras de linha e a ordem sintatica original.
+   - **Prioridade 3 (Elastica):** A secao de `context` absorve a poda algoritmica de autoinformacao de Shannon $I(w) = -\log_2 P(w)$ e o corte de orcamento, mantendo-se os termos protegidos pelo whitelist e a ordem sintatica original.
 
 ---
 
@@ -108,8 +111,8 @@ A bancada avaliou tres cenarios corporativos de extrema complexidade tecnica:
 Cada caso de teste foi executado sob quatro configuracoes metodologicas:
 1. `Few-shot (Baseline)`: Prompt convencional completo contendo descricao do problema, contexto detalhado e exemplo previo de resolucao (padrao corporativo industrial).
 2. `Zero-shot`: Remocao dos exemplos prévios, submetendo apenas o contexto e a instrucao direta.
-3. `TokLang (2x)`: Compilacao estrutural via TokLang estabelecendo orcamento de tokens com fator alvo de reducao de aproximadamente $2.0\times$ sobre o baseline.
-4. `TokLang (3x)`: Compilacao agressiva visando reducao de $3.0\times$, testando o limiar de degradacao informacional.
+3. `TokLang (2x)`: Compilacao estrutural via TokLang estabelecendo orcamento de tokens com fator alvo nominal de reducao de $2.0\times$ sobre o prompt.
+4. `TokLang (4x)`: Compilacao agressiva visando fator nominal de reducao de $4.0\times$, testando o limiar de degradacao informacional sob poda severa.
 
 ### 4.4. Metricas de Fidelidade Semantica e Economica
 A fidelidade das respostas geradas pelo modelo foi computada em relacao a gabaritos tecnicos de referencia mediante quatro funcoes:
@@ -155,7 +158,7 @@ A compilacao TokLang 4x reduziu o volume medio faturado de tokens de entrada de 
 ### 5.2. Preservacao da Fidelidade Semantica e Comparativo com Podagem Cega
 A hipotese central deste estudo sustentava que a compilacao por AST e whitelisting de entidades impediria a degradacao informacional. Enquanto ensaios exploratorios com podagem puramente estatistica sem regras gramaticais colapsaram o BERTScore F1 para a faixa de $0.4337$ a $0.5794$ (conforme documentado no laudo de qualidade semantica), o TokLang 4x sustentou um BERTScore Proxy medio de **0.8238**, atingindo **0.8524** em SQL analitico e **0.8279** na auditoria da LGPD.
 
-A retencao de entidades tecnicas alcancou **100%** no Caso 2 (SQL com CTE), garantindo que todas as clausulas relacionais essenciais (`WITH`, `DENSE_RANK() OVER`, `JOIN`, `GROUP BY`) permanecessem intactas no codigo gerado pelo modelo. A Figura 3 comprova que a pontuacao F1 de todas as configuracoes estruturadas do TokLang situa-se confortavelmente acima do limiar critico de aceitabilidade academica ($F1 \ge 0.80$).
+A retencao de entidades tecnicas alcancou **100%** no Caso 2 (SQL com CTE), garantindo que todas as clausulas relacionais essenciais (`WITH`, `DENSE_RANK() OVER`, `JOIN`, `GROUP BY`) permanecessem intactas no codigo gerado pelo modelo, e apresentou ganho de relacao sinal-ruido no Caso 3 (Auditoria LGPD), onde o F1 subiu de 0.7916 no baseline Few-shot para **0.8279** sob compressao de 4x. Apenas no Caso 1 (Consenso Raft) observou-se retracao marginal para 0.7917 (2x) e 0.7912 (4x), evidenciando a sensibilidade de modelos compactos de 11B parametros a omissao de conectivos causais em raciocinio distribuido multi-etapas. A Figura 3 apresenta a curva de retencao semantica em funcao da compressao frente ao limiar critico ($F1 = 0.80$).
 
 ```
 [Figura 3: Fidelidade Semantica (BERTScore Proxy F1) em Funcao da Compressao]
@@ -205,7 +208,7 @@ DEVLIN, J. et al. BERT: Pre-training of Deep Bidirectional Transformers for Lang
 
 JIANG, H. et al. LLMLingua: Compressing Prompts for Accelerated Inference of Large Language Models. In: **Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP)**, p. 13358–13376, 2023. DOI: 10.18653/v1/2023.emnlp-main.825. Disponivel em: <https://aclanthology.org/2023.emnlp-main.825/>.
 
-LIU, N. F. et al. Lost in the Middle: How Language Models Use Long Contexts. **Transactions of the Association for Computational Linguistics (TACL)**, v. 12, p. 157–173, 2023. DOI: 10.1162/tacl_a_00638. Disponivel em: <https://doi.org/10.1162/tacl_a_00638>.
+LIU, N. F. et al. Lost in the Middle: How Language Models Use Long Contexts. **Transactions of the Association for Computational Linguistics (TACL)**, v. 12, p. 157–173, 2024. DOI: 10.1162/tacl_a_00638. Disponivel em: <https://doi.org/10.1162/tacl_a_00638>.
 
 PAN, S. et al. A Survey on Large Language Model based Autonomous Agents. **ACM Computing Surveys**, v. 56, n. 9, p. 1–39, 2024. DOI: 10.1145/3682112. Disponivel em: <https://dl.acm.org/doi/10.1145/3682112>.
 

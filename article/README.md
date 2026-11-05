@@ -16,8 +16,8 @@ Este diretorio contem a versao preliminar e a estrutura completa do artigo cient
 1. **Matheus Sousa dos Santos** (RA: 52319400) — `52319400@unimax.edu.br`
 2. **Felipe Guarnieri Pinete** (RA: 52319337) — `52319337@unimax.edu.br`
 3. **Guilherme Gustavo Weber** (RA: 52420339) — `52420339@unimax.edu.br`
-4. **Juan Pedro** (RA: 52319411) — `52319411@unimax.edu.br`
-5. **Prof. Me. Luiz Claudio Chiavini** (Orientador) — `luiz.chiavini@unimax.edu.br`
+4. **Juan Pedro Souza de Oliveira** (RA: 52319411) — `52319411@unimax.edu.br`
+5. **Prof. Me. Luiz Claudio Chiavini Oliveira Junior** (Orientador) — `luiz.chiavini@unimax.edu.br`
 
 **Instituicao:**  
 Centro Universitario Max Planck (UniMAX) — Grupo Educlever  

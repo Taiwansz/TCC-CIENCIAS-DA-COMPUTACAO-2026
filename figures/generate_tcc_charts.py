@@ -1,19 +1,20 @@
 """
 =============================================================================
 Gerador de Figuras Gráficas Científicas — TCC II (Ciência da Computação)
-Autor: Matheus Sousa dos Santos (RA: 52319400)
+Autores: Matheus Sousa dos Santos (RA: 52319400), Felipe Guarnieri Pinete (RA: 52319337), Guilherme Gustavo Weber (RA: 52420339), Juan Pedro Souza de Oliveira (RA: 52319411)
 Orientador: Prof. Luiz Claudio Chiavini Oliveira Junior
 Centro Universitário Max Planck (UniMAX) - Indaiatuba, 2026
 =============================================================================
-Gera os 4 gráficos científicos de bancada em alta resolução (300 DPI):
+Gera os gráficos científicos de bancada em alta resolução (300 DPI):
 - Figura 10.1: Volume Médio de Tokens de Entrada por Técnica e Caso
 - Figura 10.2: Latência e Redução de Time-to-First-Token (TTFT em ms)
 - Figura 10.3: Curva de Retenção Semântica (BERTScore F1) vs Razão de Compressão
 - Figura 10.4: Projeção de Custo Financeiro e Redução de FLOPs O(n²)
+- Painel Consolidado Battle IA: Visão Executiva Integrada (2x2)
 
 POLÍTICA DE DADOS: ZERO FALLBACK / ZERO DADOS SINTÉTICOS.
 Todos os pontos plotados são estritamente lidos do banco de dados experimental:
-'03 - Bancada Experimental (Código)/battle_ia_resultados_brutos.json'
+'benchmark/battle_ia_resultados_brutos.json'
 Se qualquer medição estiver ausente, o script encerra imediatamente com erro fatal.
 =============================================================================
 """
@@ -295,3 +296,86 @@ fig4_path = out_dir / "figura_10_4_custo_flops.png"
 fig.savefig(fig4_path, dpi=300)
 plt.close(fig)
 print(f"[OK] Gerada Figura 10.4 (100% Real): {fig4_path}")
+
+# -------------------------------------------------------------
+# PAINEL CONSOLIDADO BATTLE IA (2x2 - 100% Real Llama-3.2-11B)
+# -------------------------------------------------------------
+fig_p, axs = plt.subplots(2, 2, figsize=(13.5, 8.8), dpi=300)
+fig_p.suptitle(
+    f"BATTLE IA // PAINEL CONSOLIDADO DE RESULTADOS EXPERIMENTAIS (TCC II — UniMAX 2026)\n[{SUBTITULO_MODELO}]",
+    fontsize=12.0, fontweight='bold', color='#1A202C', y=0.98
+)
+
+# Subplot (0,0): Tokens de Entrada
+ax_a = axs[0, 0]
+r_a1 = ax_a.bar(x - width*1.5, few_shot, width, label='Few-shot (Baseline)', color='#4A5568')
+r_a2 = ax_a.bar(x - width*0.5, zero_shot, width, label='Zero-shot', color='#718096')
+r_a3 = ax_a.bar(x + width*0.5, llmlingua_2x, width, label='TokLang / LLMLingua (2x)', color='#2B6CB0')
+r_a4 = ax_a.bar(x + width*1.5, llmlingua_4x, width, label='TokLang / LLMLingua (4x)', color='#319795')
+ax_a.set_title("1. Consumo Real de Tokens de Entrada (Redução Média de 56,2% em 4x)", fontsize=9.5, fontweight='bold')
+ax_a.set_ylabel("Tokens de Entrada", fontsize=8.5, fontweight='bold')
+ax_a.set_xticks(x)
+ax_a.set_xticklabels(labels, fontsize=8.0)
+ax_a.set_ylim(0, max(few_shot) * 1.25)
+ax_a.grid(axis='y', alpha=0.6)
+ax_a.legend(fontsize=7.2, loc='upper right')
+for r_grp in (r_a1, r_a2, r_a3, r_a4):
+    autolabel(r_grp, ax_a, "{:.0f}")
+
+# Subplot (0,1): Latência TTFT
+ax_b = axs[0, 1]
+r_b1 = ax_b.bar(x - width*1.5, ttft_few, width, label='Few-shot (Baseline)', color='#4A5568')
+r_b2 = ax_b.bar(x - width*0.5, ttft_zero, width, label='Zero-shot', color='#718096')
+r_b3 = ax_b.bar(x + width*0.5, ttft_2x, width, label='TokLang / LLMLingua (2x)', color='#C53030')
+r_b4 = ax_b.bar(x + width*1.5, ttft_4x, width, label='TokLang / LLMLingua (4x)', color='#DD6B20')
+ax_b.set_title("2. Latência Time-to-First-Token (TTFT Médio de 574,3 ms em 4x)", fontsize=9.5, fontweight='bold')
+ax_b.set_ylabel("TTFT Real (ms)", fontsize=8.5, fontweight='bold')
+ax_b.set_xticks(x)
+ax_b.set_xticklabels(labels, fontsize=8.0)
+ax_b.set_ylim(0, max_ttft_all * 1.18)
+ax_b.grid(axis='y', alpha=0.6)
+ax_b.legend(fontsize=7.2, loc='upper left')
+for r_grp in (r_b1, r_b2, r_b3, r_b4):
+    autolabel(r_grp, ax_b, "{:.0f}ms")
+
+# Subplot (1,0): Fidelidade Semântica BERTScore F1
+ax_c = axs[1, 0]
+ax_c.plot(ratios, c1_f1, marker='o', linewidth=2.0, label='Caso 1: Sist. Distribuídos (Raft)', color='#2B6CB0')
+ax_c.plot(ratios, c2_f1, marker='s', linewidth=2.0, label='Caso 2: SQL Analítico (DDL)', color='#2C7A7B')
+ax_c.plot(ratios, c3_f1, marker='^', linewidth=2.0, label='Caso 3: Auditoria LGPD', color='#805AD5')
+ax_c.axhline(0.80, color='#E53E3E', linestyle=':', linewidth=1.5, label='Limiar Crítico (F1 = 0,80)')
+ax_c.set_title("3. Fidelidade Semântica (BERTScore Proxy F1 Médio = 0,8238 em 4x)", fontsize=9.5, fontweight='bold')
+ax_c.set_ylabel("BERTScore Proxy F1", fontsize=8.5, fontweight='bold')
+ax_c.set_ylim(0.72, 0.94)
+ax_c.set_xticks(ratios)
+ax_c.set_xticklabels(['1x (Zero-shot)', '2x (Poda Shannon)', '4x (Poda Shannon)'], fontsize=8.0)
+ax_c.grid(True, alpha=0.6)
+ax_c.legend(fontsize=7.2, loc='upper right')
+
+# Subplot (1,1): Economia Financeira e Redução de FLOPs O(n²)
+ax_d1 = axs[1, 1]
+ax_d2 = ax_d1.twinx()
+rc_d = ax_d1.bar(x_pos - w_bar/2, cost_usd, w_bar, label='Custo Médio 100k Req. (US$)', color='#2B6CB0')
+rf_d = ax_d2.bar(x_pos + w_bar/2, flops_reduction, w_bar, label='Redução FLOPs Atenção O(n²)', color='#38A169')
+ax_d1.set_title("4. Custo em Escala (100k Req.) e Alívio Quadrático de Prefill (-80,7% FLOPs)", fontsize=9.5, fontweight='bold')
+ax_d1.set_ylabel("Custo 100k Req. (US$)", color='#2B6CB0', fontsize=8.5, fontweight='bold')
+ax_d2.set_ylabel("Redução FLOPs O(n²) (%)", color='#38A169', fontsize=8.5, fontweight='bold')
+ax_d1.set_ylim(0, max(cost_usd) * 1.30)
+ax_d2.set_ylim(0, 115)
+ax_d1.set_xticks(x_pos)
+ax_d1.set_xticklabels(scenarios, fontsize=8.0)
+for rect in rc_d:
+    h = rect.get_height()
+    ax_d1.annotate(f"US${h:.1f}", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 2), textcoords="offset points", ha='center', va='bottom', fontsize=7.2, fontweight='bold', color='#1A365D')
+for rect in rf_d:
+    h = rect.get_height()
+    ax_d2.annotate(f"{h:.1f}%", xy=(rect.get_x() + rect.get_width() / 2, h), xytext=(0, 2), textcoords="offset points", ha='center', va='bottom', fontsize=7.2, fontweight='bold', color='#22543D')
+l1, lb1 = ax_d1.get_legend_handles_labels()
+l2, lb2 = ax_d2.get_legend_handles_labels()
+ax_d1.legend(l1 + l2, lb1 + lb2, loc='upper right', fontsize=7.2)
+
+fig_p.tight_layout(rect=[0, 0.01, 1, 0.94])
+painel_path = out_dir / "painel_consolidado_battle_ia.png"
+fig_p.savefig(painel_path, dpi=300)
+plt.close(fig_p)
+print(f"[OK] Gerado Painel Consolidado Battle IA (100% Real): {painel_path}")

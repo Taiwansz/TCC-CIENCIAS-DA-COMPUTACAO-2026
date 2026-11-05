@@ -12,14 +12,11 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml, OxmlElement
 from docx.oxml.ns import nsdecls, qn
 import win32com.client
+import pypdf
 try:
     import fitz
 except ImportError:
     fitz = None
-try:
-    import pypdf
-except ImportError:
-    pypdf = None
 
 from tcc_humanizer import set_cell_margins, set_cell_background, format_abnt_table, humanize_text
 
@@ -156,15 +153,16 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         r_t.font.size = Pt(10)
         r_t.font.bold = True
 
-        if img_path.exists():
-            p_img = doc.add_paragraph()
-            p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            p_img.paragraph_format.space_before = Pt(2)
-            p_img.paragraph_format.space_after = Pt(2)
-            p_img.paragraph_format.first_line_indent = Cm(0)
-            p_img.paragraph_format.keep_with_next = True
-            run_img = p_img.add_run()
-            run_img.add_picture(str(img_path), width=Cm(14.0))
+        if not img_path.exists():
+            raise FileNotFoundError(f"ERRO FATAL: Figura cientifica obrigatoria nao encontrada: {img_path}")
+        p_img = doc.add_paragraph()
+        p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_img.paragraph_format.space_before = Pt(2)
+        p_img.paragraph_format.space_after = Pt(2)
+        p_img.paragraph_format.first_line_indent = Cm(0)
+        p_img.paragraph_format.keep_with_next = True
+        run_img = p_img.add_run()
+        run_img.add_picture(str(img_path), width=Cm(14.0))
 
         p_src = doc.add_paragraph()
         p_src.alignment = WD_ALIGN_PARAGRAPH.LEFT
@@ -434,7 +432,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
     )
     add_p(
         "Confrontamos duas linhas de base convencionais — Few-shot (Baseline) e Zero-shot — com o motor "
-        "algorítmico ShannonPromptCompressor, inspirado no LLMLingua e parametrizado em fatores nominais de poda "
+        "algorítmico ShannonPromptCompressor (integrado ao compilador determinístico TokLang), inspirado no LLMLingua e parametrizado em fatores nominais de poda "
         "de 2x e 4x. O compressor calcula a autoinformação de Shannon I(w) = -log2 P(w) de cada vocábulo, podando "
         "conectivos redundantes enquanto aplica proteção estrita (token whitelisting) sobre identificadores técnicos, "
         "cláusulas SQL e referências normativas."
@@ -811,11 +809,9 @@ def scan_heading_pages(pdf_path: Path):
     if fitz is not None:
         doc = fitz.open(pdf_path)
         pages_text = [p.get_text() for p in doc]
-    elif pypdf is not None:
+    else:
         reader = pypdf.PdfReader(str(pdf_path))
         pages_text = [p.extract_text() or "" for p in reader.pages]
-    else:
-        return {}
     search_keys = [
         ("1 INTRODUÇÃO", "1 INTRODUÇÃO"),
         ("1.1 Contextualização e Motivação", "1.1 Contextualização"),
@@ -867,7 +863,9 @@ def scan_heading_pages(pdf_path: Path):
             elif query.upper() in txt_up:
                 found_pg = p_idx + 1
                 break
-        mapping[label] = str(found_pg or 5)
+        if found_pg is None:
+            raise RuntimeError(f"ERRO FATAL: Secao '{label}' nao localizada no PDF para construcao do sumario.")
+        mapping[label] = str(found_pg)
     return mapping
 
 

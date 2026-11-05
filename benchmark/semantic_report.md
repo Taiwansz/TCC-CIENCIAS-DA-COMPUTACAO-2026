@@ -2,8 +2,8 @@
 
 **Projeto:** TokLang — Linguagem de Programacao Orientada a Tokens para Compilacao e Otimizacao de Contexto de LLMs  
 **Instituicao:** Centro Universitario Max Planck (UniMAX) — Ciencia da Computacao  
-**Autores:** Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro  
-**Orientador:** Prof. Me. Luiz Claudio Chiavini  
+**Autores:** Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro Souza de Oliveira  
+**Orientador:** Prof. Me. Luiz Claudio Chiavini Oliveira Junior  
 
 ---
 

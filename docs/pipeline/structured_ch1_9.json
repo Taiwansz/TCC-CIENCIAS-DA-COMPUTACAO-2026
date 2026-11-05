@@ -326,17 +326,5 @@
   {
     "type": "p",
     "text": "É relevante, contudo, discutir o Paradoxo de Jevons no contexto da eficiência em IA. O paradoxo, originalmente formulado pelo economista William Stanley Jevons em 1865 no contexto da eficiência de máquinas a vapor, postula que aumentos de eficiência em uma tecnologia frequentemente levam ao aumento do seu consumo total, pois a redução de custo estimula maior demanda. No campo da IA, esse fenômeno já é observável: a redução de custos de inferência proporcionada por modelos mais eficientes e técnicas de otimização tem impulsionado a proliferação de aplicações e o aumento do volume de requisições, potencialmente compensando parte da economia energética obtida por requisição individual."
-  },
-  {
-    "type": "h1",
-    "text": "10 RESULTADOS E DISCUSSÃO"
-  },
-  {
-    "type": "p",
-    "text": "A análise sistemática da literatura sobre compressão de prompts para LLMs revela um panorama consolidado em relação às taxas de compressão e seus impactos sobre qualidade semântica. Os resultados convergem em torno de um perfil consistente: taxas moderadas de compressão oferecem excelente relação entre redução de custo e preservação de qualidade, enquanto taxas extremas comprometem progressivamente a integridade das respostas."
-  },
-  {
-    "type": "p",
-    "text": "Compressões de 2x (50% de redução de tokens) apresentam degradação semântica praticamente imperceptível em praticamente todos os benchmarks avaliados. O BERTScore F1 para esse nível de compressão tipicamente excede 0,90, e avaliações humanas raramente identificam diferenças de qualidade entre respostas geradas com e sem compressão. Essa faixa"
   }
 ]

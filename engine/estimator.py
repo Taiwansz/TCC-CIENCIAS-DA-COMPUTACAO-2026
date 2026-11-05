@@ -1,9 +1,10 @@
 """
 TokLang Compression & Quadratic Attention FLOP Reduction Estimator
-Calcula metricas teoricas e empiricas do TCC de Matheus Sousa:
+Calcula metricas teoricas e empiricas do TCC (UniMAX 2026):
 - Taxa de compressao de tokens
 - Reducao quadratica de atencao O(N^2) -> O(K^2)
-- Economia computacional estimada em inference flops
+- Economia computacional estimada em inference FLOPs
+Autores: Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro Souza de Oliveira
 """
 
 import math
@@ -15,7 +16,7 @@ from .ast_nodes import PromptDocument
 class CompressionEstimator:
     @staticmethod
     def estimate_token_count(text: str) -> int:
-        """Estimativa euristica de contagem de tokens (media 3.8 caracteres/token)."""
+        """Estimativa heuristica de contagem de tokens (media 3.8 caracteres/token)."""
         if not text:
             return 0
         words = text.split()
@@ -55,15 +56,10 @@ class CompressionEstimator:
                 "theoretical_speedup_factor": 1.0
             }
 
-        # Evitar k > n em metricas de reducao
         k_eff = min(k_comp, n_raw)
         tokens_saved = n_raw - k_eff
         compression_ratio = round((tokens_saved / n_raw) * 100, 2)
 
-        # Mecanica de Atencao do Transformer:
-        # A complexidade de atencao scaled dot-product e quadratica com o comprimento da sequencia: FLOPs ~ 2 * N^2 * d
-        # A reducao relativa de FLOPs de atencao entre N (raw) e K (compiled) e:
-        # Reducao = 1 - (K^2 / N^2)
         flops_ratio = (k_eff ** 2) / (n_raw ** 2)
         flops_reduction = round((1.0 - flops_ratio) * 100, 2)
 

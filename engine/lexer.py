@@ -1,6 +1,7 @@
 """
 TokLang Lexer & Tokenizer
-Realiza analise lexica de scripts TokLang para geracao de sequencia de tokens tipados.
+Realiza analise lexica deterministica de scripts TokLang para geracao de sequencia de tokens tipados.
+Autores: Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber, Juan Pedro Souza de Oliveira
 """
 
 from dataclasses import dataclass
@@ -9,7 +10,7 @@ from enum import Enum, auto
 
 class TokenType(Enum):
     DIRECTIVE = auto()     # @compress, @budget, @constraint
-    IDENTIFIER = auto()    # context, instruction, name
+    IDENTIFIER = auto()    # context, instruction, constraint, name
     STRING = auto()        # "...", '...'
     NUMBER = auto()        # 1000, 250
     LBRACE = auto()        # {
@@ -18,6 +19,7 @@ class TokenType(Enum):
     RPAREN = auto()        # )
     EQUALS = auto()        # =
     COMMA = auto()         # ,
+    SYMBOL = auto()        # ;, :, ., *, +, etc.
     EOF = auto()
 
 
@@ -74,7 +76,7 @@ class TokLangLexer:
             cur_line = self.line
             cur_col = self.col
 
-            # Diretivas (@compress, @budget, etc)
+            # Diretivas (@compress, @budget, @constraint)
             if char == "@":
                 self._advance()
                 val = ""
@@ -86,6 +88,8 @@ class TokLangLexer:
                             val += adv
                     else:
                         break
+                if not val:
+                    raise SyntaxError(f"Erro lexico [linha {cur_line}, col {cur_col}]: Diretiva '@' vazia.")
                 tokens.append(Token(TokenType.DIRECTIVE, f"@{val}", cur_line, cur_col))
                 continue
 
@@ -93,9 +97,14 @@ class TokLangLexer:
             if char in ('"', "'"):
                 quote = self._advance()
                 val = ""
+                closed = False
                 while self.pos < self.length:
                     pk = self._peek()
-                    if pk is None or pk == quote:
+                    if pk is None:
+                        break
+                    if pk == quote:
+                        self._advance()
+                        closed = True
                         break
                     if pk == "\\":
                         self._advance()
@@ -107,12 +116,12 @@ class TokLangLexer:
                         adv = self._advance()
                         if adv is not None:
                             val += adv
-                if self.pos < self.length:
-                    self._advance()  # consome quote final
+                if not closed:
+                    raise SyntaxError(f"Erro lexico [linha {cur_line}, col {cur_col}]: String nao fechada.")
                 tokens.append(Token(TokenType.STRING, val, cur_line, cur_col))
                 continue
 
-            # Numeros
+            # Numeros (ou razoes como 2x, 4x)
             if char.isdigit():
                 val = ""
                 while self.pos < self.length:
@@ -140,7 +149,7 @@ class TokLangLexer:
                 tokens.append(Token(TokenType.IDENTIFIER, val, cur_line, cur_col))
                 continue
 
-            # Simbolos especiais
+            # Simbolos estruturais e operadores
             if char == "{":
                 self._advance()
                 tokens.append(Token(TokenType.LBRACE, "{", cur_line, cur_col))
@@ -160,7 +169,9 @@ class TokLangLexer:
                 self._advance()
                 tokens.append(Token(TokenType.COMMA, ",", cur_line, cur_col))
             else:
-                self._advance()
+                sym = self._advance()
+                if sym is not None:
+                    tokens.append(Token(TokenType.SYMBOL, sym, cur_line, cur_col))
 
         tokens.append(Token(TokenType.EOF, "", self.line, self.col))
         return tokens
