@@ -334,6 +334,32 @@ class TestBattleIABenchmarkDataIntegrity(unittest.TestCase):
         ]:
             self.assertIn(expected_marker, full_text, f"Marcador empirico '{expected_marker}' ausente no PDF final")
 
+        # Verifica anonimizacao estrita (Double-Blind Review: zero nomes de autores, RAs ou orientador)
+        full_lower = full_text.lower()
+        for forbidden_id in [
+            "orientador",
+            "chiavini",
+            "luiz claudio",
+            "matheus sousa",
+            "felipe guarnieri",
+            "pinete",
+            "guilherme gustavo",
+            "weber",
+            "juan pedro",
+            "52319400",
+            "52319337",
+            "52420339",
+            "52319411",
+            "taiwansz",
+        ]:
+            self.assertNotIn(
+                forbidden_id,
+                full_lower,
+                f"Violacao de Avaliacao Cega: identificador '{forbidden_id}' encontrado no PDF final",
+            )
+        meta_author = getattr(reader.metadata, "author", None) if reader.metadata else None
+        self.assertIn(meta_author, (None, ""), f"Metadado /Author do PDF deve estar vazio, encontrado: '{meta_author}'")
+
 
 if __name__ == "__main__":
     unittest.main()

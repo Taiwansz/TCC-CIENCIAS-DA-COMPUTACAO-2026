@@ -27,7 +27,7 @@
 ## 2. Protocolo de Avaliacao Cega (Banca Virtual Anonima)
 
 > [!NOTE]  
-> Em estrita conformidade com o Regulamento Institucional de TCC do Centro Universitario Max Planck (UniMAX), a versao em PDF do manuscrito depositada para a Banca Examinadora Virtual e gerada com a **Capa Desidentificada (Avaliacao Cega / Double-Blind Review)**. Esse procedimento assegura a isencao de julgamento e elimina vieses cognitivos na correcao dos avaliadores externos. A autoria de **Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro Souza de Oliveira** e atestada pela plataforma institucional WebTCC e pelo presente repositorio publico.
+> Em estrita conformidade com o Regulamento Institucional de TCC do Centro Universitario Max Planck (UniMAX), a versao em PDF e DOCX do manuscrito depositada para a Banca Examinadora Virtual e gerada com a **Capa Totalmente Desidentificada (Avaliacao Cega / Double-Blind Review)** — sem nomes de autores, RAs ou nome do orientador, e com metadados internos anonimizados. Esse procedimento assegura a isencao de julgamento e elimina vieses cognitivos na correcao dos avaliadores. A autoria de **Matheus Sousa dos Santos, Felipe Guarnieri Pinete, Guilherme Gustavo Weber e Juan Pedro Souza de Oliveira** e a orientacao do **Prof. Me. Luiz Claudio Chiavini Oliveira Junior** sao vinculadas externamente pela plataforma institucional WebTCC e pelo presente repositorio publico.
 
 ---
 

@@ -14,9 +14,12 @@ from docx.oxml.ns import nsdecls, qn
 import win32com.client
 import pypdf
 try:
-    import fitz
+    import pymupdf as fitz
 except ImportError:
-    fitz = None
+    try:
+        import fitz
+    except ImportError:
+        fitz = None
 
 from tcc_humanizer import set_cell_margins, set_cell_background, format_abnt_table, humanize_text
 
@@ -49,6 +52,11 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
     by_key = exp["by_key"]
 
     doc = Document()
+    doc.core_properties.author = ""
+    doc.core_properties.last_modified_by = ""
+    doc.core_properties.comments = ""
+    doc.core_properties.title = "Compressão de Prompts, Tokens e Sustentabilidade da IA"
+    doc.core_properties.subject = "Trabalho de Conclusão de Curso - Ciência da Computação"
 
     # 1. Margens ABNT
     for section in doc.sections:
@@ -216,15 +224,14 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
     r_nat = p_nat.add_run(
         "Trabalho de Conclusão de Curso apresentado ao Curso de Bacharelado em Ciência da Computação "
         "do Centro Universitário Max Planck (UniMAX), como requisito parcial para obtenção do grau de "
-        "Bacharel em Ciência da Computação.\n\n"
-        "Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior"
+        "Bacharel em Ciência da Computação."
     )
     r_nat.font.name = "Arial"
     r_nat.font.size = Pt(10)
 
     p_city = doc.add_paragraph()
     p_city.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_city.paragraph_format.space_before = Pt(130)
+    p_city.paragraph_format.space_before = Pt(160)
     p_city.paragraph_format.space_after = Pt(0)
     p_city.paragraph_format.line_spacing = 1.2
     r_city = p_city.add_run("INDAIATUBA\n2026")
@@ -806,10 +813,28 @@ def convert_to_pdf(docx_path: Path, pdf_path: Path):
         doc = word.Documents.Open(str(docx_path.resolve()))
         doc.SaveAs2(str(pdf_path.resolve()), FileFormat=17)  # 17 = wdFormatPDF
         doc.Close()
-        print(f"[OK] PDF compilado via Word COM: {pdf_path}")
-        return True
     finally:
         word.Quit()
+
+    # Sanitizar metadados internos do PDF para avaliacao cega estrita (Double-Blind Review)
+    if fitz is not None:
+        pdf_doc = fitz.open(str(pdf_path))
+        pdf_doc.set_metadata({
+            "title": "Compressão de Prompts, Tokens e Sustentabilidade da IA",
+            "author": "",
+            "subject": "Trabalho de Conclusão de Curso - Ciência da Computação",
+            "keywords": "Compressão de Prompts, TokLang, LLMs, Green AI, BERTScore",
+            "creator": "",
+            "producer": "",
+        })
+        pdf_doc.del_xml_metadata()
+        tmp_pdf = pdf_path.with_suffix(".clean.pdf")
+        pdf_doc.save(str(tmp_pdf), garbage=4, deflate=True)
+        pdf_doc.close()
+        tmp_pdf.replace(pdf_path)
+
+    print(f"[OK] PDF compilado e anonimizado via Word COM: {pdf_path}")
+    return True
 
 
 def scan_heading_pages(pdf_path: Path):
