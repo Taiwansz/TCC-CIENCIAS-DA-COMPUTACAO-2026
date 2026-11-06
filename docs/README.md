@@ -19,6 +19,7 @@
 | `TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx` | DOCX (Word) | 30 paginas | **Documento Fonte Editavel**: Formatado estritamente sob as diretrizes ABNT NBR 14724 e NBR 6023:2018 (margens 3/3/2/2 cm, Arial 12pt, entrelinhas 1,5, recuo 1,25 cm). |
 | `TCC_II.pdf` | PDF (ABNT) | 30 paginas | Espelho rapido de distribuicao da versao homologada. |
 | `TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf` | PDF (ABNT) | 30 paginas | Espelho historico de submissao protocolado no WebTCC no 1o ciclo. |
+| `TCC_II_Versao_1_Acompanhamento_Matheus_Santos.docx` | DOCX (Word) | 30 paginas | Espelho editavel homologado correspondente a submissao institucional. |
 | `bibliografia_oficial_auditada_abnt.md` | Markdown | - | 21 referencias seminais com DOIs, links e fundamentacao teorica. |
 
 ---

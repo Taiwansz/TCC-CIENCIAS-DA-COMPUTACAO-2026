@@ -492,7 +492,8 @@ def sincronizar_artefatos_derivados(resultados_finais: List[Dict[str, Any]], bas
         amostras = [r for r in resultados_finais if r["tecnica"] == tec]
         if not amostras:
             continue
-        mean_in = round(statistics.mean(r["tokens_entrada"] for r in amostras), 1)
+        raw_mean_in = statistics.mean(r["tokens_entrada"] for r in amostras)
+        mean_in = round(raw_mean_in, 1)
         mean_out = round(statistics.mean(r["tokens_saida"] for r in amostras), 1)
         mean_ttft = round(statistics.mean(r["ttft_ms"] for r in amostras), 1)
         std_ttft = round(statistics.stdev(r["ttft_ms"] for r in amostras), 1) if len(amostras) > 1 else 0.0
@@ -501,8 +502,8 @@ def sincronizar_artefatos_derivados(resultados_finais: List[Dict[str, Any]], bas
         mean_ent = round(statistics.mean(r["entity_retention"] for r in amostras) * 100.0, 1)
         mean_flops = round(statistics.mean(r["reducao_flops_atencao_pct"] for r in amostras), 1)
         mean_cost_100k = round(statistics.mean(r["custo_total_100k_usd"] for r in amostras), 2)
-        red_in_pct = round(((base_mean_in - mean_in) / base_mean_in) * 100.0, 1)
-        eff_ratio = round(base_mean_in / max(mean_in, 1.0), 2)
+        red_in_pct = round(((base_mean_in - raw_mean_in) / base_mean_in) * 100.0, 1)
+        eff_ratio = round(base_mean_in / max(raw_mean_in, 1.0), 2)
 
         agregados.append({
             "model_id": amostras[0]["modelo_avaliado"],
@@ -585,7 +586,7 @@ def sincronizar_artefatos_derivados(resultados_finais: List[Dict[str, Any]], bas
         "",
         "- **Compressao Efetiva e Poda de Shannon:** Sob compressao nominal de 4x (`LLMLingua (4x)`), o consumo medio faturado de tokens de entrada caiu **56.2%** (de 384.0 no baseline Few-shot para 168.3 tokens por chamada), atingindo **57.4%** de reducao no Caso 2 (SQL sob DDL).",
         "- **Alivio Computacional no Prefill O(n²):** A reducao quadratica media nas operacoes de autoatencao da fase de prefill alcancou **80.7%** sob 4x (80.8% no Caso 1, 81.8% no Caso 2 e 79.5% no Caso 3).",
-        "- **Estabilizacao de Latencia (TTFT):** O TTFT medio sob compressao de 4x estabilizou-se em **574.3 ms** (±54.2 ms), mitigando os picos de enfileiramento observados em prompts extensos e reduzindo a latencia inicial em **23.0%** frente ao Few-shot no Caso 3.",
+        "- **Estabilizacao de Latencia (TTFT):** O TTFT medio sob compressao de 4x estabilizou-se em **574.3 ms** (±54.3 ms), mitigando os picos de enfileiramento observados em prompts extensos e reduzindo a latencia inicial em **23.0%** frente ao Few-shot no Caso 3.",
         "- **Preservacao Semantica:** O escore composto BERTScore Proxy F1 manteve media global de **0.8238** em 4x, sustentando **100.0%** de retencao de entidades obrigatorias em SQL (F1 = 0.8524) e elevando a relacao sinal-ruido na auditoria LGPD (F1 subindo de 0.7916 para 0.8279).",
         ""
     ])

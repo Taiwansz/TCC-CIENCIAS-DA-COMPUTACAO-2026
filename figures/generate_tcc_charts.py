@@ -118,8 +118,8 @@ width = 0.18
 
 rects1 = ax.bar(x - width*1.5, few_shot, width, label='Few-shot (Baseline)', color='#4A5568', edgecolor='#2D3748')
 rects2 = ax.bar(x - width*0.5, zero_shot, width, label='Zero-shot', color='#718096', edgecolor='#4A5568')
-rects3 = ax.bar(x + width*0.5, llmlingua_2x, width, label='LLMLingua (2x)', color='#2B6CB0', edgecolor='#1A365D')
-rects4 = ax.bar(x + width*1.5, llmlingua_4x, width, label='LLMLingua (4x)', color='#319795', edgecolor='#234E52')
+rects3 = ax.bar(x + width*0.5, llmlingua_2x, width, label='TokLang / LLMLingua (2x)', color='#2B6CB0', edgecolor='#1A365D')
+rects4 = ax.bar(x + width*1.5, llmlingua_4x, width, label='TokLang / LLMLingua (4x)', color='#319795', edgecolor='#234E52')
 
 ax.set_ylabel('Tokens de Entrada (Prompt Real)', fontsize=9.5, fontweight='bold')
 ax.set_title(f'Consumo Real de Tokens de Entrada por Técnica de Prompting\n[{SUBTITULO_MODELO}]', 
@@ -162,8 +162,8 @@ ttft_4x = [get_real_metric(c, 'LLMLingua (4x)', 'ttft_ms') for c in casos]
 fig, ax = plt.subplots(figsize=(7.8, 4.5), dpi=300)
 rects1 = ax.bar(x - width*1.5, ttft_few, width, label='Few-shot (Baseline)', color='#4A5568', edgecolor='#2D3748')
 rects2 = ax.bar(x - width*0.5, ttft_zero, width, label='Zero-shot', color='#718096', edgecolor='#4A5568')
-rects3 = ax.bar(x + width*0.5, ttft_2x, width, label='LLMLingua (2x)', color='#C53030', edgecolor='#742A2A')
-rects4 = ax.bar(x + width*1.5, ttft_4x, width, label='LLMLingua (4x)', color='#DD6B20', edgecolor='#7B341E')
+rects3 = ax.bar(x + width*0.5, ttft_2x, width, label='TokLang / LLMLingua (2x)', color='#C53030', edgecolor='#742A2A')
+rects4 = ax.bar(x + width*1.5, ttft_4x, width, label='TokLang / LLMLingua (4x)', color='#DD6B20', edgecolor='#7B341E')
 
 ax.set_ylabel('Time-to-First-Token - TTFT Real (ms)', fontsize=9.5, fontweight='bold')
 ax.set_title(f'Impacto da Compressão na Latência Inicial de Inferência (Prefill Time)\n[{SUBTITULO_MODELO}]', 
@@ -239,7 +239,7 @@ print(f"[OK] Gerada Figura 10.3 (100% Real): {fig3_path}")
 # -------------------------------------------------------------
 fig, ax1 = plt.subplots(figsize=(7.8, 4.5), dpi=300)
 
-scenarios = ['Few-shot', 'Zero-shot', 'LLMLingua 2x', 'LLMLingua 4x']
+scenarios = ['Few-shot', 'Zero-shot', 'TokLang / LLMLingua 2x', 'TokLang / LLMLingua 4x']
 tecs = ['Few-shot (Baseline)', 'Zero-shot', 'LLMLingua (2x)', 'LLMLingua (4x)']
 
 # Médias consolidadas estritamente sobre os registros reais dos 3 casos

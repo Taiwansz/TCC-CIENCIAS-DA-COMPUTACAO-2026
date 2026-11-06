@@ -29,23 +29,23 @@
   },
   {
     "type": "bullet",
-    "text": "•  Realizar revisão sistemática da literatura sobre técnicas de compressão de prompts publicadas entre 2022 e 2026;"
+    "text": "• Realizar revisão sistemática da literatura sobre técnicas de compressão de prompts publicadas entre 2022 e 2026;"
   },
   {
     "type": "bullet",
-    "text": "•  Compreender os fundamentos matemáticos e computacionais que justificam a compressão, com ênfase na Teoria da Informação de Shannon e na arquitetura Transformer;"
+    "text": "• Compreender os fundamentos matemáticos e computacionais que justificam a compressão, com ênfase na Teoria da Informação de Shannon e na arquitetura Transformer;"
   },
   {
     "type": "bullet",
-    "text": "•  Analisar comparativamente os principais métodos — LLMLingua, LLMLingua‑2, LongLLMLingua, Selective Context e AutoCompressor — em termos de eficiência, qualidade e aplicabilidade;"
+    "text": "• Analisar comparativamente os principais métodos — LLMLingua, LLMLingua-2, LongLLMLingua, Selective Context e AutoCompressor — em termos de eficiência, qualidade e aplicabilidade;"
   },
   {
     "type": "bullet",
-    "text": "•  Avaliar o impacto da compressão na preservação semântica por meio da métrica BERTScore;"
+    "text": "• Avaliar o impacto da compressão na preservação semântica por meio da métrica BERTScore;"
   },
   {
     "type": "bullet",
-    "text": "•  Discutir as implicações ambientais e econômicas da compressão de prompts no contexto do movimento Green AI."
+    "text": "• Discutir as implicações ambientais e econômicas da compressão de prompts no contexto do movimento Green AI."
   },
   {
     "type": "h2",
@@ -217,7 +217,7 @@
   },
   {
     "type": "h2",
-    "text": "6.1 LLMLingua e LLMLingua‑2"
+    "text": "6.1 LLMLingua e LLMLingua-2"
   },
   {
     "type": "p",
@@ -229,7 +229,7 @@
   },
   {
     "type": "p",
-    "text": "O LLMLingua‑2, publicado por Pan et al. (2024), reformulou o problema de compressão como uma tarefa de classificação binária supervisionada. Em vez de utilizar perplexidade como proxy de relevância, o LLMLingua‑2 treina um classificador dedicado sobre dados anotados para distinguir tokens que devem ser preservados dos que devem ser removidos. Essa abordagem apresenta vantagens práticas significativas: maior velocidade de inferência durante a compressão (já que o classificador é mais leve que um modelo de linguagem completo), melhor generalização para diferentes tipos de prompt e desempenho superior em benchmarks de qualidade semântica pós-compressão, especialmente em regime de altas taxas de compressão."
+    "text": "O LLMLingua-2, publicado por Pan et al. (2024), reformulou o problema de compressão como uma tarefa de classificação binária supervisionada. Em vez de utilizar perplexidade como proxy de relevância, o LLMLingua-2 treina um classificador dedicado sobre dados anotados para distinguir tokens que devem ser preservados dos que devem ser removidos. Essa abordagem apresenta vantagens práticas significativas: maior velocidade de inferência durante a compressão (já que o classificador é mais leve que um modelo de linguagem completo), melhor generalização para diferentes tipos de prompt e desempenho superior em benchmarks de qualidade semântica pós-compressão, especialmente em regime de altas taxas de compressão."
   },
   {
     "type": "h2",
@@ -237,7 +237,7 @@
   },
   {
     "type": "p",
-    "text": "O LongLLMLingua foi desenvolvido especificamente para endereçar as limitações dos métodos anteriores em contextos de prompts muito longos e aplicações de Retrieval- Augmented Generation (RAG). Enquanto o LLMLingua original trata todos os segmentos do prompt de forma relativamente uniforme, o LongLLMLingua introduz um mecanismo de compressão sensível à pergunta do usuário: os segmentos do prompt são priorizados com base em sua relevância para a consulta específica que o LLM deverá responder."
+    "text": "O LongLLMLingua foi desenvolvido especificamente para endereçar as limitações dos métodos anteriores em contextos de prompts muito longos e aplicações de Retrieval-Augmented Generation (RAG). Enquanto o LLMLingua original trata todos os segmentos do prompt de forma relativamente uniforme, o LongLLMLingua introduz um mecanismo de compressão sensível à pergunta do usuário: os segmentos do prompt são priorizados com base em sua relevância para a consulta específica que o LLM deverá responder."
   },
   {
     "type": "p",
@@ -301,7 +301,7 @@
   },
   {
     "type": "p",
-    "text": "Estudos comparativos entre os principais métodos de compressão utilizando BERTScore revelam padrões consistentes. Em taxas de compressão de até 2x, praticamente todos os métodos mantêm BERTScore acima de 0,90, com degradação semântica imperceptível para avaliadores humanos. Em taxas de 4x, métodos orientados por perplexidade como LLMLingua mantêm tipicamente F1 entre 0,85 e 0,88, enquanto o LLMLingua‑2 alcança valores consistentemente superiores a 0,87 devido ao treinamento supervisionado. Para taxas acima de 6x, todos os métodos apresentam degradação crescente, com quedas mais acentuadas em tarefas que exigem raciocínio preciso sobre detalhes específicos do contexto."
+    "text": "Estudos comparativos entre os principais métodos de compressão utilizando BERTScore revelam padrões consistentes. Em taxas de compressão de até 2x, praticamente todos os métodos mantêm BERTScore acima de 0,90, com degradação semântica imperceptível para avaliadores humanos. Em taxas de 4x, métodos orientados por perplexidade como LLMLingua mantêm tipicamente F1 entre 0,85 e 0,88, enquanto o LLMLingua-2 alcança valores consistentemente superiores a 0,87 devido ao treinamento supervisionado. Para taxas acima de 6x, todos os métodos apresentam degradação crescente, com quedas mais acentuadas em tarefas que exigem raciocínio preciso sobre detalhes específicos do contexto."
   },
   {
     "type": "h1",

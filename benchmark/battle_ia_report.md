@@ -13,7 +13,7 @@
 | Tecnica Avaliada | Amostras | Tokens Entrada (Medio) | Reducao Entrada (%) | Razao Efetiva | TTFT Medio (ms) | Desvio Padrao TTFT (ms) | BERTScore Proxy F1 | Reducao FLOPs O(n²) | Custo Lote 100k (US$) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | `Few-shot (Baseline)` | 3 | 384.0 | 0.0% | 1.00x | 614.9 | ±85.8 | 0.8314 | 0.0% | US$ 505.20 |
-| `Zero-shot` | 3 | 309.3 | 19.5% | 1.24x | 2329.4 | ±1957.9 | 0.8285 | 35.4% | US$ 482.80 |
+| `Zero-shot` | 3 | 309.3 | 19.4% | 1.24x | 2329.4 | ±1957.9 | 0.8285 | 35.4% | US$ 482.80 |
 | `LLMLingua (2x)` | 3 | 234.3 | 39.0% | 1.64x | 956.8 | ±368.5 | 0.8192 | 62.8% | US$ 460.30 |
 | `LLMLingua (4x)` | 3 | 168.3 | 56.2% | 2.28x | 574.3 | ±54.3 | 0.8238 | 80.7% | US$ 440.50 |
 
@@ -42,5 +42,5 @@
 
 - **Compressao Efetiva e Poda de Shannon:** Sob compressao nominal de 4x (`LLMLingua (4x)`), o consumo medio faturado de tokens de entrada caiu **56.2%** (de 384.0 no baseline Few-shot para 168.3 tokens por chamada), atingindo **57.4%** de reducao no Caso 2 (SQL sob DDL).
 - **Alivio Computacional no Prefill O(n²):** A reducao quadratica media nas operacoes de autoatencao da fase de prefill alcancou **80.7%** sob 4x (80.8% no Caso 1, 81.8% no Caso 2 e 79.5% no Caso 3).
-- **Estabilizacao de Latencia (TTFT):** O TTFT medio sob compressao de 4x estabilizou-se em **574.3 ms** (±54.2 ms), mitigando os picos de enfileiramento observados em prompts extensos e reduzindo a latencia inicial em **23.0%** frente ao Few-shot no Caso 3.
+- **Estabilizacao de Latencia (TTFT):** O TTFT medio sob compressao de 4x estabilizou-se em **574.3 ms** (±54.3 ms), mitigando os picos de enfileiramento observados em prompts extensos e reduzindo a latencia inicial em **23.0%** frente ao Few-shot no Caso 3.
 - **Preservacao Semantica:** O escore composto BERTScore Proxy F1 manteve media global de **0.8238** em 4x, sustentando **100.0%** de retencao de entidades obrigatorias em SQL (F1 = 0.8524) e elevando a relacao sinal-ruido na auditoria LGPD (F1 subindo de 0.7916 para 0.8279).

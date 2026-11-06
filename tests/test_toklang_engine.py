@@ -285,6 +285,54 @@ class TestBattleIABenchmarkDataIntegrity(unittest.TestCase):
         by_tec = {item["technique"]: item for item in summary_data["aggregated_by_technique"]}
         self.assertAlmostEqual(by_tec["LLMLingua (4x)"]["mean_prompt_tokens"], 168.3, places=1)
         self.assertAlmostEqual(by_tec["Few-shot (Baseline)"]["mean_prompt_tokens"], 384.0, places=1)
+        self.assertAlmostEqual(by_tec["Zero-shot"]["token_reduction_pct"], 19.4, places=1)
+
+    def test_final_monograph_synchronized_with_pipeline(self):
+        import hashlib
+        import pypdf
+
+        repo_root = Path(__file__).resolve().parent.parent
+        docs_dir = repo_root / "docs"
+        pdf_canon = docs_dir / "TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf"
+        docx_canon = docs_dir / "TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx"
+
+        self.assertTrue(pdf_canon.exists(), "PDF canonico final deve existir em docs/")
+        self.assertTrue(docx_canon.exists(), "DOCX canonico final deve existir em docs/")
+
+        # Verifica paridade binaria exata dos espelhos institucionais
+        pdf_hash = hashlib.sha256(pdf_canon.read_bytes()).hexdigest()
+        for mirror_pdf in ["TCC_II.pdf", "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf"]:
+            m_path = docs_dir / mirror_pdf
+            self.assertTrue(m_path.exists(), f"Espelho {mirror_pdf} deve existir em docs/")
+            self.assertEqual(hashlib.sha256(m_path.read_bytes()).hexdigest(), pdf_hash)
+
+        docx_hash = hashlib.sha256(docx_canon.read_bytes()).hexdigest()
+        docx_mirror = docs_dir / "TCC_II_Versao_1_Acompanhamento_Matheus_Santos.docx"
+        self.assertTrue(docx_mirror.exists())
+        self.assertEqual(hashlib.sha256(docx_mirror.read_bytes()).hexdigest(), docx_hash)
+
+        # Verifica paginacao ABNT (30 paginas) e metricas da esteira dentro do PDF
+        reader = pypdf.PdfReader(str(pdf_canon))
+        self.assertEqual(len(reader.pages), 30, "Monografia homologada deve conter exatamente 30 paginas")
+        full_text = "\n".join((p.extract_text() or "") for p in reader.pages)
+
+        for expected_marker in [
+            "TokLang",
+            "Llama-3.2-11B-Vision-Instruct",
+            "NVIDIA NIM Cloud",
+            "A100 SXM4",
+            "56,2%",
+            "57,4%",
+            "80,7%",
+            "574,3 ms",
+            "0,8524",
+            "0,8279",
+            "0,7912",
+            "US$ 505,20",
+            "US$ 440,50",
+            "-19,4%",
+        ]:
+            self.assertIn(expected_marker, full_text, f"Marcador empirico '{expected_marker}' ausente no PDF final")
 
 
 if __name__ == "__main__":

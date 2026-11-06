@@ -217,7 +217,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         "Trabalho de Conclusão de Curso apresentado ao Curso de Bacharelado em Ciência da Computação "
         "do Centro Universitário Max Planck (UniMAX), como requisito parcial para obtenção do grau de "
         "Bacharel em Ciência da Computação.\n\n"
-        "Orientador: Prof. Luiz Claudio Chiavini Oliveira Junior"
+        "Orientador: Prof. Me. Luiz Claudio Chiavini Oliveira Junior"
     )
     r_nat.font.name = "Arial"
     r_nat.font.size = Pt(10)
@@ -250,20 +250,20 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         "visto que o mecanismo de autoatenção da arquitetura Transformer escala de forma quadrática O(n²) em relação ao comprimento da entrada. "
         "Este trabalho examina a hipótese de redundância linguística de Claude Shannon aplicada à engenharia de prompt, avaliando como o descarte "
         "algorítmico de tokens de baixa autoinformação reduz a sobrecarga de hardware sem descaracterizar a precisão técnica das respostas. "
-        "Construímos a bancada experimental automatizada Battle IA para testar três cenários corporativos: raciocínio em sistemas distribuídos (consenso Raft e Teorema CAP), "
+        "Construímos o compilador determinístico TokLang e a bancada experimental automatizada Battle IA para testar três cenários corporativos: raciocínio em sistemas distribuídos (consenso Raft e Teorema CAP), "
         "geração de consultas SQL analíticas sob esquemas DDL em 3FN e auditoria de conformidade com a LGPD. "
         "Submetemos o modelo Meta Llama-3.2-11B-Vision-Instruct, operado via nuvem NVIDIA NIM Cloud sobre aceleradores NVIDIA A100 SXM4, a ensaios reais em streaming SSE, "
-        "contrastando linhas de base convencionais (Few-shot e Zero-shot) com a compressão seletiva inspirada no LLMLingua combinada a listas de proteção lexical (token whitelisting) em taxas nominais de 2x e 4x. "
+        "contrastando linhas de base convencionais (Few-shot e Zero-shot) com a compressão seletiva do motor TokLang / LLMLingua combinada a listas de proteção lexical (token whitelisting) em taxas nominais de 2x e 4x. "
         "Os resultados empíricos demonstram que a compressão nominal de 4x reduz o volume faturado de tokens de entrada em até 57,4% (média de 56,2%, caindo de 384,0 para 168,3 tokens por requisição) "
         "e elimina em média 80,7% das operações quadráticas de autoatenção no prefill (atingindo 81,8% no Caso 2). "
-        "O Time-to-First-Token (TTFT) estabilizou-se entre 538,0 ms e 636,7 ms sob compressão de 4x, mitigando oscilações de fila na nuvem e reduzindo a latência inicial em 23,0% frente ao Few-shot no Caso 3. "
+        "O Time-to-First-Token (TTFT) estabilizou-se entre 538,0 ms e 636,7 ms sob compressão de 4x (média de 574,3 ms), mitigando oscilações de fila na nuvem e reduzindo a latência inicial em 23,0% frente ao Few-shot no Caso 3. "
         "A fidelidade semântica (BERTScore Proxy F1, com limiar crítico de 0,80) manteve-se elevada na geração de SQL (0,8524 em 4x, com 100% de retenção de entidades) e apresentou ganho de sinal-ruído na auditoria LGPD "
         "(evoluindo de 0,7916 no baseline para 0,8279 em 4x), registrando retração marginal apenas no Caso 1 (0,7912) pela sensibilidade de modelos compactos de 11B parâmetros à omissão de conectivos causais. "
         "Em escala de 100.000 requisições, a técnica reduz em 56,2% o dispêndio de entrada e em 12,8% o custo global (de US$ 505,20 para US$ 440,50), consolidando-se como instrumento prático de Green AI.",
         space_after=10, line_spacing=1.25, first_line_indent=Cm(0)
     )
 
-    add_p("Compressão de Prompts. Modelos de Linguagem de Grande Escala. Engenharia de Prompt. Green AI. BERTScore. NVIDIA NIM.",
+    add_p("Compressão de Prompts. TokLang. Modelos de Linguagem de Grande Escala. Engenharia de Prompt. Green AI. BERTScore. NVIDIA NIM.",
           bold_prefix="Palavras-chave: ", line_spacing=1.25, first_line_indent=Cm(0))
 
     # =========================================================================
@@ -283,20 +283,20 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         "Inference in Large Language Models (LLMs) imposes a substantial computational burden on modern infrastructure, as inner product "
         "calculations in the Transformer self-attention mechanism scale quadratically O(n²) with sequence length. This research examines Claude Shannon's "
         "linguistic redundancy hypothesis applied to prompt engineering, evaluating how algorithmic pruning of low-self-information tokens mitigates "
-        "hardware strain while preserving technical accuracy. We built an automated experimental testbed (Battle IA Benchmark) covering three enterprise "
+        "hardware strain while preserving technical accuracy. We built the deterministic TokLang compiler and an automated experimental testbed (Battle IA Benchmark) covering three enterprise "
         "workloads: distributed systems consensus reasoning (Raft and CAP Theorem), analytical SQL query generation under 3NF relational DDL schemas, and LGPD data privacy auditing. "
         "Evaluating Meta Llama-3.2-11B-Vision-Instruct deployed on NVIDIA NIM Cloud (NVIDIA A100 SXM4 GPUs) via real-time SSE streaming, we benchmarked "
-        "conventional baselines (Few-shot and Zero-shot) against LLMLingua-inspired selective compression with domain token whitelisting at 2x and 4x nominal target ratios. "
+        "conventional baselines (Few-shot and Zero-shot) against TokLang / LLMLingua selective compression with domain token whitelisting at 2x and 4x nominal target ratios. "
         "Empirical measurements confirm that 4x nominal compression reduces billed input token volume by up to 57.4% (averaging 56.2%, from 384.0 to 168.3 input tokens per request) "
         "and eliminates an average of 80.7% of quadratic prefill self-attention FLOPs (reaching 81.8% in Case 2). "
-        "Time-to-First-Token (TTFT) stabilized between 538.0 ms and 636.7 ms under 4x compression, mitigating multi-tenant cloud queueing jitter and cutting initial latency by 23.0% against the Few-shot baseline in Case 3. "
+        "Time-to-First-Token (TTFT) stabilized between 538.0 ms and 636.7 ms under 4x compression (averaging 574.3 ms), mitigating multi-tenant cloud queueing jitter and cutting initial latency by 23.0% against the Few-shot baseline in Case 3. "
         "Semantic retention (measured via BERTScore Proxy F1 against a 0.80 academic acceptance threshold) remained strong in SQL generation (0.8524 at 4x with 100% entity retention) and exhibited positive signal-to-noise enhancement "
         "in LGPD auditing (rising from 0.7916 in Few-shot to 0.8279 at 4x), while showing a slight dip to 0.7912 in Case 1 due to causal connective sensitivity in an 11B-parameter model. "
         "Across 100,000 requests, the approach cuts input token expenditure by 56.2% and total batch cost by 12.8% (from US$ 505.20 to US$ 440.50), validating selective prompt compression as an effective Green AI practice.",
         space_after=10, line_spacing=1.25, first_line_indent=Cm(0)
     )
 
-    add_p("Prompt Compression. Large Language Models. Prompt Engineering. Green AI. BERTScore. NVIDIA NIM.",
+    add_p("Prompt Compression. TokLang. Large Language Models. Prompt Engineering. Green AI. BERTScore. NVIDIA NIM.",
           bold_prefix="Keywords: ", line_spacing=1.25, first_line_indent=Cm(0))
 
     # =========================================================================
@@ -384,7 +384,8 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         elif etype == "h2":
             add_h2(etext)
         elif etype == "bullet":
-            add_p(etext, first_line_indent=Cm(0.5))
+            p_b = add_p(etext, first_line_indent=Cm(-0.45))
+            p_b.paragraph_format.left_indent = Cm(1.25)
         else:
             add_p(etext)
 
@@ -448,6 +449,15 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
     add_table_title("Tabela 1 – Consumo real de tokens faturados na API NVIDIA NIM e taxas efetivas de compressão")
     headers_t1 = ["Caso de Uso", "Técnica de Prompting", "Tokens Entrada", "Tokens Saída", "Razão Efetiva", "Redução Entrada (%)"]
 
+    def fmt_tec(tec: str, short_baseline: bool = True) -> str:
+        if tec == "Few-shot (Baseline)":
+            return "Few-shot" if short_baseline else "Few-shot (Baseline)"
+        if tec == "LLMLingua (2x)":
+            return "TokLang / LLMLingua (2x)"
+        if tec == "LLMLingua (4x)":
+            return "TokLang / LLMLingua (4x)"
+        return tec
+
     casos_meta = [
         ("caso_1", "Caso 1: Sistemas Distribuídos"),
         ("caso_2", "Caso 2: SQL sob DDL"),
@@ -470,8 +480,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
                 red_pct = ((t_in - base_in) / base_in) * 100.0
                 razao_str = f"{fmt_br(razao, 2)}x"
                 red_str = f"{fmt_br(red_pct, 1)}%"
-            tec_short = "Few-shot" if tec == "Few-shot (Baseline)" else tec
-            data_t1.append([c_label, tec_short, str(t_in), str(t_out), razao_str, red_str])
+            data_t1.append([c_label, fmt_tec(tec), str(t_in), str(t_out), razao_str, red_str])
 
     col_w_t1 = [Cm(4.8), Cm(3.2), Cm(2.2), Cm(2.0), Cm(2.3), Cm(2.5)]
     t1 = doc.add_table(rows=1, cols=6)
@@ -531,10 +540,9 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
                 sinal_z = "+" if diff_zero > 0 else ""
                 var_zero = f"{sinal_z}{fmt_br(diff_zero, 1)}%"
 
-            tec_short = "Few-shot" if tec == "Few-shot (Baseline)" else tec
             data_t2.append([
                 c_label,
-                tec_short,
+                fmt_tec(tec),
                 fmt_br(ttft, 1),
                 fmt_br(t_tot, 2),
                 var_few,
@@ -593,10 +601,9 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
                 status = "Aprovado (≥ 0,80)"
             else:
                 status = "Atenção (< 0,80)"
-            tec_short = "Few-shot" if tec == "Few-shot (Baseline)" else tec
             data_t3.append([
                 c_label,
-                tec_short,
+                fmt_tec(tec),
                 fmt_br(cos_v, 4),
                 fmt_br(rouge_v, 4),
                 f"{fmt_br(ent_v, 1)}%",
@@ -668,7 +675,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
             econ_str = f"{fmt_br(ec_in_pct, 1)}% / {fmt_br(ec_tot_pct, 1)}%"
             flops_str = f"-{fmt_br(avg_flops, 1)}%"
 
-        tec_label = "Few-shot (Baseline)" if tec == "Few-shot (Baseline)" else tec
+        tec_label = fmt_tec(tec, short_baseline=False)
         data_t4.append([
             f"Cenário {idx_t}: {tec_label}",
             f"{fmt_br(vol_m, 2)} M",
@@ -685,7 +692,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
 
     add_p(
         "A Figura 10.4 confronta em eixo duplo o custo total médio projetado para 100.000 requisições "
-        "(US$ 505,20 no Few-shot, US$ 482,80 no Zero-shot, US$ 460,30 no LLMLingua 2x e US$ 440,50 no LLMLingua 4x) "
+        "(US$ 505,20 no Few-shot, US$ 482,80 no Zero-shot, US$ 460,30 no TokLang / LLMLingua 2x e US$ 440,50 no TokLang / LLMLingua 4x) "
         "com a redução percentual média nos cálculos quadráticos de autoatenção durante a fase de prefill."
     )
 
@@ -696,7 +703,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
 
     add_p(
         "Como o esforço computacional da camada de autoatenção escala segundo 1 - (T_comprimido / T_baseline)², "
-        "uma redução média de 56,2% nos tokens de entrada sob LLMLingua 4x (de 38,40 milhões para 16,83 milhões de tokens "
+        "uma redução média de 56,2% nos tokens de entrada sob TokLang / LLMLingua 4x (de 38,40 milhões para 16,83 milhões de tokens "
         "a cada 100.000 chamadas) traduz-se em uma supressão média de 80,7% nos FLOPs de autoatenção do prefill "
         "(80,8% no Caso 1, 81,8% no Caso 2 e 79,5% no Caso 3). Financeiramente, o custo isolado de entrada cai 56,2% "
         "(de US$ 115,20 para US$ 50,50), gerando economia líquida de US$ 64,70 (-12,8% no custo total do lote, que é "
@@ -729,7 +736,7 @@ def build_monograph(docx_path: Path, sumario_page_map=None):
         "na fase de prefill."
     )
     add_p(
-        "Os testes empíricos conduzidos na bancada Battle IA com o modelo Meta Llama-3.2-11B-Vision-Instruct em "
+        "Os testes empíricos conduzidos na bancada Battle IA com o compilador determinístico TokLang e o modelo Meta Llama-3.2-11B-Vision-Instruct em "
         "infraestrutura NVIDIA NIM Cloud (A100 SXM4) demonstraram que a compressão nominal de 4x combinada a token whitelisting "
         "reduz em até 57,4% o volume faturado de tokens de entrada (média de 56,2%) e suprime em média 80,7% dos FLOPs "
         "quadráticos de autoatenção. Comprovou-se que a técnica mantém excelente fidelidade semântica na geração de consultas "

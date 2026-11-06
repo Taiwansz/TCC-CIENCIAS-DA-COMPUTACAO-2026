@@ -107,7 +107,9 @@ TCC-CIENCIAS-DA-COMPUTACAO-2026/
 │   ├── README.md                       # Protocolo de avaliacao cega e diretrizes ABNT
 │   ├── TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.pdf   # Manuscrito oficial canonico (30 paginas)
 │   ├── TCC_II_Monografia_Final_Ciencia_da_Computacao_2026.docx  # Documento fonte editavel ABNT
+│   ├── TCC_II.pdf                      # Espelho rapido de distribuicao da versao homologada
 │   ├── TCC_II_Versao_1_Acompanhamento_Matheus_Santos.pdf        # Espelho de acompanhamento protocolado
+│   ├── TCC_II_Versao_1_Acompanhamento_Matheus_Santos.docx       # Espelho fonte editavel de acompanhamento
 │   ├── bibliografia_oficial_auditada_abnt.md                    # 21 referencias seminais catalogadas
 │   └── pipeline/
 │       ├── build_monograph.py          # Script de orquestracao ABNT via Word COM

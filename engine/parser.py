@@ -120,7 +120,12 @@ class TokLangParser:
 
                 if dir_name == "@compress":
                     ratio_val = str(kwargs.get("ratio", "")).lower()
-                    default_level = "aggressive" if ratio_val == "4x" else ("balanced" if ratio_val == "2x" else "balanced")
+                    if ratio_val in ("4x", "aggressive"):
+                        default_level = "aggressive"
+                    elif ratio_val in ("1x", "lossless"):
+                        default_level = "lossless"
+                    else:
+                        default_level = "balanced"
                     doc.compression = CompressionDirective(
                         level=str(kwargs.get("level", default_level)),
                         target=str(kwargs.get("target", "semantic")),

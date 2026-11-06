@@ -27,7 +27,7 @@
       "samples_count": 3,
       "mean_prompt_tokens": 309.3,
       "mean_completion_tokens": 260,
-      "token_reduction_pct": 19.5,
+      "token_reduction_pct": 19.4,
       "effective_compression_ratio": 1.24,
       "mean_ttft_ms": 2329.4,
       "std_ttft_ms": 1957.9,
