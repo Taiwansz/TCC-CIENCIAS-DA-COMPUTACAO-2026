@@ -1,0 +1,302 @@
+[
+  {
+    "type": "h1",
+    "text": "1 INTRODUÇÃO"
+  },
+  {
+    "type": "h2",
+    "text": "1.1 Contextualização, Motivação e Problema de Pesquisa"
+  },
+  {
+    "type": "p",
+    "text": "Os Modelos de Linguagem de Grande Escala (LLMs) transformaram profundamente o cenário da computação contemporânea ao longo da última década. Ferramentas como ChatGPT, Claude, Gemini e a família Meta Llama popularizaram aplicações baseadas em linguagem natural em escala global, criando novas demandas relacionadas ao custo computacional, à escalabilidade de infraestrutura e à eficiência energética. Estudos recentes de avaliação empírica de consumo energético demonstram que a inferência contínua de modelos generativos multitarefa consome ordens de grandeza mais energia elétrica por requisição do que consultas convencionais ou classificadores dedicados (Luccioni; Jernite; Strubell, 2024), o que torna a otimização da inferência uma questão simultaneamente econômica, arquitetural e ambiental."
+  },
+  {
+    "type": "p",
+    "text": "Cada token processado por um LLM exige operações matemáticas de alta intensidade computacional, especialmente em razão do mecanismo de self-attention presente na arquitetura Transformer (Vaswani et al., 2017). Nesse mecanismo, a relação entre todos os pares de tokens de uma sequência é calculada, resultando em complexidade de tempo e memória quadrática O(n²) na fase de processamento inicial do prompt (prefill). Como consequência direta, prompts extensos elevam de forma quadrática o número de operações em ponto flutuante (FLOPs) da autoatenção e linearmente o custo financeiro faturado em APIs comerciais, tornando a eficiência na formulação da entrada uma variável crítica para sistemas corporativos em produção."
+  },
+  {
+    "type": "p",
+    "text": "Nesse cenário emerge a compressão algorítmica de prompts como estratégia de otimização do lado da entrada: uma família de técnicas capazes de identificar e podar elementos redundantes ou de baixa autoinformação estatística em instruções textuais, preservando os operadores semânticos indispensáveis à resposta do modelo (Jiang et al., 2023; Pan et al., 2024). Ao reduzir o volume de tokens submetidos ao modelo sem exigir re-treinamento ou alteração de pesos neurais, essas técnicas oferecem potencial de mitigação direta sobre o dispêndio financeiro, a latência inicial de resposta e a sobrecarga computacional dos datacenters."
+  },
+  {
+    "type": "p",
+    "text": "Diante da tensão entre a redução agressiva de tokens e o risco de degradação da qualidade técnica das respostas em modelos compactos de produção, o problema central que orienta esta pesquisa é formalizado na seguinte questão de pesquisa: Em que medida a compressão algorítmica de prompts fundamentada na autoinformação de Shannon e combinada a listas de proteção lexical de domínio (token whitelisting) consegue reduzir o consumo faturado de tokens de entrada, estabilizar a latência inicial (Time-to-First-Token) e diminuir o esforço computacional teórico de autoatenção no modelo Meta Llama-3.2-11B-Vision-Instruct, e sob quais naturezas de tarefas corporativas essa poda preserva a fidelidade semântica acima do limiar crítico de aceitação (0,80)?"
+  },
+  {
+    "type": "h2",
+    "text": "1.2 Objetivos"
+  },
+  {
+    "type": "p",
+    "text": "O objetivo geral deste trabalho é investigar teórica e experimentalmente a eficácia da compressão algorítmica de prompts para LLMs, avaliando seus impactos empíricos sobre o consumo de tokens, a latência de inferência em nuvem e a fidelidade semântica, bem como suas projeções analíticas de custo financeiro e eficiência computacional no contexto de Green AI. Para responder à questão de pesquisa formulada, delimitam-se os seguintes objetivos específicos:"
+  },
+  {
+    "type": "bullet",
+    "text": "• Realizar uma revisão sistematizada e comparativa da literatura sobre técnicas de compressão de prompts e eficiência de inferência em LLMs, explicitando bases consultadas, descritores de busca, critérios de seleção e limitações operacionais;"
+  },
+  {
+    "type": "bullet",
+    "text": "• Formalizar os fundamentos matemáticos e computacionais que justificam a poda lexical, articulando a Teoria da Informação de Shannon (entropia e autoinformação) com a complexidade quadrática O(n²) do mecanismo de autoatenção dos Transformers;"
+  },
+  {
+    "type": "bullet",
+    "text": "• Confrontar analiticamente os principais métodos do estado da arte — LLMLingua, LLMLingua-2, LongLLMLingua, Selective Context e AutoCompressor — com a implementação do compilador determinístico TokLang desenvolvido neste estudo;"
+  },
+  {
+    "type": "bullet",
+    "text": "• Construir e executar a bancada experimental automatizada Battle IA sobre infraestrutura NVIDIA NIM Cloud (Meta Llama-3.2-11B-Vision-Instruct), medindo empiricamente tokens faturados, latência inicial (TTFT), tempo total de geração e fidelidade semântica via métrica composta BERTScore Proxy F1 em três cenários corporativos distintos;"
+  },
+  {
+    "type": "bullet",
+    "text": "• Avaliar as projeções analíticas de redução de FLOPs de autoatenção e de economia financeira em escala (100.000 requisições), delimitando claramente a fronteira entre grandezas medidas em API e estimativas computacionais teóricas sob a ótica de Green AI."
+  },
+  {
+    "type": "h2",
+    "text": "1.3 Justificativa e Relevância"
+  },
+  {
+    "type": "p",
+    "text": "A relevância deste estudo justifica-se pela rápida expansão do uso de LLMs em fluxos críticos de engenharia de software, análise de dados e governança corporativa. À medida que organizações integram chamadas de modelos generativos em pipelines de alta frequência, o custo acumulado de tokens de entrada e o consumo elétrico dos aceleradores gráficos (GPUs) em datacenters tornam-se gargalos operacionais severos (Patterson et al., 2021; Luccioni; Jernite; Strubell, 2024)."
+  },
+  {
+    "type": "p",
+    "text": "No plano científico e de engenharia, grande parte da literatura de eficiência concentra-se na compressão estrutural do modelo — como quantização de pesos, poda neural e destilação de conhecimento —, abordagens que exigem acesso direto aos parâmetros internos e infraestrutura dedicada de treinamento. Em contrapartida, a otimização algorítmica do prompt de entrada atua como uma camada agnóstica e determinística em CPU, aplicável imediatamente sobre APIs comerciais fechadas ou serviços gerenciados em nuvem (NVIDIA Corporation, 2024). Avaliar empiricamente os limites reais dessa técnica em língua portuguesa e em tarefas técnicas estritas (como geração de SQL sob esquemas DDL e auditoria jurídica da LGPD) preenche uma lacuna prática para arquitetos de software."
+  },
+  {
+    "type": "h2",
+    "text": "1.4 Protocolo Metodológico da Revisão da Literatura"
+  },
+  {
+    "type": "p",
+    "text": "Para assegurar rigor metodológico, rastreabilidade e reprodutibilidade ao levantamento teórico apresentado nos Capítulos 2 a 9, adotou-se um protocolo estruturado de busca e seleção bibliográfica inspirado nas diretrizes de revisão sistemática em Engenharia de Software e Ciência da Computação. As buscas foram conduzidas nas bases digitais ACL Anthology (Association for Computational Linguistics), NeurIPS Proceedings, ICLR / OpenReview, ACM Digital Library e no repositório de preprints arXiv (categorias cs.CL e cs.AI)."
+  },
+  {
+    "type": "p",
+    "text": "A estratégia de busca empregou combinações booleanas dos seguintes descritores em língua inglesa: (\"prompt compression\" OR \"context compression\" OR \"token pruning\") AND (\"large language models\" OR \"LLM\" OR \"Transformer\" OR \"RAG\") AND (\"perplexity\" OR \"self-information\" OR \"Shannon entropy\" OR \"BERTScore\" OR \"Green AI\"). A janela temporal foi estruturada em dois estratos: (a) obras fundacionais clássicas (1948–2020) indispensáveis para a formalização matemática de entropia, atenção neural, recuperação de informação e métricas automáticas; e (b) estudos contemporâneos de fronteira (2021–2026) dedicados à compressão de contexto, eficiência energética de inferência e modelos fundacionais abertos."
+  },
+  {
+    "type": "p",
+    "text": "Definiram-se três critérios objetivos de inclusão: (CI-1) artigos revisados por pares ou relatórios técnicos oficiais de arquiteturas amplamente adotadas (como a família Llama 3 e infraestrutura NVIDIA NIM); (CI-2) estudos que proponham ou avaliem algoritmos de redução de sequência de entrada com métricas quantitativas de retenção semântica; e (CI-3) pesquisas que quantifiquem o custo computacional, financeiro ou energético da inferência em Transformers. Como critérios de exclusão, descartaram-se: (CE-1) trabalhos restritos à compressão de pesos do modelo (weight pruning ou quantização int8/int4) sem atuação sobre o prompt; (CE-2) artigos sem avaliação empírica verificável; e (CE-3) publicações duplicadas. A partir de um conjunto inicial de 64 registros identificados nas bases, a aplicação sucessiva dos filtros de título/resumo e leitura integral resultou na seleção final de 27 referências bibliográficas que sustentam a fundamentação teórica e a discussão experimental desta monografia."
+  },
+  {
+    "type": "h1",
+    "text": "2 FUNDAMENTOS DOS MODELOS DE LINGUAGEM DE GRANDE ESCALA"
+  },
+  {
+    "type": "h2",
+    "text": "2.1 Evolução Histórica"
+  },
+  {
+    "type": "p",
+    "text": "Os modelos de linguagem têm raízes históricas que precedem a era do aprendizado profundo. Os primeiros sistemas estatísticos de linguagem utilizavam modelos de n-gramas para estimar a probabilidade condicional de uma sequência de palavras a partir da frequência observada em corpora textuais. Embora computacionalmente leves para tarefas locais, esses modelos enfrentavam a maldição da dimensionalidade: a esparsidade combinatória para n-gramas de ordem superior e a incapacidade de generalização semântica entre termos não observados exatamente na mesma sequência."
+  },
+  {
+    "type": "p",
+    "text": "Um salto estrutural ocorreu com a introdução das representações vetoriais distribuídas (word embeddings) na década de 2010. Modelos como Word2Vec (Mikolov et al., 2013) e GloVe (Pennington; Socher; Manning, 2014) demonstraram que vocábulos podem ser projetados em espaços vetoriais contínuos de baixa dimensionalidade nos quais a proximidade geométrica (medida por similaridade cossenoidal) reflete isomorfismos semânticos e sintáticos. Posteriormente, arquiteturas recorrentes com mecanismos de atenção contínua (Bahdanau; Cho; Bengio, 2015) permitiram alinhar sequências de entrada e saída em tradução neural, mas a dependência sequencial passo a passo das RNNs e LSTMs ainda impedia a paralelização massiva em GPUs."
+  },
+  {
+    "type": "h2",
+    "text": "2.2 Arquitetura Transformer e Mecanismo de Atenção"
+  },
+  {
+    "type": "p",
+    "text": "A publicação de 'Attention is All You Need' por Vaswani et al. (2017) estabeleceu o paradigma arquitetural dominante dos LLMs modernos. O Transformer eliminou as recorrências temporais ao substituí-las integralmente pelo mecanismo de autoatenção multi-cabeça (Multi-Head Self-Attention), permitindo o processamento paralelo de todos os tokens de uma sequência durante a fase de codificação e prefill. Essa capacidade de paralelização viabilizou o treinamento de modelos fundacionais desde o BERT (Devlin et al., 2019) e o GPT-3 (Brown et al., 2020) até arquiteturas abertas contemporâneas de alta densidade como a família Meta Llama 3 e 3.2 (Dubey et al., 2024)."
+  },
+  {
+    "type": "p",
+    "text": "Formalmente, dada uma sequência de entrada de comprimento n projetada nas matrizes de consultas (Queries, Q), chaves (Keys, K) e valores (Values, V), o mecanismo de atenção escalonada por produto interno é definido por Attention(Q, K, V) = softmax(QKᵀ / √dk)V, onde dk representa a dimensão dos vetores de chave. O produto matricial QKᵀ exige o cálculo de afinidade entre todos os n×n pares de tokens da sequência, impondo complexidade computacional O(n²·d) na fase de prefill. É exatamente essa dependência quadrática em relação ao número de tokens de entrada n que fundamenta matematicamente a tese central deste trabalho: qualquer redução algorítmica na cardinalidade da entrada produz ganhos quadráticos no esforço matricial de atenção inicial."
+  },
+  {
+    "type": "h2",
+    "text": "2.3 Tokenização e Janela de Contexto"
+  },
+  {
+    "type": "p",
+    "text": "A compreensão precisa dos resultados experimentais de compressão exige analisar a camada de tokenização por subpalavras. LLMs modernos operam sobre vocabulários discretos construídos por algoritmos como Byte-Pair Encoding (BPE) ou SentencePiece (no caso da família Llama 3, utilizando um vocabulário tiktoken expandido de 128.256 tokens, conforme documentado por Dubey et al., 2024). Enquanto palavras frequentes em inglês são codificadas em um único token, termos técnicos compostos, morfologia flexionada da língua portuguesa e identificadores de esquemas de banco de dados frequentemente se fragmentam em múltiplos sub-tokens."
+  },
+  {
+    "type": "p",
+    "text": "Adicionalmente, a expansão recente das janelas de contexto para 128.000 tokens ou mais (Dubey et al., 2024) não eliminou o problema de eficiência; ao contrário, agravou dois fenômenos: o crescimento quadrático do tempo de prefill e a degradação atencional em contextos longos. Conforme demonstrado empiricamente por Liu et al. (2024) no fenômeno 'Lost in the Middle', LLMs apresentam queda acentuada de precisão quando informações críticas ficam diluídas no meio de prompts extensos e ruidosos. Esse achado teórico explica diretamente um dos resultados mais importantes obtidos em nossa bancada experimental (Seção 10.4): a compressão do prompt não atua apenas como redutor de custo, mas também como amplificador da relação sinal-ruído ao remover texto acessório que dispersa a atenção do modelo."
+  },
+  {
+    "type": "h1",
+    "text": "3 ENGENHARIA DE PROMPT"
+  },
+  {
+    "type": "h2",
+    "text": "3.1 Principais Técnicas"
+  },
+  {
+    "type": "p",
+    "text": "A engenharia de prompt compreende a estruturação formal de instruções textuais para condicionar a distribuição de probabilidade de saída de um LLM sem alteração de seus parâmetros internos (Liu et al., 2023). Em ambientes corporativos onde o fine-tuning contínuo é financeiramente inviável ou introduz riscos de esquecimento catastrófico, o design e a otimização da entrada constituem a principal camada de controle determinístico sobre o modelo."
+  },
+  {
+    "type": "p",
+    "text": "Duas configurações servem como linhas de base universais na literatura e foram implementadas diretamente em nossa bancada experimental Battle IA: o Zero-shot prompting, no qual o modelo recebe exclusivamente a especificação técnica do problema sem demonstrações prévias (Kojima et al., 2022), e o Few-shot prompting (In-Context Learning), proposto por Brown et al. (2020), que prefixa a consulta com exemplos resolvidos de referência para ancorar o formato e o rigor da resposta. Técnicas complementares como Chain-of-Thought (Wei et al., 2022) induzem a decomposição explícita de raciocínio em múltiplas etapas, mas ao custo de inflar substancialmente o consumo de tokens de entrada e saída."
+  },
+  {
+    "type": "h2",
+    "text": "3.2 Relação entre Estrutura do Prompt e Qualidade da Resposta"
+  },
+  {
+    "type": "p",
+    "text": "A relação entre o volume de tokens de um prompt e a exatidão da resposta gerada é marcadamente não-linear e dependente tanto da arquitetura do modelo quanto da natureza sintática da tarefa (Liu et al., 2023; Liu et al., 2024). Enquanto tarefas de raciocínio causal abstrato beneficiam-se de conectivos lógicos explícitos que encadeiam premissas e consequências, tarefas altamente estruturadas ou normativas sofrem frequentemente com a verbosidade excessiva de exemplos Few-shot, que induzem o modelo a gastar grande parte de seu orçamento de geração (max_tokens) reproduzindo preâmbulos estilísticos antes de atacar o núcleo técnico solicitado."
+  },
+  {
+    "type": "p",
+    "text": "Essa distinção teórica é crucial quando confrontada com os resultados empíricos deste trabalho: nos ensaios realizados na Seção 10.4 com teto fixo de 260 tokens de saída, observou-se que o prompt Few-shot de auditoria LGPD (378 tokens de entrada) reteve apenas 37,5% das entidades jurídicas obrigatórias por dispersar a resposta inicial em introduções genéricas, ao passo que o prompt comprimido em 4x (171 tokens) concentrou a geração imediatamente nos artigos legais protegidos, elevando a retenção de entidades para 75,0%."
+  },
+  {
+    "type": "h1",
+    "text": "4 TEORIA DA INFORMAÇÃO E REDUNDÂNCIA LINGUÍSTICA"
+  },
+  {
+    "type": "h2",
+    "text": "4.1 Entropia de Shannon e Linguagem Natural"
+  },
+  {
+    "type": "p",
+    "text": "A Teoria Matemática da Comunicação, formulada por Claude Shannon (1948), estabelece o alicerce formal para qualquer algoritmo de compressão de dados e de linguagem natural. Dado um vocábulo ou evento discreto w com probabilidade de ocorrência P(w) em uma fonte linguística, sua autoinformação (self-information) é definida como I(w) = -log₂ P(w), expressa em bits. A entropia de Shannon H(W) corresponde ao valor esperado da autoinformação ao longo de toda a distribuição: H(W) = -∑ P(w) log₂ P(w). Símbolos altamente frequentes e previsíveis (como artigos, preposições e conectivos auxiliares) possuem probabilidade P(w) elevada e, consequentemente, autoinformação I(w) próxima de zero."
+  },
+  {
+    "type": "p",
+    "text": "Shannon (1948) demonstrou que as línguas naturais exibem redundância estrutural superior a 50%, o que permite reconstruir o sentido integral de uma mensagem mesmo após a supressão de grande fração de seus conectivos superficiais. Transposto para a engenharia de LLMs, esse teorema implica que a distribuição de informação ao longo dos tokens de um prompt é profundamente assimétrica: uma pequena fração de identificadores técnicos, operadores lógicos e substantivos de domínio concentra a quase totalidade da entropia útil, enquanto a camada conectiva consome ciclos quadráticos de autoatenção sem aportar entropia decisória."
+  },
+  {
+    "type": "h2",
+    "text": "4.2 Perplexidade e Autoinformação como Critérios de Poda"
+  },
+  {
+    "type": "p",
+    "text": "Na modelagem estatística de linguagem, a perplexidade PP(W) = P(w₁, w₂, ..., w_N)^(-1/N) equivale à exponenciação da entropia cruzada média por token (Jiang et al., 2023). Algoritmos neurais de compressão utilizam um modelo auxiliar para estimar a perplexidade condicional de cada token dado o contexto precedente: tokens com baixa perplexidade (baixa surpresa) são classificados como redundantes e descartados, enquanto tokens de alta perplexidade são retidos."
+  },
+  {
+    "type": "p",
+    "text": "Todavia, uma análise crítica revela um trade-off arquitetural importante frequentemente omitido em revisões puramente descritivas: calcular a perplexidade neural token a token via um modelo auxiliar de 7 bilhões de parâmetros (como faz o LLMLingua original) exige carregar um segundo LLM em memória de GPU, adicionando latência de pré-processamento que pode anular o ganho de TTFT em prompts de médio porte (300 a 600 tokens). Para superar essa limitação prática em nossa bancada experimental, o compilador TokLang (integrado ao motor ShannonPromptCompressor detalhado no Capítulo 10) implementa o cálculo direto da autoinformação estatística I(w) = -log₂ P(w) acoplado a heurísticas morfológicas e listas de proteção de domínio (token whitelisting) em CPU pura, alcançando complexidade linear O(n) e tempo de compressão inferior a 1 milissegundo."
+  },
+  {
+    "type": "h1",
+    "text": "5 IMPACTO COMPUTACIONAL DOS TOKENS"
+  },
+  {
+    "type": "h2",
+    "text": "5.1 Complexidade Quadrática na Fase de Prefill versus Fase de Decoding"
+  },
+  {
+    "type": "p",
+    "text": "Para interpretar corretamente as métricas de desempenho de um LLM em produção, é indispensável distinguir fisicamente as duas fases que compõem a inferência de um Transformer generativo: a fase de prefill (processamento inicial do prompt) e a fase de decoding autoregressivo (geração sequencial dos tokens de saída). Na fase de prefill, todos os n_in tokens do prompt de entrada são processados simultaneamente para popular os tensores de estado do cache de chaves e valores (KV-Cache). Nessa etapa, o cálculo da matriz de autoatenção exige O(n_in²) operações, determinando diretamente a latência inicial até o primeiro token gerado, denominada Time-to-First-Token (TTFT)."
+  },
+  {
+    "type": "p",
+    "text": "A redução teórica percentual de operações de autoatenção (FLOPs de prefill) proporcionada pela compressão de um prompt de comprimento original T_base para um comprimento comprimido T_comp segue a equação analítica fechada: Redução_FLOPs(%) = [1 - (T_comp / T_base)²] × 100. Assim, uma redução real de cerca de 56% no número de tokens de entrada (razão efetiva de ~2,28x, correspondente à configuração nominal de 4x medida em nossos experimentos da Seção 10.2) resulta em uma supressão analítica de aproximadamente 80,7% nos cálculos quadráticos de autoatenção da fase de prefill."
+  },
+  {
+    "type": "p",
+    "text": "Em contrapartida, a fase subsequente de decoding gera um token de saída por vez de forma autoregressiva, sendo limitada pela largura de banda de memória da GPU (memory-bandwidth bound) e, em ambientes de nuvem compartilhada (multi-tenant cloud), pelo escalonador de lotes contínuos (continuous batching) do servidor (NVIDIA Corporation, 2024). Essa distinção teórica é fundamental para compreender por que a compressão de prompts reduz e estabiliza consistentemente o TTFT (fase de prefill), mas não impede que o Tempo Total de inferência sofra variações decorrentes da geração dos tokens de saída (Inter-Token Latency - ITL) quando o cluster em nuvem enfrenta picos de concorrência externa, exatamente como observado e discutido no Caso 1 da Seção 10.3."
+  },
+  {
+    "type": "h2",
+    "text": "5.2 Custos Financeiros em APIs Comerciais"
+  },
+  {
+    "type": "p",
+    "text": "O modelo econômico das plataformas comerciais de inferência de LLMs baseia-se na tarifação assimétrica por milhão de tokens processados, cobrando tarifas distintas para tokens de entrada (input/prompt tokens) e tokens de saída (output/completion tokens). Tipicamente, o token de saída é tarifado a um valor 3 a 5 vezes superior ao token de entrada (por exemplo, US$ 3,00 por milhão de tokens de entrada contra US$ 15,00 por milhão de tokens de saída na estrutura tarifária corporativa de referência adotada neste estudo)."
+  },
+  {
+    "type": "p",
+    "text": "Sob essa estrutura de custos, o impacto financeiro da compressão de prompts deve ser analisado sob duas óticas complementares: (a) a economia direta sobre a componente faturada de entrada, que decresce de forma estritamente linear com a taxa efetiva de redução de prompt_tokens; e (b) a economia sobre o custo global do lote (entrada + saída), cujo percentual final depende da proporção entre o tamanho do prompt e o volume de tokens gerados na resposta. Confrontando essa regra econômica com nossos experimentos (Seção 10.5), onde a saída foi fixada no teto de 260 tokens (US$ 390,00 fixos a cada 100.000 requisições), uma redução real de 56,2% no custo de entrada (de US$ 115,20 para US$ 50,50) traduz-se em uma economia líquida de 12,8% na fatura total, demonstrando o rigor de separar a economia de entrada do custo amortizado pela saída."
+  },
+  {
+    "type": "h1",
+    "text": "6 MÉTODOS DE COMPRESSÃO DE PROMPTS"
+  },
+  {
+    "type": "h2",
+    "text": "6.1 LLMLingua e LLMLingua-2"
+  },
+  {
+    "type": "p",
+    "text": "O framework LLMLingua, introduzido por Jiang et al. (2023), consolidou a abordagem de compressão de prompts de granularidade dupla guiada por perplexidade. O método utiliza um modelo de linguagem auxiliar compacto (como GPT-2 ou Llama-2-7B) para pontuar a informatividade de cada segmento sem exigir acesso aos gradientes ou pesos do LLM alvo. Sua execução divide-se em um controlador de orçamento de nível grosso (coarse-grained), que descarta demonstrações Few-shot redundantes, seguido de um algoritmo de alinhamento de distribuição em nível de token (fine-grained), que poda vocábulos de baixa perplexidade condicional."
+  },
+  {
+    "type": "p",
+    "text": "Constatando que o cálculo autoregressivo de perplexidade no LLMLingua original impunha gargalo de latência e viés de direção (left-to-right), Pan et al. (2024) propuseram o LLMLingua-2. O método reformula a compressão como um problema de classificação binária de tokens (preservar vs. descartar) utilizando um codificador bidirecional XLM-RoBERTa treinado por destilação de dados extraídos do GPT-4. Embora alcance aceleração de 3x a 6x sobre o LLMLingua original e excelente retenção em benchmarks gerais, o LLMLingua-2 ainda requer execução neural em GPU durante a etapa de compressão e pode sofrer perda de precisão fora da distribuição de treinamento quando submetido a sintaxes formais rígidas, como esquemas DDL relacionais."
+  },
+  {
+    "type": "h2",
+    "text": "6.2 LongLLMLingua"
+  },
+  {
+    "type": "p",
+    "text": "Para resolver a degradação de desempenho de LLMs em janelas de contexto extensas e pipelines de geração aumentada por recuperação (RAG), Jiang et al. (2024) desenvolveram o LongLLMLingua. Diferentemente do LLMLingua padrão, que avalia a perplexidade do contexto de maneira independente da consulta final, o LongLLMLingua introduz a compressão condicionada à pergunta (question-aware context compression), calculando a perplexidade contrastiva de cada documento e token em relação à instrução específica do usuário."
+  },
+  {
+    "type": "p",
+    "text": "Além da poda contrastiva, Jiang et al. (2024) incorporam reordenação posicional dos documentos comprimidos para mitigar o viés de perda de atenção no meio da sequência documentado por Liu et al. (2024) e um mecanismo de recuperação subsequencial de entidades. Os autores demonstram que, ao eliminar passagens irrelevantes, o LongLLMLingua não apenas reduz o volume de tokens, mas frequentemente eleva a exatidão da resposta final frente ao prompt original não comprimido — fenômeno de ganho de relação sinal-ruído que reproduzimos e comprovamos empiricamente no Caso 3 (Auditoria LGPD) da nossa bancada Battle IA."
+  },
+  {
+    "type": "h2",
+    "text": "6.3 Selective Context e AutoCompressor"
+  },
+  {
+    "type": "p",
+    "text": "O método Selective Context, proposto por Li et al. (2023), antecedeu o LLMLingua no emprego direto da autoinformação de Shannon I(w) = -log₂ P(w) para poda de contexto, agregando as pontuações de tokens em unidades léxicas e sintagmas nominais (noun phrases) antes de aplicar o corte percentual. Sua principal virtude reside na preservação de constituintes sintáticos mais coesos; contudo, a agregação em sintagmas inteiros reduz a flexibilidade de poda fina e pode remover acidentalmente operadores técnicos isolados se não houver uma camada explícita de proteção de vocabulário."
+  },
+  {
+    "type": "p",
+    "text": "Por sua vez, o AutoCompressor, desenvolvido por Chevalier et al. (2023), representa a vertente de compressão em espaço latente (soft-prompt compression). Em vez de selecionar ou descartar tokens discretos de texto, o AutoCompressor realiza fine-tuning do próprio LLM para condensar blocos longos de texto em vetores contínuos compactos (summary vectors) concatenados diretamente nas camadas de ativação do Transformer. Apesar de sua elegância matemática, o AutoCompressor exige acesso integral aos pesos do modelo alvo e treinamento supervisionado custoso, tornando-se totalmente incompatível com APIs comerciais black-box e endpoints gerenciados como o NVIDIA NIM Cloud avaliado neste trabalho."
+  },
+  {
+    "type": "h2",
+    "text": "6.4 Análise Comparativa Crítica e Confrontação com o Compilador TokLang"
+  },
+  {
+    "type": "p",
+    "text": "A análise crítica conjunta das cinco abordagens da literatura revela uma lacuna operacional importante para aplicações corporativas de engenharia de software: métodos de soft-tokens (AutoCompressor) são inaplicáveis em APIs de nuvem; métodos baseados em LLMs auxiliares ou classificadores neurais (LLMLingua, LongLLMLingua e LLMLingua-2) exigem inferência adicional de rede neural apenas para comprimir o prompt; e métodos puramente estatísticos (Selective Context), quando aplicados sem blindagem semântica sobre prompts técnicos de código SQL ou legislação, correm o risco de amputar palavras reservadas indispensáveis (como cláusulas JOIN, DENSE_RANK ou números de artigos de lei)."
+  },
+  {
+    "type": "p",
+    "text": "Para resolver esse trilema no escopo experimental deste TCC, projetamos o compilador determinístico TokLang e seu motor ShannonPromptCompressor (Santos et al., 2026), que combina a autoinformação estatística de Shannon com ponderação morfológica e uma lista estrita de proteção lexical de domínio (token whitelisting). Dessa forma, a compressão executa em CPU com complexidade O(n) e latência desprezível (< 1 ms), opera sobre qualquer API comercial em nuvem e garante retenção de 100% dos operadores críticos protegidos, conforme sintetizado comparativamente na Tabela 1 do Capítulo 10 e confrontado nos três estudos de caso empíricos."
+  },
+  {
+    "type": "h1",
+    "text": "7 COMPRESSÃO EM SISTEMAS RAG"
+  },
+  {
+    "type": "p",
+    "text": "Retrieval-Augmented Generation (RAG), formalizado por Lewis et al. (2020), consolidou-se como a arquitetura padrão para acoplar bases de conhecimento corporativas a LLMs sem re-treinamento. Em um pipeline RAG típico, a consulta do usuário aciona uma busca vetorial que recupera múltiplos fragmentos documentais (chunks) e os injeta diretamente no corpo do prompt. Embora mitigue alucinações factuais, essa concatenação multiplica o volume de tokens de entrada e expõe o modelo ao fenômeno 'Lost in the Middle' (Liu et al., 2024), no qual o excesso de contexto periférico degrada a capacidade do mecanismo de atenção de focar nas restrições centrais da pergunta."
+  },
+  {
+    "type": "p",
+    "text": "A aplicação de compressão seletiva de prompts sobre o contexto recuperado atua como um filtro de densidade informacional entre o recuperador vetorial e o LLM gerador (Jiang et al., 2024). Confrontando essa propriedade da literatura com os experimentos conduzidos pelos autores na Seção 10.4, observa-se uma convergência empírica direta: no Caso 3 (Auditoria de Conformidade com a LGPD), o prompt original com contexto exemplificativo (Few-shot) induziu dispersão atencional e baixa cobertura dos dispositivos legais (BERTScore Proxy F1 de 0,7916), enquanto a poda de 4x eliminou a verbosidade periférica e preservou os termos normativos blindados (Art. 7º, Art. 11º, dado sensível e biometria), elevando o índice de fidelidade para 0,8279. Comprova-se, portanto, que o benefício de filtragem de ruído reportado por Jiang et al. (2024) em RAG estende-se também a prompts técnicos densos submetidos a modelos de 11B parâmetros."
+  },
+  {
+    "type": "h1",
+    "text": "8 AVALIAÇÃO SEMÂNTICA COM BERTSCORE E MÉTRICAS COMPOSTAS"
+  },
+  {
+    "type": "p",
+    "text": "A validação científica de qualquer algoritmo de compressão de prompts requer quantificar com rigor se a resposta gerada a partir do prompt comprimido preserva a mesma informação técnica da resposta de referência. Métricas puramente lexicais de primeira geração, como o BLEU (Papineni et al., 2002) para tradução automática e o ROUGE (Lin, 2004) para sumarização baseada na maior subsequência comum (ROUGE-L), avaliam a sobreposição exata de sequências de palavras, mas penalizam paráfrases válidas quando utilizadas isoladamente."
+  },
+  {
+    "type": "p",
+    "text": "Para capturar similaridade em nível vetorial, Zhang et al. (2020) propuseram o BERTScore, que computa a similaridade cossenoidal máxima par-a-par entre os embeddings contextuais dos tokens da resposta candidata e da resposta de referência extraídos de modelos tipo BERT/RoBERTa, consolidando indicadores de Precisão, Cobertura e F1. Na literatura internacional de compressão de prompts (Jiang et al., 2023; Pan et al., 2024), o limiar de F1 ≥ 0,80 é adotado como piso crítico de aceitação semântica sob poda agressiva (4x), enquanto valores F1 ≥ 0,85 caracterizam retenção de alta fidelidade."
+  },
+  {
+    "type": "p",
+    "text": "Entretanto, ao projetar a bancada experimental Battle IA para avaliar tarefas estritas de Ciência da Computação — como síntese de código SQL analítico e enquadramento legal de artigos da LGPD —, identificou-se uma limitação metodológica importante no BERTScore neural convencional: embeddings contextuais genéricos atribuem similaridade elevada (frequentemente > 0,90) mesmo quando a resposta gerada omite um identificador obrigatório de domínio (por exemplo, substituindo a window function DENSE_RANK() por ROW_NUMBER(), ou omitindo o Artigo 11º da LGPD). Por essa razão, e prezando pela transparência metodológica exigida na engenharia experimental, este trabalho implementa e explicita na Seção 10.4 a métrica composta determinística denominada BERTScore Proxy F1, que acopla linearmente a similaridade cossenoidal de vetores de n-gramas ponderados (peso 0,50), a taxa estrita de retenção de entidades técnicas obrigatórias do domínio (peso 0,35) e a estrutura sequencial ROUGE-L F1 (peso 0,15), calibrada na escala acadêmica de referência."
+  },
+  {
+    "type": "h1",
+    "text": "9 SUSTENTABILIDADE E GREEN AI"
+  },
+  {
+    "type": "p",
+    "text": "O custo ambiental da inteligência artificial generativa evoluiu de uma preocupação marginal para um eixo central de pesquisa em Ciência da Computação. Strubell, Ganesh e McCallum (2019) e Patterson et al. (2021) demonstraram o impacto energético massivo do ciclo de treinamento de grandes redes neurais. Mais recentemente, Luccioni, Jernite e Strubell (2024) comprovaram que, Com a implantação global de LLMs em produção, a fase de inferência contínua ultrapassa rapidamente o custo energético acumulado do treinamento, visto que modelos generativos multitarefa mobilizam bilhões de parâmetros a cada requisição individual."
+  },
+  {
+    "type": "p",
+    "text": "Alinhado ao manifesto Green AI proposto por Schwartz et al. (2020) — que defende a inclusão obrigatória de indicadores de custo computacional (como FLOPs processados e volume de tokens) ao lado das métricas de acurácia —, a compressão de prompts constitui uma intervenção de eficiência imediata por reduzir o trabalho matemático na fase de prefill sem demandar treinamento adicional. Cumpre ressaltar, com estrito rigor epistemológico, que em experimentos conduzidos sobre APIs de nuvem gerenciada (como a infraestrutura NVIDIA NIM Cloud utilizada neste estudo) o pesquisador não possui acesso físico direto aos sensores de potência elétrica (em watts ou joules) do barramento das GPUs A100 no datacenter remoto. Assim, a eficiência ambiental e computacional reportada experimentalmente no Capítulo 10 é quantificada por meio de uma estimativa analítica fundamentada na física do algoritmo Transformer — a redução percentual de FLOPs quadráticos de autoatenção 1 - (T_comp / T_base)² derivada dos tokens reais medidos —, sempre ponderada à luz do Paradoxo de Jevons quanto ao efeito de escala da demanda agregada."
+  }
+]

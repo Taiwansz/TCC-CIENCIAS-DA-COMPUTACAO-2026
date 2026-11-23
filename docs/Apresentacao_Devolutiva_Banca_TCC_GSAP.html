@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Devolutiva do TCC: Resumo para o Grupo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    :root {
+      --bg-page: #F6F5F0;
+      --bg-card: #FFFFFF;
+      --bg-subtle: #EFECE4;
+      --bg-dark: #121211;
+      --ink-primary: #141413;
+      --ink-secondary: #5C5A54;
+      --ink-muted: #8C8980;
+      --accent: #1F5FA8;
+      --accent-soft: rgba(31, 95, 168, 0.09);
+      --ok: #1D7A4C;
+      --warn: #C85A32;
+      --border-soft: rgba(20, 20, 19, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background: var(--bg-page);
+      color: var(--ink-primary);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: clip;
+    }
+
+    body {
+      background: var(--bg-page);
+      color: var(--ink-primary);
+      overflow-x: clip;
+      line-height: 1.55;
+    }
+
+    .font-display {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Barra fina de progresso no topo */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--ink-primary);
+      z-index: 90;
+    }
+
+    /* Ilha de navegação limpa e arredondada */
+    .nav-island {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 80;
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 12px 32px -12px rgba(20, 20, 19, 0.08);
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      padding: 7px 14px;
+      border-radius: 999px;
+      transition: background-color 220ms var(--ease-apple), color 220ms var(--ease-apple), transform 160ms var(--ease-apple);
+      white-space: nowrap;
+    }
+    .nav-link:hover {
+      color: var(--ink-primary);
+      background: var(--bg-subtle);
+    }
+    .nav-link.is-active {
+      background: var(--ink-primary);
+      color: #FFFFFF;
+    }
+
+    /* Microinteração tátil Apple Design */
+    .tactile {
+      transition: transform 180ms var(--ease-apple), box-shadow 220ms var(--ease-apple), background-color 220ms var(--ease-apple);
+      cursor: pointer;
+    }
+    .tactile:active,
+    .tactile.is-pressed {
+      transform: scale(0.97);
+    }
+
+    /* Cartões suaves com bordas arredondadas modernas */
+    .card-clean {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 18px 40px -24px rgba(20, 20, 19, 0.07);
+    }
+
+    .card-dark {
+      background: var(--bg-dark);
+      color: #F6F5F0;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 24px 48px -20px rgba(20, 20, 19, 0.22);
+    }
+
+    /* Transição das 4 cenas do palco GSAP */
+    .scene-slide {
+      display: none;
+    }
+    .scene-slide.is-active {
+      display: grid;
+    }
+
+    /* Indicadores de passo */
+    .step-pill {
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      background: var(--bg-subtle);
+      border: 1px solid transparent;
+      transition: all 240ms var(--ease-apple);
+    }
+    .step-pill.is-active {
+      background: var(--ink-primary);
+      color: #FFFFFF;
+    }
+
+    section {
+      scroll-margin-top: 88px;
+    }
+
+    /* Acordeão de Progressive Disclosure (12 Quesitos) */
+    .acc-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: border-color 220ms var(--ease-apple);
+    }
+    .acc-body {
+      max-height: 0;
+      padding: 0 24px;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 320ms var(--ease-apple), padding 320ms var(--ease-apple), opacity 240ms var(--ease-apple);
+    }
+    .acc-item.is-open .acc-body {
+      max-height: 360px;
+      padding: 0 24px 20px 24px;
+      opacity: 1;
+    }
+    .acc-chevron {
+      transition: transform 260ms var(--ease-apple);
+    }
+    .acc-item.is-open .acc-chevron {
+      transform: rotate(45deg);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="topProgress"></div>
+
+  <!-- Navegação Minimalista -->
+  <nav class="nav-island" aria-label="Seções">
+    <a href="#resumo" class="nav-link is-active tactile">Resumo</a>
+    <a href="#ajustes" class="nav-link tactile">4 Ajustes</a>
+    <a href="#fala-banca" class="nav-link tactile">O Que Falar</a>
+    <a href="#quesitos" class="nav-link tactile">12 Itens</a>
+  </nav>
+
+  <!-- =================================================================== -->
+  <!-- 1. HERO LIMPO E RESPIRADO (POUCOS ELEMENTOS, FOCO IMEDIATO)         -->
+  <!-- =================================================================== -->
+  <section id="resumo" class="min-h-[88dvh] flex items-center pt-28 pb-16 px-5 sm:px-8">
+    <div class="max-w-5xl mx-auto w-full">
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+        <!-- Texto Principal (7 colunas) -->
+        <div class="lg:col-span-7 space-y-6 hero-anim">
+          <div class="text-sm font-medium text-[#5C5A54]">
+            TCC II · Matheus, Felipe, Guilherme e Juan
+          </div>
+
+          <h1 class="font-display text-4xl sm:text-5xl lg:text-[3.5rem] font-bold leading-[1.06] text-[#141413]">
+            O que a banca avaliou e como blindamos o TCC.
+          </h1>
+
+          <p class="text-base sm:text-lg text-[#5C5A54] max-w-xl leading-relaxed">
+            O professor elogiou o tema, os gráficos e os três experimentos reais. As críticas focaram em <strong>quatro detalhes técnicos</strong>. Mantivemos o PDF original intacto e geramos um <strong>arquivo extra revisado</strong> com tudo corrigido.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#ajustes" class="tactile px-6 py-3.5 rounded-full bg-[#141413] text-white font-semibold text-sm">
+              Ver os 4 ajustes principais
+            </a>
+            <a href="#fala-banca" class="tactile px-6 py-3.5 rounded-full bg-[#EFECE4] text-[#141413] font-semibold text-sm">
+              Respostas para a apresentação
+            </a>
+          </div>
+        </div>
+
+        <!-- Cartão Resumo Visual (5 colunas) -->
+        <div class="lg:col-span-5 hero-anim">
+          <div class="card-clean p-7 sm:p-8 space-y-6">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-[#5C5A54]">Resumo da Revisão</span>
+              <span class="font-mono-num text-xs font-semibold text-[#1D7A4C]">
+                Pronto para a banca
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="p-4 rounded-2xl bg-[#F6F5F0]">
+                <div class="font-display text-3xl font-bold text-[#141413] font-mono-num">12/12</div>
+                <div class="text-xs text-[#5C5A54] mt-1">Itens respondidos</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-[#F6F5F0]">
+                <div class="font-display text-3xl font-bold text-[#141413] font-mono-num">21 &rarr; 27</div>
+                <div class="text-xs text-[#5C5A54] mt-1">Referências ABNT</div>
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-1 text-sm">
+              <div class="flex items-center justify-between py-2 border-b border-black/5">
+                <span class="text-[#5C5A54]">PDF Entregue (30 págs.)</span>
+                <span class="font-semibold text-[#141413]">Mantido intacto</span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-[#5C5A54]">PDF Extra Revisado (36 págs.)</span>
+                <span class="font-semibold text-[#1F5FA8]">Compilado à parte</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!-- 2. PALCO PINNED GSAP SCROLLTRIGGER: OS 4 AJUSTES (1 POR VEZ)        -->
+  <!-- =================================================================== -->
+  <section id="ajustes" class="py-12 px-5 sm:px-8">
+    <div class="max-w-5xl mx-auto" id="pinnedStageWrapper">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#141413]">
+            Os 4 pontos que a banca cobrou
+          </h2>
+          <p class="text-sm text-[#5C5A54] mt-1">
+            Role a página ou clique nas abas para ver cada crítica e a solução aplicada.
+          </p>
+        </div>
+
+        <!-- Seletores Limpos -->
+        <div class="flex flex-wrap items-center gap-2" role="tablist">
+          <button type="button" data-step="0" class="step-pill is-active tactile">1. Tempo do Caso 1</button>
+          <button type="button" data-step="1" class="step-pill tactile">2. Fórmula BERTScore</button>
+          <button type="button" data-step="2" class="step-pill tactile">3. Revisão Sistemática</button>
+          <button type="button" data-step="3" class="step-pill tactile">4. Energia &amp; Referências</button>
+        </div>
+      </div>
+
+      <!-- Cartão Central Único (Muda suavemente conforme o scroll) -->
+      <div class="card-clean p-7 sm:p-10 min-h-[420px] flex items-center" id="pinnedCard">
+
+        <!-- CENA 1: O PARADOXO DOS 17,96 SEGUNDOS -->
+        <div class="scene-slide is-active grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full" data-scene="0">
+          <div class="lg:col-span-6 space-y-4">
+            <span class="font-mono-num text-xs font-semibold text-[#C85A32]">
+              PONTO 01 DE 04 · LATÊNCIA EM NUVEM
+            </span>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-[#141413] leading-tight">
+              "Por que no Caso 1 o tempo total subiu de 7,05 s para 17,96 s na compressão 4x?"
+            </h3>
+            <p class="text-sm sm:text-base text-[#5C5A54] leading-relaxed">
+              O prompt menor só acelera a <strong>leitura inicial (TTFT)</strong>, que realmente caiu para <strong>538 ms</strong>. Os 17 segundos vieram da geração dos <strong>260 tokens de resposta</strong> porque a GPU compartilhada da nuvem NVIDIA oscilou naquela rodada.
+            </p>
+            <p class="text-sm text-[#141413] font-medium">
+              <strong>O que adicionamos:</strong> Explicamos a diferença entre leitura (Prefill) e geração (Decoding) e colocamos média e desvio-padrão na Tabela 2.
+            </p>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="card-dark p-6 sm:p-7 space-y-6">
+              <div class="text-xs font-mono-num text-[#8C8980]">
+                DECOMPOSIÇÃO DO CASO 1 (MESMA SAÍDA DE 260 TOKENS)
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono-num">
+                  <span>Few-shot (340 tokens entrada)</span>
+                  <span>Total: 7,05 s</span>
+                </div>
+                <div class="h-8 rounded-xl bg-white/10 overflow-hidden flex text-xs font-mono-num font-semibold">
+                  <div class="bg-[#1D7A4C] text-white flex items-center justify-center px-3" style="width: 24%;">
+                    TTFT: 585 ms
+                  </div>
+                  <div class="bg-white/15 text-white/90 flex items-center justify-center px-3" style="width: 76%;">
+                    Geração de 260 tokens: 6,46 s
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono-num">
+                  <span class="text-[#7CC49B]">Comprimido 4x (149 tokens entrada)</span>
+                  <span>TTFT 8% mais rápido</span>
+                </div>
+                <div class="h-8 rounded-xl bg-white/10 overflow-hidden flex text-xs font-mono-num font-semibold">
+                  <div class="bg-[#1D7A4C] text-white flex items-center justify-center px-3" style="width: 19%;">
+                    TTFT: 538 ms
+                  </div>
+                  <div class="bg-[#C85A32] text-white flex items-center justify-center px-3" style="width: 81%;">
+                    Fila da nuvem nos 260 tokens: 17,42 s
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                <span class="text-[#8C8980]">Estabilidade do TTFT em 4x (Desvio-Padrão):</span>
+                <span class="font-mono-num font-semibold text-[#7CC49B]">574,3 ± 54,3 ms (variação de só 9,5%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENA 2: BERTSCORE PROXY & ALGORITMO TOKLANG -->
+        <div class="scene-slide grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full" data-scene="1">
+          <div class="lg:col-span-6 space-y-4">
+            <span class="font-mono-num text-xs font-semibold text-[#1F5FA8]">
+              PONTO 02 DE 04 · TRANSPARÊNCIA DA MÉTRICA
+            </span>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-[#141413] leading-tight">
+              "Como o algoritmo escolhe os tokens e como funciona o BERTScore Proxy F1?"
+            </h3>
+            <p class="text-sm sm:text-base text-[#5C5A54] leading-relaxed">
+              O BERTScore tradicional dá nota alta mesmo quando a IA esquece um comando SQL obrigatório como <code>DENSE_RANK()</code>. Por isso criamos o <strong>Proxy F1</strong>, que exige a presença das palavras técnicas obrigatórias.
+            </p>
+            <p class="text-sm text-[#141413] font-medium">
+              <strong>O que adicionamos:</strong> Colocamos a fórmula exata com os pesos no Capítulo 10.4 e as 4 regras matemáticas do compressor TokLang no Capítulo 10.1.
+            </p>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="card-dark p-6 sm:p-7 space-y-5">
+              <div class="text-xs font-mono-num text-[#8C8980]">
+                COMPOSIÇÃO DA NOTA SEMÂNTICA (BERTSCORE PROXY F1)
+              </div>
+
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="p-4 rounded-2xl bg-white/5">
+                  <div class="font-display text-2xl font-bold text-white font-mono-num">50%</div>
+                  <div class="text-xs text-[#8C8980] mt-1">Cosseno de Termos</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-[#1D7A4C]/25 border border-[#1D7A4C]/50">
+                  <div class="font-display text-2xl font-bold text-[#7CC49B] font-mono-num">35%</div>
+                  <div class="text-xs text-white/90 mt-1">Termos Obrigatórios</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white/5">
+                  <div class="font-display text-2xl font-bold text-white font-mono-num">15%</div>
+                  <div class="text-xs text-[#8C8980] mt-1">Ordem (ROUGE-L)</div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white/5 font-mono-num text-xs text-white/90 space-y-1.5">
+                <div class="text-[#8C8980]">Regras do Compressor TokLang:</div>
+                <div>1. <strong>39 termos blindados</strong> (SQL, Raft, LGPD) = nota máxima 100</div>
+                <div>2. <strong>55 conectivos comuns</strong> (de, para, com) = penalizados em 85%</div>
+                <div>3. <strong>Demais palavras</strong> = Entropia de Shannon -log₂ P(w)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENA 3: REVISÃO SISTEMÁTICA E COMPARAÇÃO -->
+        <div class="scene-slide grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full" data-scene="2">
+          <div class="lg:col-span-6 space-y-4">
+            <span class="font-mono-num text-xs font-semibold text-[#1F5FA8]">
+              PONTO 03 DE 04 · METODOLOGIA DA REVISÃO
+            </span>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-[#141413] leading-tight">
+              "O objetivo fala em revisão sistemática, mas faltou mostrar como os artigos foram buscados."
+            </h3>
+            <p class="text-sm sm:text-base text-[#5C5A54] leading-relaxed">
+              Quando usamos a palavra "sistemática", a banca cobra quais bases foram consultadas, quais palavras-chave usamos e uma tabela comparando os métodos estudados.
+            </p>
+            <p class="text-sm text-[#141413] font-medium">
+              <strong>O que adicionamos:</strong> Criamos a Seção 1.4 explicando o filtro (64 artigos encontrados &rarr; 27 selecionados), deixamos a Pergunta de Pesquisa explícita na Introdução e criamos o Quadro 1 comparando os métodos.
+            </p>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="card-dark p-6 sm:p-7 space-y-4">
+              <div class="text-xs font-mono-num text-[#8C8980]">
+                RESUMO DO NOVO QUADRO 1 (CAPÍTULO 6.4 · PÁG. 16)
+              </div>
+
+              <div class="space-y-2.5 text-xs">
+                <div class="p-3.5 rounded-2xl bg-white/5 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white">LLMLingua / LongLLMLingua</div>
+                    <div class="text-[#8C8980]">Usa um modelo de 7B para medir perplexidade</div>
+                  </div>
+                  <span class="font-mono-num text-[#C85A32]">Exige GPU extra</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-white/5 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white">AutoCompressor</div>
+                    <div class="text-[#8C8980]">Comprime em vetores latentes internos</div>
+                  </div>
+                  <span class="font-mono-num text-[#C85A32]">Não roda em API</span>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-[#1D7A4C]/25 border border-[#1D7A4C]/50 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white">TokLang (Nosso Compilador)</div>
+                    <div class="text-white/80">Entropia de Shannon + Lista de Proteção</div>
+                  </div>
+                  <span class="font-mono-num font-semibold text-[#7CC49B]">CPU &lt; 1 ms · API OK</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENA 4: MEDIDO VS ESTIMADO E REFERÊNCIAS -->
+        <div class="scene-slide grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full" data-scene="3">
+          <div class="lg:col-span-6 space-y-4">
+            <span class="font-mono-num text-xs font-semibold text-[#1D7A4C]">
+              PONTO 04 DE 04 · GREEN AI &amp; BIBLIOGRAFIA
+            </span>
+            <h3 class="font-display text-2xl sm:text-3xl font-bold text-[#141413] leading-tight">
+              "Separar o que foi medido na prática do que é estimativa teórica e completar as referências."
+            </h3>
+            <p class="text-sm sm:text-base text-[#5C5A54] leading-relaxed">
+              Como o modelo rodou na nuvem da NVIDIA, não existe tomada física para medir watts na placa. A economia energética vem do cálculo teórico de redução de <strong>80,7% nas operações quadráticas O(n²)</strong>.
+            </p>
+            <p class="text-sm text-[#141413] font-medium">
+              <strong>O que adicionamos:</strong> Identificamos em todas as tabelas o que é <em>Medido na API</em> vs. <em>Projeção Teórica</em> e incluímos as 6 referências que faltavam (LongLLMLingua, Llama 3.2, NVIDIA NIM, nosso GitHub e 2 artigos de 2024).
+            </p>
+          </div>
+
+          <div class="lg:col-span-6">
+            <div class="card-dark p-6 sm:p-7 space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-4 rounded-2xl bg-[#1D7A4C]/20 border border-[#1D7A4C]/40 space-y-2">
+                  <div class="font-mono-num font-semibold text-[#7CC49B]">MEDIDO DIRETO NA API</div>
+                  <ul class="space-y-1.5 text-white/90">
+                    <li>• Queda de 56,2% nos tokens</li>
+                    <li>• TTFT de 574,3 ± 54,3 ms</li>
+                    <li>• 100% das entidades no SQL</li>
+                  </ul>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div class="font-mono-num font-semibold text-white">PROJEÇÃO TEÓRICA</div>
+                  <ul class="space-y-1.5 text-[#8C8980]">
+                    <li>• -80,7% cálculos O(n²)</li>
+                    <li>• Lote 100k: US$ 505 &rarr; 440</li>
+                    <li>• Alívio térmico estimado</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white/5 text-xs space-y-1">
+                <div class="font-mono-num text-[#8C8980]">6 novas referências incluídas (Total: 27):</div>
+                <div class="text-white/90">
+                  Jiang et al. (2024 - LongLLMLingua) · Dubey et al. (2024 - Llama 3.2) · NVIDIA NIM Docs (2024) · Repositório GitHub do Grupo (2026) · Liu et al. (2024) · Luccioni et al. (2024).
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!-- 3. O QUE FALAR NA APRESENTAÇÃO (4 CARTÕES CURTOS E DIRETOS)         -->
+  <!-- =================================================================== -->
+  <section id="fala-banca" class="py-16 px-5 sm:px-8">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="mb-10">
+        <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#141413]">
+          Respostas curtas caso a banca pergunte ao vivo
+        </h2>
+        <p class="text-sm text-[#5C5A54] mt-1">
+          Direto ao ponto para qualquer um de nós quatro responder com segurança.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="card-clean p-7 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="font-mono-num text-xs font-semibold text-[#C85A32]">Pergunta 1 · Tempo Total no Caso 1</span>
+            <h3 class="font-display text-lg font-bold text-[#141413]">
+              Por que o Caso 1 levou 17,96 s em 4x contra 7,05 s no Few-shot?
+            </h3>
+            <p class="text-sm text-[#5C5A54]" id="ans-1">
+              Porque comprimir o prompt otimiza a leitura da entrada (Prefill), tanto que o primeiro token (TTFT) saiu mais rápido (538 ms). Os 17 segundos ocorreram na geração dos 260 tokens de saída por oscilação da fila compartilhada na nuvem NVIDIA NIM.
+            </p>
+          </div>
+          <div>
+            <button type="button" data-copy="ans-1" class="copy-btn tactile text-xs font-semibold px-4 py-2 rounded-full bg-[#EFECE4] text-[#141413]">
+              Copiar resposta
+            </button>
+          </div>
+        </div>
+
+        <div class="card-clean p-7 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="font-mono-num text-xs font-semibold text-[#1F5FA8]">Pergunta 2 · BERTScore Proxy F1</span>
+            <h3 class="font-display text-lg font-bold text-[#141413]">
+              Por que criar o BERTScore Proxy em vez de usar o BERTScore padrão?
+            </h3>
+            <p class="text-sm text-[#5C5A54]" id="ans-2">
+              O BERTScore neural comum dá nota alta mesmo se a IA apagar uma cláusula obrigatória como DENSE_RANK() no SQL ou o Artigo 11º da LGPD. O nosso Proxy F1 reserva 35% da nota para a presença estrita das entidades obrigatórias de cada caso.
+            </p>
+          </div>
+          <div>
+            <button type="button" data-copy="ans-2" class="copy-btn tactile text-xs font-semibold px-4 py-2 rounded-full bg-[#EFECE4] text-[#141413]">
+              Copiar resposta
+            </button>
+          </div>
+        </div>
+
+        <div class="card-clean p-7 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="font-mono-num text-xs font-semibold text-[#1D7A4C]">Pergunta 3 · Economia de Energia</span>
+            <h3 class="font-display text-lg font-bold text-[#141413]">
+              A economia de energia foi medida na placa de vídeo ou estimada?
+            </h3>
+            <p class="text-sm text-[#5C5A54]" id="ans-3">
+              Os tokens (redução média de 56,2%) e a latência foram medidos diretamente na API da NVIDIA. Já a redução de 80,7% no esforço computacional é uma estimativa analítica baseada na lei quadrática O(n²) da atenção do Transformer, já que em nuvem não há acesso físico ao sensor de watts da GPU.
+            </p>
+          </div>
+          <div>
+            <button type="button" data-copy="ans-3" class="copy-btn tactile text-xs font-semibold px-4 py-2 rounded-full bg-[#EFECE4] text-[#141413]">
+              Copiar resposta
+            </button>
+          </div>
+        </div>
+
+        <div class="card-clean p-7 flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <span class="font-mono-num text-xs font-semibold text-[#141413]">Pergunta 4 · Queda para 0,7912 no Caso 1</span>
+            <h3 class="font-display text-lg font-bold text-[#141413]">
+              Se o Caso 1 ficou em 0,7912 (abaixo de 0,80), a técnica vale a pena?
+            </h3>
+            <p class="text-sm text-[#5C5A54]" id="ans-4">
+              Esse é justamente o achado central do trabalho: em tarefas estruturadas como SQL (0,8524) e normativas como LGPD (onde a nota subiu para 0,8279 por cortar ruído), a compressão 4x é excelente. Já em explicações teóricas causais longas (Caso 1) em modelos menores de 11B, recomenda-se compressão moderada para não perder conectivos de causa e efeito.
+            </p>
+          </div>
+          <div>
+            <button type="button" data-copy="ans-4" class="copy-btn tactile text-xs font-semibold px-4 py-2 rounded-full bg-[#EFECE4] text-[#141413]">
+              Copiar resposta
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!-- 4. LISTA SANFONA (PROGRESSIVE DISCLOSURE) DOS 12 ITENS DA BANCA     -->
+  <!-- =================================================================== -->
+  <section id="quesitos" class="py-16 px-5 sm:px-8">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+          <h2 class="font-display text-2xl sm:text-3xl font-bold text-[#141413]">
+            Todos os 12 itens da ficha de avaliação
+          </h2>
+          <p class="text-sm text-[#5C5A54] mt-1">
+            Clique em qualquer item para abrir o comentário do professor e a correção feita.
+          </p>
+        </div>
+        <button type="button" id="toggleAllBtn" class="tactile text-xs font-semibold px-4 py-2.5 rounded-full bg-[#EFECE4] text-[#141413]">
+          Expandir todos
+        </button>
+      </div>
+
+      <div class="space-y-3" id="accordionList">
+
+        <div class="acc-item is-open">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">01. Título: Evitar repetição de ideias entre título e subtítulo</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Título coerente, mas recomendou evitar dois títulos com ideias muito próximas.</p>
+            <p class="text-[#141413]"><strong>Correção (Pág. 1):</strong> Subtítulo ajustado na versão extra para <em>"Avaliação Empírica de Consumo de Tokens, Latência, Fidelidade Semântica e Eficiência Computacional"</em>.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">02. Resumo: Separar medição real de estimativa energética</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Deixar claro que economia energética é estimativa computacional e que a qualidade depende da tarefa.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 2 a 3):</strong> Resumo e Abstract atualizados distinguindo tokens medidos via API da redução teórica de 80,7% nos FLOPs O(n²).</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">03. Introdução: Formular explicitamente o problema de pesquisa</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Sentiu falta de uma pergunta explícita de pesquisa na Introdução.</p>
+            <p class="text-[#141413]"><strong>Correção (Pág. 5):</strong> Inserido parágrafo com a Questão Central de Pesquisa ao final da Seção 1.1.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">04. Revisão de Literatura: Protocolo de busca e comparação entre métodos</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Faltou o procedimento da revisão sistemática e uma comparação direta entre as técnicas.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 7 e 16):</strong> Criada a Seção 1.4 (Protocolo de Revisão nas 5 bases) e a Seção 6.4 com o Quadro 1 comparando os 6 métodos.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">05. Revisão de Literatura: Confrontar teoria com nossos resultados</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Fundamentação muito descritiva em alguns trechos; faltou cruzar os artigos com os dados obtidos pelo grupo.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 10 a 23):</strong> Adicionados parágrafos cruzando Jiang et al. (2023 e 2024) e Liu et al. (2024) com as taxas faturadas e o ganho de F1 no Caso 3 (LGPD).</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">06. Metodologia: Critérios e parâmetros para reprodução do algoritmo</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Explicar os critérios internos do compressor, parâmetros de validação e controle de latência.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 20 a 21):</strong> Detalhadas na Seção 10.1 as 4 etapas matemáticas do TokLang, as 39 palavras protegidas, as 55 stopwords e o link do GitHub.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">07. Resultados: Caso 1 (7,05 s vs. 17,96 s) e fórmula do BERTScore Proxy</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Explicar por que o tempo total aumentou no Caso 1 (4x) e detalhar a métrica BERTScore Proxy F1.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 24 a 29):</strong> Decomposição entre Prefill (TTFT) e Decoding (260 tokens na nuvem) na Seção 10.3 e equação aberta do Proxy F1 na Seção 10.4.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">08 e 09. Tabelas e Figuras: Variação estatística e rótulos Medido vs. Projetado</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Incluir indicadores de variação estatística na latência e identificar o que é medido e o que é projeção.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 22 a 31):</strong> Adicionadas Média, Desvio-Padrão e Coeficiente de Variação (CV%) na Tabela 2 e tags claras nos títulos das 4 tabelas.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">10. Conclusão: Responder à questão com as limitações de cada tarefa</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> A preservação da qualidade depende da tarefa (como visto no Caso 1), exigindo explicitar essas condições.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 32 a 33):</strong> Capítulo 11 ampliado com resposta direta à pergunta de pesquisa, seção de Limitações Metodológicas e 4 trabalhos futuros.</p>
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button type="button" class="acc-trigger w-full px-6 py-4 flex items-center justify-between text-left">
+            <span class="font-display font-bold text-base text-[#141413]">11 e 12. Referências: Citar LongLLMLingua, Llama 3.2, NVIDIA NIM, GitHub e papers 2024</span>
+            <span class="acc-chevron font-mono-num text-xl text-[#5C5A54]">+</span>
+          </button>
+          <div class="acc-body text-sm text-[#5C5A54] space-y-2">
+            <p><strong>Banca:</strong> Incluir referência específica do LongLLMLingua, docs do Llama/NVIDIA NIM, link do código TokLang/Battle IA e estudos recentes.</p>
+            <p class="text-[#141413]"><strong>Correção (Págs. 34 a 36):</strong> Adicionadas 6 novas referências ABNT NBR 6023:2018 (totalizando 27 referências conferidas 1:1 com o texto).</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-10 px-5 sm:px-8 border-t border-black/5 text-center text-xs text-[#8C8980]">
+    Ciência da Computação UniMAX 2026 · Matheus Sousa, Felipe Pinete, Guilherme Weber e Juan Pedro
+  </footer>
+
+  <script>
+    (function () {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Feedback tátil imediato em pointerdown
+      document.addEventListener('pointerdown', function (e) {
+        const el = e.target.closest('.tactile');
+        if (el) el.classList.add('is-pressed');
+      });
+      document.addEventListener('pointerup', function () {
+        document.querySelectorAll('.tactile.is-pressed').forEach(function (el) {
+          el.classList.remove('is-pressed');
+        });
+      });
+
+      // Troca de cena nos 4 ajustes
+      let currentStep = 0;
+      const pills = document.querySelectorAll('.step-pill');
+      const scenes = document.querySelectorAll('.scene-slide');
+
+      function setStep(idx) {
+        if (idx === currentStep && scenes[idx].classList.contains('is-active')) return;
+        currentStep = idx;
+
+        pills.forEach(function (p, i) {
+          p.classList.toggle('is-active', i === idx);
+        });
+
+        scenes.forEach(function (s, i) {
+          if (i === idx) {
+            s.classList.add('is-active');
+            if (window.gsap && !reducedMotion) {
+              gsap.fromTo(s, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.38, ease: "power2.out" });
+            }
+          } else {
+            s.classList.remove('is-active');
+          }
+        });
+      }
+
+      pills.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setStep(Number(btn.getAttribute('data-step')));
+        });
+      });
+
+      // Acordeão dos 12 quesitos
+      document.querySelectorAll('.acc-trigger').forEach(function (trig) {
+        trig.addEventListener('click', function () {
+          const item = trig.closest('.acc-item');
+          item.classList.toggle('is-open');
+        });
+      });
+
+      const toggleAllBtn = document.getElementById('toggleAllBtn');
+      let allExpanded = false;
+      if (toggleAllBtn) {
+        toggleAllBtn.addEventListener('click', function () {
+          allExpanded = !allExpanded;
+          document.querySelectorAll('.acc-item').forEach(function (item) {
+            item.classList.toggle('is-open', allExpanded);
+          });
+          toggleAllBtn.textContent = allExpanded ? 'Recolher todos' : 'Expandir todos';
+        });
+      }
+
+      // Botões de copiar resposta
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const id = btn.getAttribute('data-copy');
+          const txt = document.getElementById(id)?.textContent?.trim();
+          if (txt && navigator.clipboard) {
+            navigator.clipboard.writeText(txt);
+          }
+          const prev = btn.textContent;
+          btn.textContent = 'Copiado';
+          btn.style.background = '#141413';
+          btn.style.color = '#FFFFFF';
+          setTimeout(function () {
+            btn.textContent = prev;
+            btn.style.background = '';
+            btn.style.color = '';
+          }, 1500);
+        });
+      });
+
+      // GSAP + ScrollTrigger (Pin real na seção dos 4 ajustes em telas Desktop >= 1024px)
+      if (window.gsap && window.ScrollTrigger && !reducedMotion) {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.to('#topProgress', {
+          width: '100%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: document.body,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 0.15
+          }
+        });
+
+        gsap.from('.hero-anim', {
+          y: 20,
+          opacity: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: 'power3.out'
+        });
+
+        ScrollTrigger.matchMedia({
+          "(min-width: 1024px)": function () {
+            ScrollTrigger.create({
+              trigger: "#ajustes",
+              start: "top 12%",
+              end: "+=1400",
+              pin: true,
+              scrub: 0.5,
+              onUpdate: function (self) {
+                const idx = Math.min(3, Math.floor(self.progress * 4));
+                setStep(idx);
+              }
+            });
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
