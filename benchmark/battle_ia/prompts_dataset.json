@@ -1,0 +1,46 @@
+{
+  "dataset_metadata": {
+    "version": "1.0",
+    "project": "TCC II - Battle IA",
+    "theme": "Compressao de Prompts e Sustentabilidade da IA",
+    "contract_spec": "Cada caso contem uma pergunta/tarefa expressa sob diferentes tecnicas de engenharia e compressao de prompt."
+  },
+  "cases": [
+    {
+      "case_id": "CASE-01-ARCH-QA",
+      "name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida",
+      "domain": "Sistemas Distribuidos",
+      "system_prompt": "Voce e um arquiteto de solucoes especialista em microsservicos e tolerancia a falhas. Responda de forma tecnica, concisa e direta.",
+      "ground_truth_reference": "Os principais gargalos identificados sao o acoplamento sincrono via REST, a ausencia de circuit breaker no servico de pagamentos e a concorrencia no banco compartilhado de pedidos, cuja solucao exige mensageria assincrona e Saga pattern.",
+      "techniques": {
+        "zero_shot": "Considere o seguinte cenario de arquitetura de software corporativa detalhado: Uma plataforma de comercio eletronico de alta escala atende cerca de 50.000 requisicoes concorrentes por minuto durante periodos promocionais. A arquitetura atual e composta por uma camada de API Gateway construida em Node.js, que encaminha requisicoes para tres servicos centrais: Servico de Autenticacao, Servico de Catalogo e Servico de Checkout. O Servico de Checkout comunica-se de maneira puramente sincrona atraves de chamadas HTTP REST com um Servico Legado de Processamento de Pagamentos Bancarios e com o Servico de Inventario em tempo real. Ambos os servicos leem e gravam concorrentemente na mesma instancia de banco de dados relacional PostgreSQL, sem filas intermediarias ou barramentos de mensageria. Durante o ultimo grande evento comercial, observou-se que o tempo medio de resposta subiu de 200 milissegundos para 14 segundos, resultando em timeouts generalizados no Gateway e queda em cascata dos servicos dependentes. Com base estritamente no cenario exposto, analise minuciosamente os tres principais pontos de falha arquiteturais que causaram a degradacao do sistema e descreva quais padroes de projeto distribuidos devem ser adotados para sanar o problema de concorrencia e indisponibilidade em cascata.",
+        "few_shot": "Exemplo 1:\nContexto: Sistema monolitico sofrendo com lock de tabelas em escrita massiva.\nResposta: Ponto de falha no lock de I/O. Solucao: Adotar CQRS separando leitura e escrita com read-replicas.\n\nExemplo 2:\nContexto: Servico de notificacoes bloqueando thread principal de checkout.\nResposta: Ponto de falha no acoplamento temporal sincrono. Solucao: Mensageria assincrona com RabbitMQ.\n\nAgora analise o cenario principal: Plataforma de e-commerce com 50k req/min, Gateway Node.js encaminhando para Checkout, que chama de forma sincrona HTTP REST um processador legado e inventario. Ambos disputam o mesmo PostgreSQL sem filas, gerando latencia de 14s e queda em cascata. Liste os 3 principais pontos de falha e os padroes recomendados.",
+        "compressed_llmlingua": "Cenario e-commerce 50k req/min. Gateway Node -> Checkout sincrono HTTP REST -> Pagamento Legado e Inventario. Banco PostgreSQL compartilhado sem filas. Latencia subiu 200ms -> 14s com timeout e falha em cascata. Liste 3 principais gargalos arquiteturais e padroes distribuidos recomendados para mitigar concorrencia e efeito cascata."
+      }
+    },
+    {
+      "case_id": "CASE-02-SQL-GEN",
+      "name": "Geracao de Query Analitica SQL sob Longo DDL de Banco",
+      "domain": "Engenharia de Dados",
+      "system_prompt": "Voce e um DBA especialista em PostgreSQL e otimizacao de consultas SQL. Gere apenas a consulta SQL otimizada sem explicacoes prolixas.",
+      "ground_truth_reference": "SELECT c.id, c.nome, SUM(p.valor_total) as receita_total FROM clientes c JOIN pedidos p ON c.id = p.cliente_id WHERE p.data_pedido >= CURRENT_DATE - INTERVAL '30 days' AND p.status = 'CONCLUIDO' GROUP BY c.id, c.nome HAVING COUNT(p.id) >= 3 ORDER BY receita_total DESC LIMIT 10;",
+      "techniques": {
+        "zero_shot": "Abaixo esta a definicao completa das tabelas do nosso banco de dados corporativo:\nCREATE TABLE clientes (id SERIAL PRIMARY KEY, nome VARCHAR(255) NOT NULL, email VARCHAR(255) UNIQUE, criado_em TIMESTAMP DEFAULT NOW());\nCREATE TABLE categorias (id SERIAL PRIMARY KEY, nome VARCHAR(100) NOT NULL);\nCREATE TABLE produtos (id SERIAL PRIMARY KEY, categoria_id INT REFERENCES categorias(id), nome VARCHAR(255), preco NUMERIC(10,2));\nCREATE TABLE pedidos (id SERIAL PRIMARY KEY, cliente_id INT REFERENCES clientes(id), data_pedido TIMESTAMP NOT NULL, status VARCHAR(50), valor_total NUMERIC(12,2));\nCREATE TABLE itens_pedido (id SERIAL PRIMARY KEY, pedido_id INT REFERENCES pedidos(id), produto_id INT REFERENCES produtos(id), quantidade INT, preco_unitario NUMERIC(10,2));\nCREATE TABLE logs_acesso (id SERIAL PRIMARY KEY, cliente_id INT, ip VARCHAR(45), data_acesso TIMESTAMP);\nCom base rigorosamente nesse esquema relacional, elabore uma consulta SQL analitica altamente eficiente para PostgreSQL que retorne o ID e o nome dos 10 clientes que geraram o maior volume financeiro total (soma de valor_total) em pedidos com status 'CONCLUIDO' nos ultimos 30 dias, filtrando apenas clientes que realizaram pelo menos 3 pedidos no periodo.",
+        "few_shot": "Exemplo:\nEsquema: vendas(id, vendedor_id, valor, data)\nObjetivo: Top 5 vendedores com mais de 10 vendas.\nSQL: SELECT vendedor_id, SUM(valor) FROM vendas GROUP BY vendedor_id HAVING COUNT(*) > 10 ORDER BY 2 DESC LIMIT 5;\n\nAgora considere o esquema: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere SQL para os top 10 clientes com maior receita em pedidos 'CONCLUIDO' nos ultimos 30 dias e minimo de 3 pedidos.",
+        "compressed_llmlingua": "DDL: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere query PostgreSQL eficiente: Top 10 clientes por SUM(valor_total) com status='CONCLUIDO' nos ultimos 30 dias e HAVING COUNT(pedidos) >= 3."
+      }
+    },
+    {
+      "case_id": "CASE-03-RAG-COMPLIANCE",
+      "name": "Auditoria de Compliance LGPD / Seguranca da Informacao",
+      "domain": "Seguranca e Governanca",
+      "system_prompt": "Voce e um oficial de seguranca da informacao (CISO) e encarregado de dados (DPO). Responda com rigor de auditoria corporativa.",
+      "ground_truth_reference": "A politica viola o Artigo 14 da LGPD e o principio da necessidade ao armazenar biometria e CPF em logs de aplicacao sem criptografia e sem base legal explicitada para compartilhamento com terceiros.",
+      "techniques": {
+        "zero_shot": "Analise a seguinte clausula extraida dos termos de servico internos de uma fintech financeira: 'A empresa reserva-se o direito irrevogavel de coletar, processar e armazenar indeterminadamente registros biometricos faciais, dados de geolocalizacao continuos em segundo plano e identificadores fiscais (CPF) de todos os usuarios cadastrados. Estes dados serao gravados em arquivos de log em formato texto puro nos servidores de aplicacao para fins de telemetria interna e poderao ser transmitidos ou comercializados com parceiros comerciais de marketing sem necessidade de notificacao previa ao titular'. Identifique objetivamente quais principios basilares da Lei Geral de Protecao de Dados (LGPD - Lei nº 13.709/2018) estao sendo frontalmente violados por essa clausula, citando os requisitos de finalidade, adequacao, necessidade e seguranca da informacao.",
+        "few_shot": "Exemplo:\nClausula: Armazenar senhas de usuarios em texto puro no log.\nViolacao: Principio da seguranca e prevencao (Art. 6, VII e VIII LGPD). Risco severo de vazamento.\n\nAgora analise a clausula: Coleta indefinida de biometria facial, geolocalizacao e CPF, gravados em texto puro em logs de aplicacao e compartilhados com parceiros de marketing sem notificacao ao titular. Quais principios da LGPD foram violados?",
+        "compressed_llmlingua": "Clausula: Coleta indeterminada biometria facial, geolocalizacao continua, CPF. Logs texto puro no servidor, compartilhamento/venda parceiros marketing sem aviso. Quais principios basilares LGPD (finalidade, necessidade, seguranca) foram violados?"
+      }
+    }
+  ]
+}

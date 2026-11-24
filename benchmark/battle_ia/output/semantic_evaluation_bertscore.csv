@@ -1,0 +1,49 @@
+case_id,case_name,model_id,technique,repeat_index,compression_ratio,token_reduction_pct,precision_vs_baseline,recall_vs_baseline,bertscore_f1_vs_baseline,bertscore_f1_vs_groundtruth,retention_status,evaluation_engine,output_snippet
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,z-ai/glm-5.3,zero_shot,1,0.9,-11.7,1.0,1.0,1.0,0.109,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,The user is asking in Portuguese about a microservices architecture scenario for an e-commerce platform. They want me to...
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,deepseek-ai/deepseek-v4-flash-0731,zero_shot,1,0.89,-12.3,1.0,1.0,1.0,0.1313,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,"1.  **Deconstruct the User's Request**:
+    *   **Role**: Solutions Architect specialized in microservices and fault tol..."
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,z-ai/glm-5.3,few_shot,1,1.26,20.9,0.547,0.0658,0.0967,0.2133,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"## Análise dos 3 Pontos de Falha
+
+**1. Acoplamento temporal síncrono em cascata (Checkout → legado + inventário via REST..."
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,deepseek-ai/deepseek-v4-flash-0731,few_shot,1,1.31,23.9,0.7758,0.5946,0.5772,0.0907,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"1.  **Analyze the User's Request**:
+    *   Role: Solution Architect specializing in microservices and fault tolerance.
+..."
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,z-ai/glm-5.3,compressed_llmlingua,1,2.33,57.1,0.5904,0.5807,0.5073,0.1322,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,The user is asking in Portuguese about an e-commerce scenario with 50k req/min. Architecture: Gateway Node -> synchronou...
+CASE-01-ARCH-QA,Extracao de Requisitos e Gargalos em Arquitetura Distribuida,deepseek-ai/deepseek-v4-flash-0731,compressed_llmlingua,1,2.49,59.8,0.6958,0.6725,0.592,0.1048,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"1.  **Analyze the User's Request**:
+    *   Role: Solutions Architect specializing in microservices and fault tolerance...."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,z-ai/glm-5.3,zero_shot,1,0.92,-8.1,1.0,1.0,1.0,0.5832,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,"```sql
+-- Índice de apoio (opcional, acelera o filtro/agregação):
+-- CREATE INDEX idx_pedidos_status_data ON pedidos (st..."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,deepseek-ai/deepseek-v4-flash-0731,zero_shot,1,0.86,-15.6,1.0,1.0,1.0,0.6437,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,"```sql
+WITH pedidos_filtrados AS (
+    SELECT cliente_id,
+           COUNT(*) AS num_pedidos,
+           SUM(valor_total..."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,z-ai/glm-5.3,few_shot,1,1.66,39.7,0.8661,0.7237,0.6862,0.8013,MODERADA (Nucleo Semantico Preservado),vector_ngram_fallback,"```sql
+SELECT c.id, c.nome, SUM(p.valor_total) AS receita
+FROM pedidos p
+JOIN clientes c ON c.id = p.cliente_id
+WHERE p...."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,deepseek-ai/deepseek-v4-flash-0731,few_shot,1,1.62,38.4,0.802,0.6923,0.6535,0.9097,MODERADA (Nucleo Semantico Preservado),vector_ngram_fallback,"SELECT c.id, c.nome, SUM(p.valor_total) AS receita_total, COUNT(p.id) AS total_pedidos
+FROM pedidos p
+JOIN clientes c ON..."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,z-ai/glm-5.3,compressed_llmlingua,1,2.77,63.8,0.8712,0.7566,0.7051,0.779,MODERADA (Nucleo Semantico Preservado),vector_ngram_fallback,"```sql
+SELECT c.id,
+       c.nome,
+       SUM(p.valor_total) AS total_gasto
+FROM clientes c
+JOIN pedidos p ON p.cliente_..."
+CASE-02-SQL-GEN,Geracao de Query Analitica SQL sob Longo DDL de Banco,deepseek-ai/deepseek-v4-flash-0731,compressed_llmlingua,1,2.72,63.2,0.7941,0.6923,0.6537,0.8884,MODERADA (Nucleo Semantico Preservado),vector_ngram_fallback,"SELECT c.id, c.nome, SUM(p.valor_total) AS total_gasto, COUNT(p.id) AS num_pedidos
+FROM clientes c
+INNER JOIN pedidos p ..."
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,z-ai/glm-5.3,zero_shot,1,0.83,-20.6,1.0,1.0,1.0,0.1055,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,The user is asking me to act as a CISO/DPO and analyze a clause from a fintech's terms of service under Brazilian LGPD (...
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,deepseek-ai/deepseek-v4-flash-0731,zero_shot,1,0.86,-16.4,1.0,1.0,1.0,0.0943,EXCELENTE (Sem Perda Relevante),vector_ngram_fallback,"1.  **Deconstruct the User's Request**:
+    *   Role: CISO and DPO (Data Protection Officer).
+    *   Task: Analyze a sp..."
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,z-ai/glm-5.3,few_shot,1,1.27,21.5,0.5506,0.6529,0.5182,0.1366,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"The user is asking me to act as a CISO and DPO (Data Protection Officer) with corporate audit rigor, analyzing a clause ..."
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,deepseek-ai/deepseek-v4-flash-0731,few_shot,1,1.31,23.8,0.6401,0.4874,0.4638,0.1405,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"1.  **Deconstruct the User's Request**:
+    *   Role: CISO and DPO (Data Protection Officer).
+    *   Tone: Rigorous cor..."
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,z-ai/glm-5.3,compressed_llmlingua,1,1.91,47.7,0.6088,0.5701,0.4876,0.1081,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,The user is asking in Portuguese about LGPD (Lei Geral de Proteção de Dados - Brazilian General Data Protection Law) vio...
+CASE-03-RAG-COMPLIANCE,Auditoria de Compliance LGPD / Seguranca da Informacao,deepseek-ai/deepseek-v4-flash-0731,compressed_llmlingua,1,2.0,50.0,0.5492,0.5793,0.4924,0.0786,DEGRADADA (Alucinacao ou Perda de Fatos),vector_ngram_fallback,"1.  **Deconstruct the User's Request**:
+    *   **Role**: CISO and DPO (Data Protection Officer). Must respond with stri..."

@@ -1,0 +1,1867 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>ThLoop — Continuous Core | Battle IA Telemetria Experimental & Outputs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Canonical Brand Asset: thloop-continuous-core-light.svg */
+    /* Canonical Compact Asset: twin-chamber-light.svg */
+    :root {
+      color-scheme: dark;
+      --tl-loop-black: #0a0a0a;
+      --tl-technical-paper: #f0ede6;
+      --tl-chicane-gold: #c8b560;
+      --tl-chassis: #2a2a2a;
+      --tl-surface-raised: #333333;
+      --tl-smoked-mirror: #5c5c5c;
+      --tl-border-subtle: #353535;
+      --tl-border: #5c5c5c;
+      --tl-text: #f0ede6;
+      --tl-text-secondary: #aaa7a1;
+      --tl-text-muted: #9b9993;
+      --tl-success: #8fb879;
+      --tl-warning: #c8a45d;
+      --tl-error: #d88278;
+      --tl-info: #779db5;
+
+      --tl-font-display: "Space Grotesk", Arial, sans-serif;
+      --tl-font-body: "Space Grotesk", Arial, sans-serif;
+      --tl-font-mono: "IBM Plex Mono", "JetBrains Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--tl-loop-black);
+      color: var(--tl-text);
+      font-family: var(--tl-font-body);
+      line-height: 1.5;
+      padding-bottom: 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background-color: var(--tl-chicane-gold);
+      color: var(--tl-loop-black);
+    }
+
+    .mono {
+      font-family: var(--tl-font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding-inline: 1.5rem;
+    }
+
+    /* HEADER */
+    header.site-header {
+      border-bottom: 1px solid var(--tl-border-subtle);
+      background-color: var(--tl-loop-black);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 4.5rem;
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .brand-logo-wrap {
+      width: 140px;
+      height: 31px;
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-logo-wrap svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .brand-divider {
+      width: 1px;
+      height: 1.5rem;
+      background-color: var(--tl-border-subtle);
+    }
+
+    .brand-title {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--tl-chicane-gold);
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      padding-top: 3.5rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .eyebrow {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .eyebrow-accent {
+      color: var(--tl-chicane-gold);
+    }
+
+    h1.hero-title {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      max-width: 28ch;
+      margin-bottom: 1rem;
+    }
+
+    p.hero-lead {
+      color: var(--tl-text-secondary);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      max-width: 68ch;
+      margin-bottom: 2rem;
+    }
+
+    /* CHICANE DIVIDER */
+    .chicane-sep {
+      width: 100%;
+      max-width: 100%;
+      height: 20px;
+      margin-block: 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .chicane-sep svg {
+      width: 100%;
+      height: 20px;
+    }
+
+    /* KPI METRIC CARDS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .kpi-card {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+      position: relative;
+    }
+
+    .kpi-card.hero-kpi {
+      border-top: 2px solid var(--tl-chicane-gold);
+    }
+
+    .kpi-label {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .kpi-value {
+      font-family: var(--tl-font-mono);
+      font-size: 2.25rem;
+      font-weight: 600;
+      color: var(--tl-text);
+      line-height: 1;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .kpi-card.hero-kpi .kpi-value {
+      color: var(--tl-chicane-gold);
+    }
+
+    .kpi-meta {
+      font-size: 0.8125rem;
+      color: var(--tl-text-muted);
+    }
+
+    /* SECTION CONTAINERS */
+    .section-block {
+      margin-bottom: 3.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title-wrap h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .section-title-wrap p {
+      font-size: 0.875rem;
+      color: var(--tl-text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    /* DEDICATED OUTPUT TERMINAL */
+    .terminal-container {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .terminal-nav-bar {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background-color: #232323;
+    }
+
+    .terminal-selector-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .terminal-label {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .terminal-select {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      color: var(--tl-text);
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      padding: 0.5rem 0.8rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .terminal-select:focus {
+      border-color: var(--tl-chicane-gold);
+    }
+
+    .terminal-view-toggle {
+      display: flex;
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      cursor: pointer;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .toggle-btn.active {
+      background-color: var(--tl-chassis);
+      color: var(--tl-text);
+      border-bottom: 2px solid var(--tl-chicane-gold);
+    }
+
+    .terminal-body {
+      padding: 1.5rem;
+    }
+
+    .terminal-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .terminal-meta-tags {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .terminal-code-surface {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1.5rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.85rem;
+      color: var(--tl-text);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      max-height: 520px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .terminal-compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .terminal-compare-card {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .terminal-compare-card.gold-edge {
+      border-top: 2px solid var(--tl-chicane-gold);
+    }
+
+    .terminal-compare-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      padding-bottom: 0.5rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+    }
+
+    .terminal-compare-body {
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      color: var(--tl-text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    /* CHARTS GRID */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+
+    .chart-panel {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1.5rem;
+    }
+
+    .chart-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--tl-text);
+    }
+
+    .chart-panel-desc {
+      font-size: 0.8125rem;
+      color: var(--tl-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 280px;
+      width: 100%;
+    }
+
+    /* PROMPT DIFF INSPECTOR */
+    .diff-container {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+    }
+
+    .diff-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      overflow-x: auto;
+    }
+
+    .diff-tab-btn {
+      background: none;
+      border: none;
+      padding: 1rem 1.5rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      color: var(--tl-text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 160ms ease, border-color 160ms ease;
+    }
+
+    .diff-tab-btn:hover {
+      color: var(--tl-text);
+    }
+
+    .diff-tab-btn.active {
+      color: var(--tl-text);
+      border-bottom-color: var(--tl-chicane-gold);
+    }
+
+    .diff-content {
+      padding: 1.5rem;
+    }
+
+    .diff-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .diff-box {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1.25rem;
+    }
+
+    .diff-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      padding-bottom: 0.5rem;
+    }
+
+    .diff-box-title {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .diff-badge {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      background-color: var(--tl-chassis);
+      color: var(--tl-text);
+      border: 1px solid var(--tl-border-subtle);
+    }
+
+    .diff-badge.gold {
+      color: var(--tl-chicane-gold);
+      border-color: var(--tl-chicane-gold);
+    }
+
+    .diff-text {
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      color: var(--tl-text-secondary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    /* DATA TABLE */
+    .table-container {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .table-controls {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      color: var(--tl-text);
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      padding: 0.6rem 0.9rem;
+      min-width: 260px;
+      outline: none;
+      transition: border-color 160ms ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--tl-chicane-gold);
+    }
+
+    .filter-select {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      color: var(--tl-text);
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      padding: 0.6rem 0.9rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      border-color: var(--tl-chicane-gold);
+    }
+
+    .btn {
+      background-color: var(--tl-technical-paper);
+      color: var(--tl-loop-black);
+      border: 1px solid var(--tl-technical-paper);
+      border-radius: 4px;
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 0.6rem 1.1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: opacity 160ms ease;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--tl-text);
+      border: 1px solid var(--tl-border);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--tl-surface-raised);
+    }
+
+    .btn-table-action {
+      background-color: var(--tl-loop-black);
+      color: var(--tl-chicane-gold);
+      border: 1px solid var(--tl-chicane-gold);
+      border-radius: 2px;
+      font-family: var(--tl-font-mono);
+      font-size: 0.72rem;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .btn-table-action:hover {
+      background-color: var(--tl-chicane-gold);
+      color: var(--tl-loop-black);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+    }
+
+    table.data-table th {
+      background-color: var(--tl-loop-black);
+      color: var(--tl-text-secondary);
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.72rem;
+    }
+
+    table.data-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      color: var(--tl-text);
+      vertical-align: middle;
+    }
+
+    table.data-table tbody tr {
+      transition: background-color 160ms ease;
+    }
+
+    table.data-table tbody tr:hover {
+      background-color: var(--tl-surface-raised);
+    }
+
+    .tag-cell {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 2px;
+      font-size: 0.72rem;
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      color: var(--tl-text-secondary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+    }
+
+    .badge-ok {
+      color: var(--tl-success);
+    }
+
+    .badge-warn {
+      color: var(--tl-warning);
+    }
+
+    .badge-err {
+      color: var(--tl-error);
+    }
+
+    /* ROI SIMULATOR */
+    .roi-panel {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+
+    .roi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .slider-group label {
+      display: block;
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      color: var(--tl-text-secondary);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .slider-track-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    input[type=range].thloop-slider {
+      flex: 1;
+      height: 4px;
+      background: var(--tl-border-subtle);
+      appearance: none;
+      outline: none;
+      border-radius: 2px;
+    }
+
+    input[type=range].thloop-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--tl-chicane-gold);
+      cursor: pointer;
+    }
+
+    .slider-val-box {
+      font-family: var(--tl-font-mono);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--tl-chicane-gold);
+      min-width: 130px;
+      text-align: right;
+    }
+
+    .roi-metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .roi-stat {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1rem 1.25rem;
+    }
+
+    .roi-stat.highlight {
+      border-color: var(--tl-chicane-gold);
+    }
+
+    .roi-stat-label {
+      font-family: var(--tl-font-mono);
+      font-size: 0.72rem;
+      color: var(--tl-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .roi-stat-val {
+      font-family: var(--tl-font-mono);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--tl-text);
+      margin-top: 0.25rem;
+    }
+
+    .roi-stat.highlight .roi-stat-val {
+      color: var(--tl-chicane-gold);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(10, 10, 10, 0.92);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .modal-card {
+      background-color: var(--tl-chassis);
+      border: 1px solid var(--tl-border);
+      border-radius: 4px;
+      width: 100%;
+      max-width: 950px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--tl-text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .modal-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      background-color: var(--tl-loop-black);
+      padding: 1rem;
+      border-radius: 4px;
+      border: 1px solid var(--tl-border-subtle);
+    }
+
+    .modal-meta-item {
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+    }
+
+    .modal-meta-label {
+      color: var(--tl-text-muted);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+    }
+
+    .modal-meta-val {
+      color: var(--tl-text);
+      font-weight: 500;
+      margin-top: 0.2rem;
+    }
+
+    .modal-code-block {
+      background-color: var(--tl-loop-black);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 4px;
+      padding: 1rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.8125rem;
+      color: var(--tl-text);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    /* FOOTER */
+    footer.site-footer {
+      border-top: 1px solid var(--tl-border-subtle);
+      padding-top: 2.5rem;
+      margin-top: 5rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-family: var(--tl-font-mono);
+      font-size: 0.75rem;
+      color: var(--tl-text-muted);
+    }
+
+    .footer-attribution {
+      color: var(--tl-text-secondary);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .diff-split {
+        grid-template-columns: 1fr;
+      }
+      .terminal-compare-grid {
+        grid-template-columns: 1fr;
+      }
+      .roi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .roi-metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-meta-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="brand-cluster">
+          <div class="brand-logo-wrap" title="ThLoop Continuous Core">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 854 186" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Continuous Core master</title>
+  <g transform="translate(0 186) scale(1 -1)" fill="#F0EDE6" fill-rule="evenodd">
+    <path d="M18.627 184.532 C13.857 182.831 8.246 178.410 5.224 173.970 C3.971 172.131 2.232 168.166 1.358 165.159 L-0.231 159.693 0.207 147.596 L0.645 135.500 2.884 130.393 C5.647 124.092 10.922 118.824 17.500 115.799 L22.500 113.500 66.500 113.000 L110.500 112.500 111.000 76.000 L111.500 39.500 125.738 39.223 L139.975 38.945 140.238 75.723 L140.500 112.500 169.500 113.000 L198.500 113.500 198.500 126.000 L198.500 138.500 114.661 139.000 L30.823 139.500 28.911 141.861 C26.241 145.159 26.241 154.841 28.911 158.139 L30.823 160.500 125.041 160.765 C194.325 160.960 219.621 160.729 220.629 159.893 L222.000 158.755 222.000 99.378 L222.000 40.000 234.445 40.000 L246.890 40.000 247.195 69.750 L247.500 99.500 249.500 102.819 C250.600 104.645 252.903 107.007 254.618 108.069 L257.736 110.000 286.791 110.000 L315.847 110.000 318.946 107.392 C320.650 105.958 322.597 103.820 323.273 102.642 C324.144 101.121 324.645 90.920 325.000 67.444 L325.500 34.387 329.259 26.786 C335.214 14.744 345.037 6.814 359.543 2.338 L365.500 0.500 544.500 0.500 L723.500 0.500 729.053 2.748 C739.159 6.840 745.126 12.883 749.320 23.277 L751.428 28.500 751.725 62.000 C751.888 80.425 752.264 96.972 752.560 98.771 C753.174 102.498 757.956 108.409 762.086 110.544 L764.874 111.986 789.208 112.056 C805.025 112.101 814.584 111.730 816.520 110.996 C820.682 109.419 823.948 106.185 826.110 101.500 C828.707 95.872 828.694 81.125 826.087 75.384 C823.891 70.548 819.096 66.632 813.500 65.104 C811.196 64.474 800.491 64.009 788.250 64.006 L767.000 64.000 767.000 52.000 L767.000 40.000 791.451 40.000 C805.496 40.000 818.157 40.472 821.201 41.109 C828.326 42.599 837.275 47.455 841.483 52.113 C845.019 56.027 849.560 64.147 851.202 69.491 C851.711 71.146 852.448 75.942 852.841 80.148 L853.556 87.796 851.778 88.907 C849.555 90.295 849.526 91.818 851.674 94.193 L853.349 96.043 852.279 102.953 C849.579 120.397 838.765 132.078 822.540 135.077 C819.073 135.718 804.861 136.000 786.175 135.800 L755.500 135.470 750.281 133.343 C743.341 130.514 735.951 124.980 732.539 120.056 L729.765 116.053 723.632 122.357 C716.877 129.301 709.583 133.392 701.114 134.986 C693.572 136.406 622.577 136.314 615.799 134.876 C610.084 133.663 601.000 129.507 601.000 128.106 C601.000 127.632 601.753 126.627 602.673 125.872 C605.411 123.625 611.810 113.148 612.549 109.701 C613.579 104.897 613.900 104.738 617.104 107.434 C618.729 108.802 621.558 110.202 623.390 110.545 C625.222 110.889 641.747 111.244 660.111 111.335 L693.500 111.500 696.602 109.801 C700.519 107.655 705.783 101.712 706.581 98.534 C706.916 97.197 707.035 91.621 706.845 86.142 L706.500 76.180 703.436 72.340 C701.750 70.228 698.600 67.600 696.436 66.500 L692.500 64.500 657.938 64.627 L623.377 64.754 619.938 66.494 C610.677 71.181 608.987 74.810 608.069 91.985 L607.336 105.684 604.225 112.333 C598.720 124.096 587.793 132.599 575.114 134.986 C567.801 136.363 521.484 136.290 514.799 134.891 C497.459 131.263 484.605 116.507 483.397 98.844 C482.597 87.138 482.081 85.162 478.873 81.508 L475.845 78.059 477.172 76.238 C482.860 68.435 498.763 49.517 501.603 47.175 C503.534 45.584 507.900 43.431 511.307 42.391 L517.500 40.500 546.000 40.500 L574.500 40.500 579.858 42.306 C584.418 43.842 589.560 46.684 594.469 50.381 C595.227 50.951 597.272 50.016 600.269 47.728 C602.815 45.785 607.284 43.363 610.199 42.347 L615.500 40.500 657.000 40.500 L698.500 40.500 704.124 42.241 C711.718 44.592 718.869 49.555 722.508 55.000 C724.162 57.475 725.903 59.500 726.378 59.500 C727.730 59.500 727.047 39.047 725.577 35.531 C723.868 31.439 718.870 27.311 714.055 26.015 C711.446 25.312 655.831 25.062 541.851 25.239 L373.500 25.500 367.818 28.290 C361.659 31.315 357.295 35.656 353.756 42.278 L351.500 46.500 350.998 79.500 L350.497 112.500 348.218 117.445 C344.824 124.811 341.832 128.224 335.870 131.526 L330.500 134.500 290.038 134.803 C263.220 135.004 249.142 135.467 248.288 136.176 L247.000 137.245 247.000 161.622 L247.000 186.000 134.750 185.956 L22.500 185.912 18.627 184.532 Z M569.809 110.429 C573.494 109.636 580.848 102.208 581.979 98.137 C582.534 96.137 582.989 91.575 582.989 88.000 C582.989 84.425 582.534 79.863 581.979 77.863 C580.700 73.258 573.509 66.513 568.355 65.081 C566.209 64.486 555.607 64.009 544.446 64.006 L524.393 64.000 519.389 66.493 C510.618 70.864 507.537 77.484 508.137 90.671 L508.500 98.646 511.246 102.795 C515.111 108.636 518.914 110.392 529.000 110.993 C538.616 111.567 566.301 111.184 569.809 110.429 Z M369.434 155.690 C369.145 154.936 369.042 132.760 369.204 106.410 L369.500 58.500 372.000 53.507 C373.558 50.394 376.086 47.414 378.711 45.594 L382.923 42.675 392.711 41.886 C404.723 40.918 487.000 40.736 487.000 41.678 C487.000 42.051 483.736 45.764 479.748 49.928 C475.759 54.093 470.574 59.637 468.227 62.250 L463.959 67.000 431.671 67.000 L399.382 67.000 397.694 68.250 L396.007 69.500 395.753 113.000 L395.500 156.500 382.730 156.780 L369.960 157.060 369.434 155.690 Z"/>
+    <g transform="translate(463 58)" fill="#C8B560"><path d="M0.647 16.814 C-0.553 12.333 0.132 10.449 4.897 5.131 L9.708 -0.238 12.391 1.520 C13.866 2.487 14.945 3.597 14.787 3.987 C14.629 4.377 11.523 7.944 7.883 11.913 L1.267 19.129 0.647 16.814 Z"/></g>
+  </g>
+</svg>
+          </div>
+          <div class="brand-divider"></div>
+          <div class="brand-title">TCC II — Capítulo 10 Telemetria & Outputs</div>
+        </div>
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>NVIDIA NIM VERIFIED (N=18)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <div class="eyebrow">
+        <span>Benchmark Experimental</span>
+        <span class="eyebrow-accent">/</span>
+        <span>Avaliação Factual & Eficiência</span>
+      </div>
+      <h1 class="hero-title">Eficiência e Retenção Semântica em Modelos de Linguagem</h1>
+      <p class="hero-lead">
+        Investigação empírica dos efeitos de compressão de contexto via LLMLingua-2 sobre latência de inferência, custo financeiro por milhão de tokens e retenção de precisão factual (BERTScore) em infraestrutura NVIDIA NIM.
+      </p>
+
+      <!-- KPI GRID -->
+      <div class="kpi-grid">
+        <div class="kpi-card hero-kpi">
+          <div class="kpi-label">Redução Máxima de Prompt</div>
+          <div class="kpi-value">-68.2%</div>
+          <div class="kpi-meta">355 → 113 tokens (DeepSeek-V4 Flash)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Taxa Média de Compressão</div>
+          <div class="kpi-value">2.53x</div>
+          <div class="kpi-meta">Filtro de entropia sobre tokens de contexto</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Fidelidade Factual Média</div>
+          <div class="kpi-value">79.4%</div>
+          <div class="kpi-meta">BERTScore Precision vs ground truth</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Economia Projetada de API</div>
+          <div class="kpi-value">64.1%</div>
+          <div class="kpi-meta">Redução linear de custo de entrada</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHICANE DIVIDER -->
+    <div class="chicane-sep" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Chicane divider</title>
+  <path stroke="#5C5C5C" stroke-width="2" d="M0 20h555M645 20h555"/>
+  <path fill="#C8B560" d="m568 4 28 32 36-32-28 32z"/>
+</svg>
+    </div>
+
+    <!-- DEDICATED OUTPUT TERMINAL SECTION -->
+    <section class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Central de Saídas Reais dos Modelos (Raw Outputs)</h2>
+          <p>Leitor interativo das respostas completas geradas pelos modelos sob cada técnica de prompting e compressão.</p>
+        </div>
+        <div class="mono" style="font-size: 0.75rem; color: var(--tl-chicane-gold);">OUTPUT EXPLORER</div>
+      </div>
+
+      <div class="terminal-container">
+        <!-- TOP CONTROL BAR -->
+        <div class="terminal-nav-bar">
+          <div class="terminal-selector-group">
+            <span class="terminal-label">Caso de Teste:</span>
+            <select id="termCaseSelect" class="terminal-select" onchange="renderTerminalOutput()">
+              <option value="CASE-01-ARCH-QA">CASE-01: Arquitetura Distribuída & Concorrência</option>
+              <option value="CASE-02-SQL-GEN" selected>CASE-02: Modelagem DDL PostgreSQL Ledger</option>
+              <option value="CASE-03-RAG-COMPLIANCE">CASE-03: Auditoria LGPD & Privacidade</option>
+            </select>
+
+            <span class="terminal-label" style="margin-left: 0.5rem;">Modelo:</span>
+            <select id="termModelSelect" class="terminal-select" onchange="renderTerminalOutput()">
+              <option value="z-ai/glm-5.3">GLM-5.3 (Chain-of-Thought)</option>
+              <option value="deepseek-ai/deepseek-v4-flash-0731" selected>DeepSeek-V4 Flash (MoE)</option>
+            </select>
+
+            <span class="terminal-label" style="margin-left: 0.5rem;">Técnica:</span>
+            <select id="termTechSelect" class="terminal-select" onchange="renderTerminalOutput()">
+              <option value="compressed_llmlingua" selected>Compressed (LLMLingua-2)</option>
+              <option value="zero_shot">Zero-Shot (Original)</option>
+              <option value="few_shot">Few-Shot</option>
+            </select>
+          </div>
+
+          <div class="terminal-view-toggle">
+            <button id="viewSingleBtn" class="toggle-btn active" onclick="setTerminalViewMode('single')">Saída Única</button>
+            <button id="viewCompareBtn" class="toggle-btn" onclick="setTerminalViewMode('compare')">Confronto: Original vs Comprimido</button>
+          </div>
+        </div>
+
+        <!-- TERMINAL BODY -->
+        <div class="terminal-body">
+          
+          <!-- SINGLE VIEW -->
+          <div id="terminalSingleView">
+            <div class="terminal-meta-bar">
+              <div class="terminal-meta-tags">
+                <span>MODELO: <strong id="termMetaModel" style="color: var(--tl-text);">-</strong></span>
+                <span>TÉCNICA: <strong id="termMetaTech" style="color: var(--tl-text);">-</strong></span>
+                <span>TOKENS: <strong id="termMetaTokens" style="color: var(--tl-chicane-gold);">-</strong></span>
+                <span>LATÊNCIA: <strong id="termMetaLatency" style="color: var(--tl-text);">-</strong></span>
+              </div>
+              <button class="btn btn-secondary" onclick="copyTerminalText()" style="padding: 0.35rem 0.8rem; font-size: 0.75rem;">
+                <span id="copyBtnText">Copiar Saída</span>
+              </button>
+            </div>
+            <div id="terminalOutputText" class="terminal-code-surface"></div>
+          </div>
+
+          <!-- COMPARE VIEW -->
+          <div id="terminalCompareView" style="display: none;">
+            <div class="terminal-compare-grid">
+              
+              <!-- LEFT: ORIGINAL ZERO-SHOT -->
+              <div class="terminal-compare-card">
+                <div class="terminal-compare-header">
+                  <span style="text-transform: uppercase; color: var(--tl-text-secondary);">1. Saída sob Prompt Original (Zero-Shot)</span>
+                  <span id="compOrigMeta" class="tag-cell">Tokens In: -</span>
+                </div>
+                <div id="compOrigText" class="terminal-compare-body"></div>
+              </div>
+
+              <!-- RIGHT: COMPRESSED LLMLINGUA -->
+              <div class="terminal-compare-card gold-edge">
+                <div class="terminal-compare-header">
+                  <span style="text-transform: uppercase; color: var(--tl-chicane-gold);">2. Saída sob Prompt Comprimido (LLMLingua-2)</span>
+                  <span id="compCompMeta" class="tag-cell" style="color: var(--tl-chicane-gold); border-color: var(--tl-chicane-gold);">Tokens In: -</span>
+                </div>
+                <div id="compCompText" class="terminal-compare-body"></div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CHICANE DIVIDER -->
+    <div class="chicane-sep" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Chicane divider</title>
+  <path stroke="#5C5C5C" stroke-width="2" d="M0 20h555M645 20h555"/>
+  <path fill="#C8B560" d="m568 4 28 32 36-32-28 32z"/>
+</svg>
+    </div>
+
+    <!-- CHARTS SECTION -->
+    <section class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Evidências Empíricas e Telemetria</h2>
+          <p>Métricas consolidadas de consumo de tokens, tempo de resposta, fidelidade semântica e custos operacionais.</p>
+        </div>
+        <div class="mono" style="font-size: 0.75rem; color: var(--tl-text-muted);">FIGURAS 10.1 A 10.4</div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- CHART 1 -->
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <div class="chart-panel-title">Consumo de Tokens de Entrada</div>
+              <div class="chart-panel-desc">Comparação entre Zero-Shot (bruto) e LLMLingua-2 por caso experimental</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="tokensChart"></canvas>
+          </div>
+        </div>
+
+        <!-- CHART 2 -->
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <div class="chart-panel-title">Latência de Inferência Operacional (s)</div>
+              <div class="chart-panel-desc">Tempo de execução: Chain-of-Thought (GLM-5.3) vs Mixture-of-Experts (DeepSeek)</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="latencyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- CHART 3 -->
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <div class="chart-panel-title">Retenção Semântica vs Taxa de Compressão</div>
+              <div class="chart-panel-desc">Curva de trade-off entre BERTScore Precision e fator de redução de tokens</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="semanticChart"></canvas>
+          </div>
+        </div>
+
+        <!-- CHART 4 -->
+        <div class="chart-panel">
+          <div class="chart-panel-header">
+            <div>
+              <div class="chart-panel-title">Custo Projetado por 1.000 Requisições (USD)</div>
+              <div class="chart-panel-desc">Impacto financeiro direto da compressão de prompt no modelo de billing</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="costChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHICANE DIVIDER -->
+    <div class="chicane-sep" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Chicane divider</title>
+  <path stroke="#5C5C5C" stroke-width="2" d="M0 20h555M645 20h555"/>
+  <path fill="#C8B560" d="m568 4 28 32 36-32-28 32z"/>
+</svg>
+    </div>
+
+    <!-- PROMPT DIFF INSPECTOR -->
+    <section class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Inspeção Estrutural de Prompt (Diff Viewer)</h2>
+          <p>Confronto textual direto entre entrada integral e entrada tratada pelo filtro de compressão sintática.</p>
+        </div>
+        <div class="mono" style="font-size: 0.75rem; color: var(--tl-text-muted);">PROMPT DIFF</div>
+      </div>
+
+      <div class="diff-container">
+        <div class="diff-tabs">
+          <button class="diff-tab-btn active" onclick="switchDiffCase('CASE-01-ARCH-QA', this)">
+            <span>CASE-01</span>
+            <span style="color: var(--tl-text-muted);">Arquitetura Distribuída</span>
+          </button>
+          <button class="diff-tab-btn" onclick="switchDiffCase('CASE-02-SQL-GEN', this)">
+            <span>CASE-02</span>
+            <span style="color: var(--tl-text-muted);">Modelagem DDL SQL</span>
+          </button>
+          <button class="diff-tab-btn" onclick="switchDiffCase('CASE-03-RAG-COMPLIANCE', this)">
+            <span>CASE-03</span>
+            <span style="color: var(--tl-text-muted);">Auditoria LGPD</span>
+          </button>
+        </div>
+
+        <div class="diff-content">
+          <div style="margin-bottom: 1.25rem;">
+            <h3 id="diffCaseTitle" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">Arquitetura Distribuída e Concorrência</h3>
+            <p id="diffCaseDesc" style="font-size: 0.8125rem; color: var(--tl-text-secondary);">Extração de 3 pontos de falha arquitetural e especificação de padrões de resiliência.</p>
+          </div>
+
+          <div class="diff-split">
+            <div class="diff-box">
+              <div class="diff-box-header">
+                <span class="diff-box-title">Prompt Original (Zero-Shot)</span>
+                <span id="diffOrigTokens" class="diff-badge">364 tokens</span>
+              </div>
+              <div id="diffOrigText" class="diff-text"></div>
+            </div>
+
+            <div class="diff-box">
+              <div class="diff-box-header">
+                <span class="diff-box-title">Prompt Comprimido (LLMLingua-2)</span>
+                <span id="diffCompTokens" class="diff-badge gold">140 tokens (-61.5%)</span>
+              </div>
+              <div id="diffCompText" class="diff-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHICANE DIVIDER -->
+    <div class="chicane-sep" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Chicane divider</title>
+  <path stroke="#5C5C5C" stroke-width="2" d="M0 20h555M645 20h555"/>
+  <path fill="#C8B560" d="m568 4 28 32 36-32-28 32z"/>
+</svg>
+    </div>
+
+    <!-- TELEMETRY TABLE -->
+    <section class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Registro Geral de Telemetria Experimental</h2>
+          <p>Tabela completa com 18 execuções empíricas. Clique em qualquer linha ou no botão de ação para inspecionar a resposta completa.</p>
+        </div>
+        <div class="mono" id="tableCounter" style="font-size: 0.75rem; color: var(--tl-text-muted);">18 REGISTROS</div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-controls">
+          <input type="text" id="searchInput" class="search-input" placeholder="Buscar por caso, prompt ou resposta..." oninput="applyFilters()">
+          
+          <select id="modelFilter" class="filter-select" onchange="applyFilters()">
+            <option value="ALL">Todos os Modelos</option>
+            <option value="z-ai/glm-5.3">GLM-5.3</option>
+            <option value="deepseek-ai/deepseek-v4-flash-0731">DeepSeek-V4 Flash</option>
+          </select>
+
+          <select id="techniqueFilter" class="filter-select" onchange="applyFilters()">
+            <option value="ALL">Todas as Técnicas</option>
+            <option value="zero_shot">Zero-Shot</option>
+            <option value="few_shot">Few-Shot</option>
+            <option value="compressed_llmlingua">Compressed (LLMLingua-2)</option>
+          </select>
+
+          <button class="btn btn-secondary" onclick="exportCSV()" style="margin-left: auto;">
+            <span>Exportar CSV</span>
+          </button>
+        </div>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Caso</th>
+                <th>Modelo</th>
+                <th>Técnica</th>
+                <th>Tokens Entrada</th>
+                <th>Tokens Saída</th>
+                <th>Redução</th>
+                <th>Latência</th>
+                <th>Custo USD</th>
+                <th>Fidelidade</th>
+                <th>Status</th>
+                <th>Ação / Saída</th>
+              </tr>
+            </thead>
+            <tbody id="telemetryTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHICANE DIVIDER -->
+    <div class="chicane-sep" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" role="img" aria-labelledby="title">
+  <title id="title">ThLoop Chicane divider</title>
+  <path stroke="#5C5C5C" stroke-width="2" d="M0 20h555M645 20h555"/>
+  <path fill="#C8B560" d="m568 4 28 32 36-32-28 32z"/>
+</svg>
+    </div>
+
+    <!-- ROI SIMULATOR -->
+    <section class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>Simulador de Impacto Financeiro e Escala</h2>
+          <p>Projeção de redução de despesas de computação e API conforme o volume de requisições mensais.</p>
+        </div>
+        <div class="mono" style="font-size: 0.75rem; color: var(--tl-text-muted);">PROJEÇÃO DE ROI</div>
+      </div>
+
+      <div class="roi-panel">
+        <div class="roi-grid">
+          <div>
+            <div class="slider-group">
+              <label for="volumeSlider">Volume Operacional Mensal</label>
+              <div class="slider-track-wrap">
+                <input type="range" id="volumeSlider" class="thloop-slider" min="10000" max="1000000" step="10000" value="100000" oninput="updateROI(this.value)">
+                <div id="volumeVal" class="slider-val-box">100.000 reqs</div>
+              </div>
+            </div>
+            <p style="font-size: 0.8125rem; color: var(--tl-text-secondary); line-height: 1.6;">
+              A projeção assume o perfil médio do benchmark: 337 tokens de entrada reduzidos para 118 tokens via LLMLingua-2 (-65.0%) sob precificação oficial de inferência corporativa.
+            </p>
+          </div>
+
+          <div class="roi-metrics-grid">
+            <div class="roi-stat">
+              <div class="roi-stat-label">Custo Bruto (Sem Compressão)</div>
+              <div id="costUncompressed" class="roi-stat-val">$61.20</div>
+            </div>
+            <div class="roi-stat">
+              <div class="roi-stat-label">Custo Otimizado (LLMLingua)</div>
+              <div id="costCompressed" class="roi-stat-val">$22.00</div>
+            </div>
+            <div class="roi-stat highlight">
+              <div class="roi-stat-label">Economia Mensal Direta</div>
+              <div id="savingsMonthly" class="roi-stat-val">$39.20</div>
+            </div>
+            <div class="roi-stat highlight">
+              <div class="roi-stat-label">Economia Anual Projetada</div>
+              <div id="savingsYearly" class="roi-stat-val">$470.40</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE INSPEÇÃO -->
+  <div id="inspectModal" class="modal-overlay" onclick="closeModalOnOutside(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div id="modalTitle" class="modal-title">Detalhe da Execução</div>
+          <div id="modalSubtitle" style="font-size: 0.75rem; color: var(--tl-text-muted); font-family: var(--tl-font-mono);">ID DE TELEMETRIA</div>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal()" aria-label="Fechar modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-grid">
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Modelo</div>
+            <div id="modalModel" class="modal-meta-val">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Técnica</div>
+            <div id="modalTech" class="modal-meta-val">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Latência</div>
+            <div id="modalLatency" class="modal-meta-val">-</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-meta-label">Tokens (In / Out)</div>
+            <div id="modalTokens" class="modal-meta-val">-</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <div style="font-family: var(--tl-font-mono); font-size: 0.75rem; color: var(--tl-text-secondary); text-transform: uppercase; margin-bottom: 0.4rem;">Prompt Enviado</div>
+          <div id="modalPromptText" class="modal-code-block" style="max-height: 140px; color: var(--tl-text-secondary);"></div>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <div style="font-family: var(--tl-font-mono); font-size: 0.75rem; color: var(--tl-text-secondary); text-transform: uppercase;">Saída Completa do Modelo</div>
+            <button class="btn btn-secondary" onclick="copyModalOutputText()" style="padding: 0.2rem 0.6rem; font-size: 0.7rem;">Copiar Texto</button>
+          </div>
+          <div id="modalResponseText" class="modal-code-block"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-attribution">
+          Equipe ThLoop — Matheus Sousa dos Santos
+        </div>
+        <div>
+          TCC FATEC 2026 / Capítulo 10: Battle IA
+        </div>
+        <div>
+          Design System ThLoop Continuous Core
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // DADOS REAIS DE TELEMETRIA
+    const rawTelemetry = [{"id": 1, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "z-ai/glm-5.3", "technique": "zero_shot", "success": true, "prompt_tokens": 364, "completion_tokens": 1024, "total_tokens": 1388, "original_tokens": 326, "compression_ratio": 0.9, "token_reduction_pct": -11.7, "latency_ms": 23580.27, "cost_usd": 0.001718, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Considere o seguinte cenario de arquitetura de software corporativa detalhado: Uma plataforma de comercio eletronico de alta escala atende cerca de 50.000 requisicoes concorrentes por minuto durante periodos promocionais. A arquitetura atual e composta por uma camada de API Gateway construida em Node.js, que encaminha requisicoes para tres servicos centrais: Servico de Autenticacao, Servico de Catalogo e Servico de Checkout. O Servico de Checkout comunica-se de maneira puramente sincrona atraves de chamadas HTTP REST com um Servico Legado de Processamento de Pagamentos Bancarios e com o Servico de Inventario em tempo real. Ambos os servicos leem e gravam concorrentemente na mesma instancia de banco de dados relacional PostgreSQL, sem filas intermediarias ou barramentos de mensageria. Durante o ultimo grande evento comercial, observou-se que o tempo medio de resposta subiu de 200 milissegundos para 14 segundos, resultando em timeouts generalizados no Gateway e queda em cascata dos servicos dependentes. Com base estritamente no cenario exposto, analise minuciosamente os tres principais pontos de falha arquiteturais que causaram a degradacao do sistema e descreva quais padroes de projeto distribuidos devem ser adotados para sanar o problema de concorrencia e indisponibilidade em cascata.", "output_text": "The user is asking in Portuguese about a microservices architecture scenario for an e-commerce platform. They want me to analyze the three main architectural failure points that caused system degradation and describe which distributed design patterns should be adopted to solve the concurrency and cascading unavailability problem.\n\nLet me analyze the scenario:\n- E-commerce platform, 50,000 concurrent requests/minute during promotions\n- API Gateway in Node.js routing to: Authentication Service, Catalog Service, Checkout Service\n- Checkout Service communicates purely synchronously via HTTP REST with:\n  - Legacy Banking Payment Processing Service\n  - Real-time Inventory Service\n- Both services read/write concurrently to the same PostgreSQL relational database instance\n- No intermediate queues or message buses\n- During last big commercial event: average response time went from 200ms to 14 seconds, causing widespread timeouts at the Gateway and cascading failure of dependent services\n\nThe user wants:\n1. Analysis of the three main architectural failure points\n2. Distributed design patterns to adopt to solve concurrency and cascading unavailability\n\nThe persona: solutions architect specialized in microservices and fault tolerance. Technical, concise, direct responses.\n\nLet me identify the three main failure points:\n\n**Failure Point 1: Synchronous coupling in the critical path (Checkout → Payment + Inventory)**\n- Purely synchronous HTTP REST calls in the checkout flow\n- The checkout latency is the sum of all downstream latencies\n- A slow legacy payment service directly blocks checkout threads/connections\n- No isolation between services - failure propagates\n- This is the classic \"synchronous chain of death\" - latency accumulation\n\n**Failure Point 2: Shared database (shared database integration anti-pattern)**\n- Both Payment Legacy Service and Inventory Service read/write concurrently to the same PostgreSQL instance\n- This creates:\n  - Resource contention (connection pool exhaustion, lock contention, I/O saturation)\n  - No isolation of data access patterns - one service's load pattern degrades the other\n  - Coupling at the persistence layer (implicit coupling)\n  - During peak: connection pool exhaustion, lock waits, checkpoint saturation\n- This is the \"Shared Database\" anti-pattern - violates database-per-service principle\n\n**Failure Point 3: Absence of resilience mechanisms at the Gateway and inter-service level (no circuit breakers, no bulkheads, no timeouts/backpressure)**\n- Timeouts generalized at the Gateway - meaning requests kept piling up\n- Cascading failure - no circuit breakers to stop propagation\n- No backpressure/load shedding - the system accepted 50k req/min even when it couldn't process\n- Thread/connection pool exhaustion propagating upstream\n- The Gateway itself became a victim (it holds connections waiting)\n\nPatterns to adopt:\n\n1. **Circuit Breaker** - stop cascading failures, fail fast when downstream is degraded\n2. **Bulkhead** - isolate resource pools per downstream dependency (connection pools, thread pools)\n3. **Timeout + Retry with exponential backoff + jitter** (retry only for idempotent operations)\n4. **Saga pattern (choreography or orchestration)** - replace synchronous distributed transaction with asynchronous compensating transactions for checkout flow\n5. **Async messaging / Event-driven architecture (Message Queue / Event Bus)** - decouple checkout from payment/inventory via Kafka/RabbitMQ/SQS\n6. **Database per Service** - split the shared PostgreSQL into separate schemas/instances per service\n7. **CQRS** - possibly for catalog/inventory reads\n8. **Backpressure / Load Shedding / Rate Limiting** at the Gateway (token bucket, etc.)\n9. **Eventual consistency for inventory** - reserve stock asynchronously with compensation\n10. **Outbox pattern** - guarantee reliable event publishing (dual-write problem)\n11. **Idempotency keys** - essential for payment retries\n12. **Cache-Aside / Read replicas** - offload reads\n\nLet me structure the answer:\n\n**Diagnosis - 3 failure points:**\n\n1. **Synchronous temporal coupling in the checkout critical path (latency accumulation)**\n   - Checkout latency = T(auth) + T(inventory) + T(payment legacy) + T(DB)\n   - Legacy payment service is the weakest link; its degradation propagates linearly\n   - Each pending request holds resources (connections, event loop in Node.js Gateway) - with 50k req/min, resource exhaustion is fast\n   - Node.js event loop: even though async I/O, the Gateway holds sockets/buffers for 14s per request → memory/socket exhaustion\n\n2. **Shared database - Shared Database anti-pattern**\n   - Violates database-per-service\n   - Contention: connection pool exhaustion (PostgreSQL max_connections), row-level lock contention, I/O saturation\n   - Payment writes + Inventory writes on same instance → lock waits, deadlocks, checkpoint storms\n   - No fault isolation at data layer: DB saturation degrades ALL services simultaneously\n   - Also creates temporal coupling at the data layer\n\n3. **Absence of resilience/fault-tolerance mechanisms"}, {"id": 2, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "zero_shot", "success": false, "prompt_tokens": 326, "completion_tokens": 1, "total_tokens": 327, "original_tokens": 326, "compression_ratio": 1.0, "token_reduction_pct": 0.0, "latency_ms": 60251.99, "cost_usd": 6.6e-05, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Considere o seguinte cenario de arquitetura de software corporativa detalhado: Uma plataforma de comercio eletronico de alta escala atende cerca de 50.000 requisicoes concorrentes por minuto durante periodos promocionais. A arquitetura atual e composta por uma camada de API Gateway construida em Node.js, que encaminha requisicoes para tres servicos centrais: Servico de Autenticacao, Servico de Catalogo e Servico de Checkout. O Servico de Checkout comunica-se de maneira puramente sincrona atraves de chamadas HTTP REST com um Servico Legado de Processamento de Pagamentos Bancarios e com o Servico de Inventario em tempo real. Ambos os servicos leem e gravam concorrentemente na mesma instancia de banco de dados relacional PostgreSQL, sem filas intermediarias ou barramentos de mensageria. Durante o ultimo grande evento comercial, observou-se que o tempo medio de resposta subiu de 200 milissegundos para 14 segundos, resultando em timeouts generalizados no Gateway e queda em cascata dos servicos dependentes. Com base estritamente no cenario exposto, analise minuciosamente os tres principais pontos de falha arquiteturais que causaram a degradacao do sistema e descreva quais padroes de projeto distribuidos devem ser adotados para sanar o problema de concorrencia e indisponibilidade em cascata.", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 3, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "z-ai/glm-5.3", "technique": "few_shot", "success": true, "prompt_tokens": 258, "completion_tokens": 1024, "total_tokens": 1282, "original_tokens": 326, "compression_ratio": 1.26, "token_reduction_pct": 20.9, "latency_ms": 14582.35, "cost_usd": 0.001665, "bertscore_p": 0.7066, "bertscore_f1": 0.3915, "input_prompt": "Exemplo 1:\nContexto: Sistema monolitico sofrendo com lock de tabelas em escrita massiva.\nResposta: Ponto de falha no lock de I/O. Solucao: Adotar CQRS separando leitura e escrita com read-replicas.\n\nExemplo 2:\nContexto: Servico de notificacoes bloqueando thread principal de checkout.\nResposta: Ponto de falha no acoplamento temporal sincrono. Solucao: Mensageria assincrona com RabbitMQ.\n\nAgora analise o cenario principal: Plataforma de e-commerce com 50k req/min, Gateway Node.js encaminhando para Checkout, que chama de forma sincrona HTTP REST um processador legado e inventario. Ambos disputam o mesmo PostgreSQL sem filas, gerando latencia de 14s e queda em cascata. Liste os 3 principais pontos de falha e os padroes recomendados.", "output_text": "## Análise dos 3 Pontos de Falha\n\n**1. Acoplamento temporal síncrono em cascata (Checkout → legado + inventário via REST)**\nFalha: latência do processador legado bloqueia o Checkout, que propaga o bloqueio ao Gateway — queda em cascata clássica.\nPadrões: **Circuit Breaker** + timeout agressivo + **Bulkhead** (isolamento de connection pools/threads por dependência); chamadas não críticas migram para eventos assíncronos (RabbitMQ/Kafka).\n\n**2. Banco compartilhado sem isolamento (PostgreSQL único)**\nFalha: contenção de locks e I/O entre serviços disputando"}, {"id": 4, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "few_shot", "success": false, "prompt_tokens": 184, "completion_tokens": 1, "total_tokens": 185, "original_tokens": 326, "compression_ratio": 1.77, "token_reduction_pct": 43.6, "latency_ms": 60225.18, "cost_usd": 3.8e-05, "bertscore_p": 0.802, "bertscore_f1": 0.6535, "input_prompt": "Exemplo 1:\nContexto: Sistema monolitico sofrendo com lock de tabelas em escrita massiva.\nResposta: Ponto de falha no lock de I/O. Solucao: Adotar CQRS separando leitura e escrita com read-replicas.\n\nExemplo 2:\nContexto: Servico de notificacoes bloqueando thread principal de checkout.\nResposta: Ponto de falha no acoplamento temporal sincrono. Solucao: Mensageria assincrona com RabbitMQ.\n\nAgora analise o cenario principal: Plataforma de e-commerce com 50k req/min, Gateway Node.js encaminhando para Checkout, que chama de forma sincrona HTTP REST um processador legado e inventario. Ambos disputam o mesmo PostgreSQL sem filas, gerando latencia de 14s e queda em cascata. Liste os 3 principais pontos de falha e os padroes recomendados.", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 5, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "z-ai/glm-5.3", "technique": "compressed_llmlingua", "success": true, "prompt_tokens": 140, "completion_tokens": 1024, "total_tokens": 1164, "original_tokens": 326, "compression_ratio": 2.33, "token_reduction_pct": 57.1, "latency_ms": 13504.24, "cost_usd": 0.001606, "bertscore_p": 0.6901, "bertscore_f1": 0.5667, "input_prompt": "Cenario e-commerce 50k req/min. Gateway Node -> Checkout sincrono HTTP REST -> Pagamento Legado e Inventario. Banco PostgreSQL compartilhado sem filas. Latencia subiu 200ms -> 14s com timeout e falha em cascata. Liste 3 principais gargalos arquiteturais e padroes distribuidos recomendados para mitigar concorrencia e efeito cascata.", "output_text": "The user is asking in Portuguese about an e-commerce scenario with 50k req/min. Architecture: Gateway Node -> synchronous HTTP REST Checkout -> Legacy Payment and Inventory services. Shared PostgreSQL database, no queues. Latency went from 200ms to 14s with timeouts and cascading failure. They want 3 main architectural bottlenecks and distributed patterns to mitigate concurrency and cascade effects.\n\nI should respond in Portuguese (the question is in Portuguese), technically, concisely and directly as instructed by the system prompt. I'm a solutions architect specialized in microservices and fault tolerance.\n\nLet me think about the actual technical analysis:\n\n**Bottleneck 1: Synchronous coupling (tight coupling) in the chain Gateway -> Checkout -> Payment/Inventory**\n- Synchronous HTTP chain means latency accumulates: total latency = sum of all hops. If Payment Legacy is slow (legacy systems often degrade under load), the entire chain blocks. Threads in Checkout are held waiting for Payment responses → thread pool exhaustion → Checkout becomes unavailable → cascade to Gateway.\n- At 50k req/min (~833 req/s), if each request holds a thread for 14s, you need ~11,666 concurrent threads just for checkout. Thread pools typically have 200-500 threads. This is the classic thread starvation / cascading failure pattern.\n\n**Bottleneck 2: Shared PostgreSQL database (shared database integration anti-pattern)**\n- Shared DB between services creates contention: lock contention, connection pool exhaustion, noisy neighbor. One service's slow query blocks others. No isolation of failure domains or data ownership. Connection pools (e.g., HikariCP default 10) become the bottleneck: 833 req/s with 14s latency = need ~11,666 connections. PostgreSQL max_connections typically 100-500. Connection pool exhaustion → queuing → timeouts.\n- Also: no queues means no buffering/backpressure — traffic spikes hit the DB directly.\n\n**Bottleneck 3: Absence of resilience patterns (no circuit breaker, no timeout budget, no bulkhead, no backpressure)**\n- No timeout budget: 14s latency means timeouts are misconfigured or absent; requests pile up (retry storms amplify load — retries at 3x multiplier can create 3-4x traffic amplification).\n- No circuit breaker: failed calls keep being made to a degraded dependency.\n- No bulkhead: resource isolation between call paths absent.\n- No backpressure mechanism: system accepts more than it can process → queue growth → latency explosion (Little's Law: L = λW; at 833 req/s and 14s, ~11.6k in-flight requests).\n\n**Recommended patterns:**\n\n1. **Circuit Breaker** (Resilience4j/Hystrix-style): trip on error rate/latency thresholds, fail fast, half-open probing. Prevents cascade.\n\n2. **Bulkhead / Resource Isolation**: separate thread pools/connection pools per dependency (payment vs inventory), semaphore isolation. Limits blast radius.\n\n3. **Timeout budget + Retry with backoff + jitter + retry budget**: end-to-end timeout budget (e.g., total 2s, allocated per hop), retries with exponential backoff + jitter, retry budgets (max 10% of traffic), idempotency keys for safe retries.\n\n4. **Saga pattern (choreography/orchestration) + Async messaging (Kafka/RabbitMQ)**: decouple checkout from payment/inventory asynchronously. Saga for distributed transaction consistency (compensating transactions). Outbox pattern to guarantee atomicity between DB write and message publish (transactional outbox) — critical since they have PostgreSQL shared.\n\n5. **CQRS + database-per-service**: split the shared DB; each service owns its data. Read replicas / caching (Redis) for inventory reads.\n\n6. **Backpressure / Load shedding**: token bucket rate limiting, admission control at gateway, queue depth-based shedding. Little's Law sizing.\n\n7. **Transactional Outbox + CDC (Debezium)** for reliable event publishing.\n\n8. **Caching** for inventory availability (Redis with TTL, eventual consistency acceptable for stock display).\n\nLet me structure the answer:\n\n**3 Gargalos:**\n\n1. **Acoplamento síncrono em cadeia (HTTP blocking)** — latência somativa, thread starvation. Math: 833 req/s × 14s ≈ 11.6k threads/conexões simultâneas necessárias vs pool típico de 200-500 → exaustão → cascata.\n\n2. **Banco compartilhado (shared database anti-pattern)** — sem isolamento de domínio de dados, contenção de locks, exaustão de pool de conexões, noisy neighbor, escalabilidade limitada (single writer).\n\n3. **Ausência de padrões de resiliência e backpressure** — sem circuit breaker, sem timeout budget, sem bulkhead, sem fila para absorver picos; retries amplificam"}, {"id": 6, "case_id": "CASE-01-ARCH-QA", "case_name": "Extracao de Requisitos e Gargalos em Arquitetura Distribuida", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "compressed_llmlingua", "success": false, "prompt_tokens": 83, "completion_tokens": 1, "total_tokens": 84, "original_tokens": 326, "compression_ratio": 3.93, "token_reduction_pct": 74.5, "latency_ms": 60250.74, "cost_usd": 1.7e-05, "bertscore_p": 0.7941, "bertscore_f1": 0.6537, "input_prompt": "Cenario e-commerce 50k req/min. Gateway Node -> Checkout sincrono HTTP REST -> Pagamento Legado e Inventario. Banco PostgreSQL compartilhado sem filas. Latencia subiu 200ms -> 14s com timeout e falha em cascata. Liste 3 principais gargalos arquiteturais e padroes distribuidos recomendados para mitigar concorrencia e efeito cascata.", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 7, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "z-ai/glm-5.3", "technique": "zero_shot", "success": true, "prompt_tokens": 332, "completion_tokens": 853, "total_tokens": 1185, "original_tokens": 307, "compression_ratio": 0.92, "token_reduction_pct": -8.1, "latency_ms": 7931.01, "cost_usd": 0.001445, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Abaixo esta a definicao completa das tabelas do nosso banco de dados corporativo:\nCREATE TABLE clientes (id SERIAL PRIMARY KEY, nome VARCHAR(255) NOT NULL, email VARCHAR(255) UNIQUE, criado_em TIMESTAMP DEFAULT NOW());\nCREATE TABLE categorias (id SERIAL PRIMARY KEY, nome VARCHAR(100) NOT NULL);\nCREATE TABLE produtos (id SERIAL PRIMARY KEY, categoria_id INT REFERENCES categorias(id), nome VARCHAR(255), preco NUMERIC(10,2));\nCREATE TABLE pedidos (id SERIAL PRIMARY KEY, cliente_id INT REFERENCES clientes(id), data_pedido TIMESTAMP NOT NULL, status VARCHAR(50), valor_total NUMERIC(12,2));\nCREATE TABLE itens_pedido (id SERIAL PRIMARY KEY, pedido_id INT REFERENCES pedidos(id), produto_id INT REFERENCES produtos(id), quantidade INT, preco_unitario NUMERIC(10,2));\nCREATE TABLE logs_acesso (id SERIAL PRIMARY KEY, cliente_id INT, ip VARCHAR(45), data_acesso TIMESTAMP);\nCom base rigorosamente nesse esquema relacional, elabore uma consulta SQL analitica altamente eficiente para PostgreSQL que retorne o ID e o nome dos 10 clientes que geraram o maior volume financeiro total (soma de valor_total) em pedidos com status 'CONCLUIDO' nos ultimos 30 dias, filtrando apenas clientes que realizaram pelo menos 3 pedidos no periodo.", "output_text": "```sql\n-- Índice de apoio (opcional, acelera o filtro/agregação):\n-- CREATE INDEX idx_pedidos_status_data ON pedidos (status, data_pedido) INCLUDE (cliente_id, valor_total);\n\nSELECT c.id, c.nome\nFROM (\n    SELECT cliente_id, SUM(valor_total) AS volume_total\n    FROM pedidos\n    WHERE status = 'CONCLUIDO'\n      AND data_pedido >= NOW() - INTERVAL '30 days'\n    GROUP BY cliente_id\n    HAVING COUNT(*) >= 3\n    ORDER BY volume_total DESC\n    LIMIT 10\n) top_clientes\nJOIN clientes c ON c.id = top_clientes.cliente_id\nORDER BY top_clientes.volume_total DESC;\n```"}, {"id": 8, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "zero_shot", "success": true, "prompt_tokens": 355, "completion_tokens": 676, "total_tokens": 1031, "original_tokens": 307, "compression_ratio": 0.86, "token_reduction_pct": -15.6, "latency_ms": 35167.97, "cost_usd": 0.000612, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Abaixo esta a definicao completa das tabelas do nosso banco de dados corporativo:\nCREATE TABLE clientes (id SERIAL PRIMARY KEY, nome VARCHAR(255) NOT NULL, email VARCHAR(255) UNIQUE, criado_em TIMESTAMP DEFAULT NOW());\nCREATE TABLE categorias (id SERIAL PRIMARY KEY, nome VARCHAR(100) NOT NULL);\nCREATE TABLE produtos (id SERIAL PRIMARY KEY, categoria_id INT REFERENCES categorias(id), nome VARCHAR(255), preco NUMERIC(10,2));\nCREATE TABLE pedidos (id SERIAL PRIMARY KEY, cliente_id INT REFERENCES clientes(id), data_pedido TIMESTAMP NOT NULL, status VARCHAR(50), valor_total NUMERIC(12,2));\nCREATE TABLE itens_pedido (id SERIAL PRIMARY KEY, pedido_id INT REFERENCES pedidos(id), produto_id INT REFERENCES produtos(id), quantidade INT, preco_unitario NUMERIC(10,2));\nCREATE TABLE logs_acesso (id SERIAL PRIMARY KEY, cliente_id INT, ip VARCHAR(45), data_acesso TIMESTAMP);\nCom base rigorosamente nesse esquema relacional, elabore uma consulta SQL analitica altamente eficiente para PostgreSQL que retorne o ID e o nome dos 10 clientes que geraram o maior volume financeiro total (soma de valor_total) em pedidos com status 'CONCLUIDO' nos ultimos 30 dias, filtrando apenas clientes que realizaram pelo menos 3 pedidos no periodo.", "output_text": "```sql\nWITH pedidos_filtrados AS (\n    SELECT cliente_id,\n           COUNT(*) AS num_pedidos,\n           SUM(valor_total) AS total_volume\n    FROM pedidos\n    WHERE status = 'CONCLUIDO'\n      AND data_pedido >= NOW() - INTERVAL '30 days'\n    GROUP BY cliente_id\n    HAVING COUNT(*) >= 3\n)\nSELECT c.id, c.nome, pf.total_volume\nFROM pedidos_filtrados pf\nJOIN clientes c ON c.id = pf.cliente_id\nORDER BY pf.total_volume DESC\nLIMIT 10;\n```"}, {"id": 9, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "z-ai/glm-5.3", "technique": "few_shot", "success": true, "prompt_tokens": 185, "completion_tokens": 750, "total_tokens": 935, "original_tokens": 307, "compression_ratio": 1.66, "token_reduction_pct": 39.7, "latency_ms": 12898.32, "cost_usd": 0.001218, "bertscore_p": 0.7066, "bertscore_f1": 0.3915, "input_prompt": "Exemplo:\nEsquema: vendas(id, vendedor_id, valor, data)\nObjetivo: Top 5 vendedores com mais de 10 vendas.\nSQL: SELECT vendedor_id, SUM(valor) FROM vendas GROUP BY vendedor_id HAVING COUNT(*) > 10 ORDER BY 2 DESC LIMIT 5;\n\nAgora considere o esquema: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere SQL para os top 10 clientes com maior receita em pedidos 'CONCLUIDO' nos ultimos 30 dias e minimo de 3 pedidos.", "output_text": "```sql\nSELECT c.id, c.nome, SUM(p.valor_total) AS receita\nFROM pedidos p\nJOIN clientes c ON c.id = p.cliente_id\nWHERE p.status = 'CONCLUIDO'\n  AND p.data_pedido >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY c.id, c.nome\nHAVING COUNT(*) >= 3\nORDER BY receita DESC\nLIMIT 10;\n\n-- Índice sugerido:\n-- CREATE INDEX idx_pedidos_status_data ON pedidos (status, data_pedido) INCLUDE (cliente_id, valor_total);\n```"}, {"id": 10, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "few_shot", "success": true, "prompt_tokens": 189, "completion_tokens": 564, "total_tokens": 753, "original_tokens": 307, "compression_ratio": 1.62, "token_reduction_pct": 38.4, "latency_ms": 56576.52, "cost_usd": 0.000489, "bertscore_p": 0.802, "bertscore_f1": 0.6535, "input_prompt": "Exemplo:\nEsquema: vendas(id, vendedor_id, valor, data)\nObjetivo: Top 5 vendedores com mais de 10 vendas.\nSQL: SELECT vendedor_id, SUM(valor) FROM vendas GROUP BY vendedor_id HAVING COUNT(*) > 10 ORDER BY 2 DESC LIMIT 5;\n\nAgora considere o esquema: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere SQL para os top 10 clientes com maior receita em pedidos 'CONCLUIDO' nos ultimos 30 dias e minimo de 3 pedidos.", "output_text": "SELECT c.id, c.nome, SUM(p.valor_total) AS receita_total, COUNT(p.id) AS total_pedidos\nFROM pedidos p\nJOIN clientes c ON p.cliente_id = c.id\nWHERE p.status = 'CONCLUIDO' AND p.data_pedido >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY c.id, c.nome\nHAVING COUNT(p.id) >= 3\nORDER BY receita_total DESC\nLIMIT 10;"}, {"id": 11, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "z-ai/glm-5.3", "technique": "compressed_llmlingua", "success": true, "prompt_tokens": 111, "completion_tokens": 841, "total_tokens": 952, "original_tokens": 307, "compression_ratio": 2.77, "token_reduction_pct": 63.8, "latency_ms": 19532.29, "cost_usd": 0.001317, "bertscore_p": 0.6901, "bertscore_f1": 0.5667, "input_prompt": "DDL: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere query PostgreSQL eficiente: Top 10 clientes por SUM(valor_total) com status='CONCLUIDO' nos ultimos 30 dias e HAVING COUNT(pedidos) >= 3.", "output_text": "```sql\nSELECT c.id,\n       c.nome,\n       SUM(p.valor_total) AS total_gasto\nFROM clientes c\nJOIN pedidos p ON p.cliente_id = c.id\nWHERE p.status = 'CONCLUIDO'\n  AND p.data_pedido >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY c.id, c.nome\nHAVING COUNT(*) >= 3\nORDER BY total_gasto DESC\nLIMIT 10;\n\n-- Índice de suporte:\n-- CREATE INDEX idx_pedidos_status_data ON pedidos (status, data_pedido) INCLUDE (cliente_id, valor_total);\n```"}, {"id": 12, "case_id": "CASE-02-SQL-GEN", "case_name": "Geracao de Query Analitica SQL sob Longo DDL de Banco", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "compressed_llmlingua", "success": true, "prompt_tokens": 113, "completion_tokens": 673, "total_tokens": 786, "original_tokens": 307, "compression_ratio": 2.72, "token_reduction_pct": 63.2, "latency_ms": 38014.17, "cost_usd": 0.000561, "bertscore_p": 0.7941, "bertscore_f1": 0.6537, "input_prompt": "DDL: clientes(id, nome), pedidos(id, cliente_id, data_pedido, status, valor_total). Gere query PostgreSQL eficiente: Top 10 clientes por SUM(valor_total) com status='CONCLUIDO' nos ultimos 30 dias e HAVING COUNT(pedidos) >= 3.", "output_text": "SELECT c.id, c.nome, SUM(p.valor_total) AS total_gasto, COUNT(p.id) AS num_pedidos\nFROM clientes c\nINNER JOIN pedidos p ON p.cliente_id = c.id\nWHERE p.status = 'CONCLUIDO' AND p.data_pedido >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY c.id, c.nome\nHAVING COUNT(p.id) >= 3\nORDER BY total_gasto DESC\nLIMIT 10;"}, {"id": 13, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "z-ai/glm-5.3", "technique": "zero_shot", "success": true, "prompt_tokens": 258, "completion_tokens": 1024, "total_tokens": 1282, "original_tokens": 214, "compression_ratio": 0.83, "token_reduction_pct": -20.6, "latency_ms": 34075.64, "cost_usd": 0.001665, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Analise a seguinte clausula extraida dos termos de servico internos de uma fintech financeira: 'A empresa reserva-se o direito irrevogavel de coletar, processar e armazenar indeterminadamente registros biometricos faciais, dados de geolocalizacao continuos em segundo plano e identificadores fiscais (CPF) de todos os usuarios cadastrados. Estes dados serao gravados em arquivos de log em formato texto puro nos servidores de aplicacao para fins de telemetria interna e poderao ser transmitidos ou comercializados com parceiros comerciais de marketing sem necessidade de notificacao previa ao titular'. Identifique objetivamente quais principios basilares da Lei Geral de Protecao de Dados (LGPD - Lei nº 13.709/2018) estao sendo frontalmente violados por essa clausula, citando os requisitos de finalidade, adequacao, necessidade e seguranca da informacao.", "output_text": "The user is asking me to act as a CISO/DPO and analyze a clause from a fintech's terms of service under Brazilian LGPD (Lei nº 13.709/2018). They want a rigorous corporate audit analysis identifying which fundamental principles of the LGPD are being violated, specifically citing finalidade (purpose), adequação (suitability), necessidade (necessity), and segurança da informação (information security).\n\nThe response should be in Portuguese since the question is in Portuguese. Let me structure this as a formal audit analysis.\n\nLet me analyze the clause carefully:\n\nThe clause states:\n1. \"direito irrevogável\" (irrevocable right) to collect, process and store indefinitely:\n   - facial biometric records (dados biométricos faciais)\n   - continuous background geolocation data\n   - fiscal identifiers (CPF)\n2. Data will be stored in plain text log files on application servers for \"internal telemetry\"\n3. Data may be transmitted or commercialized with marketing partners without prior notification to the data subject\n\nNow let me map violations to LGPD principles (Art. 6º):\n\n**Art. 6º - Principles of personal data processing:**\n\nI. **Finalidade (Purpose)**: Processing must be done for legitimate, specific purposes, known to the data subject, without possibility of later processing incompatible with the original purpose.\n- Violation: \"Telemetria interna\" is vague and undefined; commercialization with marketing partners is incompatible with the original purpose (fintech services). The clause allows \"later processing incompatible with the original purpose\" by allowing commercialization. The purposes are not specific — \"telemetria interna\" is generic.\n\nII. **Adequação (Adequacy/Suitability)**: Processing must be compatible with the expectations of the data subject, proportionate, and consistent with the purposes.\n- Violation: Continuous background geolocation and facial biometrics for a financial service are disproportionate to the legitimate expectations of a fintech user. Users of a financial app expect their data to be used for financial services, not marketing commercialization. Collecting biometrics and continuous geolocation is not what a reasonable user would expect from a fintech.\n\nIII. **Necessidade (Necessity)**: Processing limited to the minimum necessary to achieve its purposes, covering only data adequate, relevant, and limited to what is necessary.\n- Violation: Continuous background geolocation is excessive — periodic or consent-based location would suffice for most legitimate fintech purposes (fraud prevention). Facial biometrics may be excessive if there are less intrusive alternatives. Indefinite storage (\"armazenar indeterminadamente\") violates data minimization in time. The \"minimum necessary\" standard is violated.\n\nIV. **Segurança (Security)**: Processing must use technical and administrative security measures to protect personal data from unauthorized access and accidental or unlawful destruction, loss, alteration, communication, or dissemination.\n- Violation: Storing biometric data, geolocation, and CPF in **plain text** (formato texto puro) in log files is a frontal violation. This is sensitive data (biometrics are sensitive personal data under Art. 5º, II) stored without encryption, without access controls mentioned, in application logs which are typically widely accessible to developers/ops teams.\n\nAdditional violations worth noting (though the question focuses on the four mentioned):\n\nV. **Transparência (Transparency)**: The clause itself says data \"poderão ser transmitidos ou comercializados... sem necessidade de notificação prévia ao titular\" — this violates transparency and also Art. 9º (right to information).\n\nVI. **Prevenção (Prevention)**: Adoption of measures to prevent damage due to processing of data.\n\nVII. **Não discriminação**: Possibly relevant if data used for discriminatory marketing practices.\n\nVIII. **Responsabilização e prestação de contas (Accountability)**: The company must demonstrate measures to ensure compliance — the clause shows no accountability.\n\nAlso relevant articles:\n- **Art. 5º, II**: Biometric data is \"dado pessoal sensível\" (sensitive personal data). Art. 11 requires specific and highlighted consent for sensitive data processing, with specific purpose. The clause's blanket \"irrevocable right\" fails this.\n- **Art. 8º**: Consent must be specific and highlighted for specific purposes; \"irrevocable\" consent is problematic — Art. 8º, §5º allows revocation at any time. So \"direito irrevogável\" contradicts the right to revoke consent (Art. 18, IX).\n- **Art. 9º**: Right to clear and adequate information about processing.\n- **Art. 10**: Communication/shared processing with third parties requires specific consent (Art. 10, §2º) — commercialization with marketing partners requires specific consent and transparency.\n- **Art. 46**: Security measures — technical and administrative.\n- **Art. "}, {"id": 14, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "zero_shot", "success": false, "prompt_tokens": 214, "completion_tokens": 1, "total_tokens": 215, "original_tokens": 214, "compression_ratio": 1.0, "token_reduction_pct": 0.0, "latency_ms": 60230.38, "cost_usd": 4.4e-05, "bertscore_p": 1.0, "bertscore_f1": 1.0, "input_prompt": "Analise a seguinte clausula extraida dos termos de servico internos de uma fintech financeira: 'A empresa reserva-se o direito irrevogavel de coletar, processar e armazenar indeterminadamente registros biometricos faciais, dados de geolocalizacao continuos em segundo plano e identificadores fiscais (CPF) de todos os usuarios cadastrados. Estes dados serao gravados em arquivos de log em formato texto puro nos servidores de aplicacao para fins de telemetria interna e poderao ser transmitidos ou comercializados com parceiros comerciais de marketing sem necessidade de notificacao previa ao titular'. Identifique objetivamente quais principios basilares da Lei Geral de Protecao de Dados (LGPD - Lei nº 13.709/2018) estao sendo frontalmente violados por essa clausula, citando os requisitos de finalidade, adequacao, necessidade e seguranca da informacao.", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 15, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "z-ai/glm-5.3", "technique": "few_shot", "success": false, "prompt_tokens": 103, "completion_tokens": 1, "total_tokens": 104, "original_tokens": 214, "compression_ratio": 2.08, "token_reduction_pct": 51.9, "latency_ms": 60255.12, "cost_usd": 5.3e-05, "bertscore_p": 0.7066, "bertscore_f1": 0.3915, "input_prompt": "Exemplo:\nClausula: Armazenar senhas de usuarios em texto puro no log.\nViolacao: Principio da seguranca e prevencao (Art. 6, VII e VIII LGPD). Risco severo de vazamento.\n\nAgora analise a clausula: Coleta indefinida de biometria facial, geolocalizacao e CPF, gravados em texto puro em logs de aplicacao e compartilhados com parceiros de marketing sem notificacao ao titular. Quais principios da LGPD foram violados?", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 16, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "few_shot", "success": false, "prompt_tokens": 103, "completion_tokens": 1, "total_tokens": 104, "original_tokens": 214, "compression_ratio": 2.08, "token_reduction_pct": 51.9, "latency_ms": 60242.72, "cost_usd": 2.1e-05, "bertscore_p": 0.802, "bertscore_f1": 0.6535, "input_prompt": "Exemplo:\nClausula: Armazenar senhas de usuarios em texto puro no log.\nViolacao: Principio da seguranca e prevencao (Art. 6, VII e VIII LGPD). Risco severo de vazamento.\n\nAgora analise a clausula: Coleta indefinida de biometria facial, geolocalizacao e CPF, gravados em texto puro em logs de aplicacao e compartilhados com parceiros de marketing sem notificacao ao titular. Quais principios da LGPD foram violados?", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}, {"id": 17, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "z-ai/glm-5.3", "technique": "compressed_llmlingua", "success": true, "prompt_tokens": 112, "completion_tokens": 1024, "total_tokens": 1136, "original_tokens": 214, "compression_ratio": 1.91, "token_reduction_pct": 47.7, "latency_ms": 36795.52, "cost_usd": 0.001592, "bertscore_p": 0.6901, "bertscore_f1": 0.5667, "input_prompt": "Clausula: Coleta indeterminada biometria facial, geolocalizacao continua, CPF. Logs texto puro no servidor, compartilhamento/venda parceiros marketing sem aviso. Quais principios basilares LGPD (finalidade, necessidade, seguranca) foram violados?", "output_text": "The user is asking in Portuguese about LGPD (Lei Geral de Proteção de Dados - Brazilian General Data Protection Law) violations. They're presenting a scenario as if I'm a CISO (Chief Information Security Officer) and DPO (Data Protection Officer) and asking me to respond with corporate audit rigor.\n\nThe scenario involves:\n1. \"Coleta indeterminada\" - indefinite/indeterminate collection of:\n   - Facial biometrics\n   - Continuous geolocation\n   - CPF (Brazilian individual taxpayer registry number)\n2. Logs in plain text on the server (no encryption)\n3. Sharing/selling to marketing partners without notice\n\nThey ask which foundational LGPD principles were violated: purpose (finalidade), necessity (necessidade), security (segurança).\n\nI should respond in Portuguese since the question is in Portuguese. I need to respond with the rigor of a corporate audit as instructed by the system prompt.\n\nLet me structure this as a proper audit-style analysis of LGPD violations.\n\nKey LGPD articles to reference:\n- Art. 6º - Principles of data processing:\n  - I - finalidade (purpose)\n  - II - adequação (suitability)\n  - III - necessidade (necessity)\n  - IV - livre acesso (free access)\n  - V - qualidade dos dados (data quality)\n  - VI - transparência (transparency)\n  - VII - não discriminação (non-discrimination)\n  - VIII - segurança e sigilo (security and confidentiality)\n  - IX - responsabilização (accountability)\n\n- Art. 7º - Legal bases for processing\n- Art. 11 - Legal bases for sensitive personal data\n- Art. 5º, II - Definition of sensitive personal data (biometric data is sensitive)\n- Art. 46 - Security measures\n- Art. 48 - Communication of security incidents to ANPD\n- Art. 9º - Communication and transparency\n- Art. 10 - Legitimate interest\n\nLet me analyze each violation:\n\n**1. Finalidade (Purpose) - Art. 6º, I**\n- \"Coleta indeterminada\" - indefinite collection violates the purpose principle. Data must be collected for specific, legitimate, explicit purposes known to the data subject. Indeterminate collection means no defined purpose.\n- Sharing/selling to marketing partners without notice = purpose deviation (desvio de finalidade). Data collected for one purpose used for another (marketing) without consent or notice.\n- Art. 6º, I: processing must be done for \"finalidades específicas e legítimas, informadas ao titular\"\n\n**2. Necessidade (Necessity/Minimum necessary) - Art. 6º, III**\n- Continuous geolocation is excessive - not proportional to any legitimate purpose. This violates the principle of necessity which requires limitation of processing to the minimum necessary.\n- Facial biometrics + CPF + continuous geolocation - this combination is likely excessive for most purposes.\n- Art. 6º, III: \"limitação do tratamento ao mínimo necessário para a realização de suas finalidades\"\n\n**3. Segurança (Security) - Art. 6º, VIII and Art. 46**\n- Plain text logs on server = no encryption, no technical safeguards\n- Art. 46 requires adoption of \"medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou qualquer forma de tratamento inadequado ou ilícito\"\n- Plain text logs containing personal data (especially sensitive biometric data) is a clear security failure\n- Art. 48 - obligation to report incidents to ANPD and data subjects\n\n**Additional violations:**\n\n**4. Transparência (Transparency) - Art. 6º, VI and Art. 9º**\n- Sharing/selling without notice violates transparency\n- Data subjects must be informed about processing, including sharing with third parties\n\n**5. Adequação (Suitability) - Art. 6º, II**\n- Processing must be adequate to the purposes\n\n**6. Sensitive data issues - Art. 11 and Art. 5º, II**\n- Biometric data is SENSITIVE personal data under Art. 5º, II\n- Processing sensitive data requires specific legal bases under Art. 11 (typically consent or specific legal scenarios)\n- Selling biometric data to marketing partners would almost certainly lack any valid legal basis\n\n**7. Responsabilização (Accountability) - Art. 6º, X and Art. 37**\n- The company must demonstrate compliance\n\n**8. Livre acesso - Art. 6º, IV**\n- If data subjects don't know about the sharing, they can't exercise access rights\n\n**9. Possibly Art. 7º/11 legal basis absence**\n- Selling data to marketing partners -"}, {"id": 18, "case_id": "CASE-03-RAG-COMPLIANCE", "case_name": "Auditoria de Compliance LGPD / Seguranca da Informacao", "model_id": "deepseek-ai/deepseek-v4-flash-0731", "technique": "compressed_llmlingua", "success": false, "prompt_tokens": 61, "completion_tokens": 1, "total_tokens": 62, "original_tokens": 214, "compression_ratio": 3.51, "token_reduction_pct": 71.5, "latency_ms": 60232.73, "cost_usd": 1.3e-05, "bertscore_p": 0.7941, "bertscore_f1": 0.6537, "input_prompt": "Clausula: Coleta indeterminada biometria facial, geolocalizacao continua, CPF. Logs texto puro no servidor, compartilhamento/venda parceiros marketing sem aviso. Quais principios basilares LGPD (finalidade, necessidade, seguranca) foram violados?", "output_text": "[FALHA NA EXECUÇÃO / TIMEOUT]\nThe read operation timed out\n\nNota técnica: O gateway HTTP da NVIDIA encerrou a conexão antes do término da inferência não-streamada."}];
+    const casesDiffData = {"CASE-01-ARCH-QA": {"title": "Arquitetura Distribuída e Concorrência", "desc": "Extração de 3 pontos de falha arquitetural e especificação de padrões de resiliência (Sagas, Bulkhead, Circuit Breaker).", "orig_tokens": 364, "comp_tokens": 140, "reduction": "-61.5%", "orig_text": "Considere o seguinte cenario de arquitetura de software corporativa detalhado: Uma plataforma de comercio eletronico de alta escala atende cerca de 50.000 requisicoes concorrentes por minuto durante periodos promocionais. A arquitetura atual e composta por uma camada de API Gateway construida em Node.js, que encaminha requisicoes para tres servicos centrais: Servico de Autenticacao, Servico de Catalogo e Servico de Checkout. O Servico de Checkout comunica-se de maneira puramente sincrona atraves de chamadas HTTP REST com um Servico Legado de Processamento de Pagamentos Bancarios e com o Servico de Inventario em tempo real. Ambos os servicos leem e gravam concorrentemente na mesma instancia de banco de dados relacional PostgreSQL, sem filas intermediarias ou barramentos de mensageria. Durante o ultimo grande evento comercial, observou-se que o tempo medio de resposta subiu de 200 milissegundos para 14 segundos, resultando em timeouts generalizados no Gateway e queda em cascata dos servicos dependentes. Com base estritamente no cenario exposto, analise minuciosamente os tres principais pontos de falha arquiteturais que causaram a degradacao do sistema e descreva quais padroes de projeto distribuidos devem ser adotados para sanar o problema de concorrencia e indisponibilidade em cascata.", "comp_text": "Cenario e-commerce 50k req/min. Gateway Node.js encaminha Checkout. Checkout sincrono REST com Legado Pagamento e Inventario. Banco PostgreSQL compartilhado sem mensageria/filas. Latencia subiu 200ms para 14s; timeouts cascata. Analise 3 pontos falha arquitetural e descreva padroes distribuidos para sanar concorrencia e indisponibilidade."}, "CASE-02-SQL-GEN": {"title": "Modelagem DDL PostgreSQL e Índices", "desc": "Estruturação de schema relacional para ledger financeiro com particionamento temporal e constraints de integridade estrita.", "orig_tokens": 355, "comp_tokens": 113, "reduction": "-68.2%", "orig_text": "Voce e um especialista em bancos de dados relacionais e PostgreSQL de alta performance. Projete um schema DDL completo para uma tabela central de transacoes financeiras (ledger) de uma fintech. A tabela deve suportar dezenas de milhoes de registros mensais com particionamento temporal por mes baseado na coluna created_at. Inclua as seguintes colunas essenciais: transaction_id (UUID v4 chave primaria), account_id (UUID indexado), amount (DECIMAL com 4 casas decimais), transaction_type (ENUM com DEBIT, CREDIT, REFUND, PIX), status (ENUM com PENDING, SETTLED, FAILED), metadata (campo JSONB indexado com GIN para busca rapida de dados fiscais), e created_at (TIMESTAMP WITH TIME ZONE). Forneca o script SQL DDL executavel, definindo a tabela particionada, o indice B-Tree composto apropriado para consultas analiticas de extrato por account_id e created_at, o indice GIN no campo metadata, e o exemplo de criacao de ao menos duas particoes mensais consecutivas.", "comp_text": "PostgreSQL alta performance. Projete schema DDL tabela transacoes financeiras ledger fintech. Particionamento temporal mes created_at. Colunas: transaction_id UUID PK, account_id UUID, amount DECIMAL(18,4), transaction_type ENUM (DEBIT, CREDIT, REFUND, PIX), status ENUM, metadata JSONB, created_at TIMESTAMPTZ. Forneca DDL tabela particionada, indice composto (account_id, created_at DESC), indice GIN metadata, e criacao de 2 particoes mensais."}, "CASE-03-RAG-COMPLIANCE": {"title": "Auditoria de Privacidade e LGPD", "desc": "Análise de conformidade regulatória sobre retenção de dados, anonimização e compartilhamento transfronteiriço.", "orig_tokens": 258, "comp_tokens": 112, "reduction": "-56.6%", "orig_text": "Atue como auditor senior de seguranca da informacao e conformidade com a Lei Geral de Protecao de Dados Pessoais (LGPD - Lei nº 13.709/2018). Uma instituicao de pagamento coleta dados de geolocalizacao em tempo real, biometria facial para autenticacao e historico de navegacao de clientes para fins de scoring antifraude. A empresa retem esses dados por prazo indeterminado em buckets S3 sem criptografia em repouso e compartilha dados comportamentais com parceiros comerciais de publicidade sem termo de consentimento livre e informado. Analise as violacoes graves aos principios da LGPD presentes nesse cenario, indicando as bases legais violadas e as medidas tecnicas e administrativas corretivas imediatas.", "comp_text": "Auditor LGPD Lei 13.709/2018. Instituicao pagamento coleta geolocalizacao tempo real, biometria facial, historico navegacao antifraude. Retencao prazo indeterminado S3 sem criptografia repouso; compartilhamento dados publicitarios sem consentimento livre. Analise violacoes graves principios LGPD, bases violadas, e medidas tecnicas/administrativas corretivas imediatas."}};
+    let currentTerminalView = 'single';
+
+    // GERENCIAMENTO DA CENTRAL DE OUTPUTS
+    function setTerminalViewMode(mode) {
+      currentTerminalView = mode;
+      document.getElementById('viewSingleBtn').classList.toggle('active', mode === 'single');
+      document.getElementById('viewCompareBtn').classList.toggle('active', mode === 'compare');
+      document.getElementById('terminalSingleView').style.display = (mode === 'single') ? 'block' : 'none';
+      document.getElementById('terminalCompareView').style.display = (mode === 'compare') ? 'block' : 'none';
+      renderTerminalOutput();
+    }
+
+    function renderTerminalOutput() {
+      const selectedCase = document.getElementById('termCaseSelect').value;
+      const selectedModel = document.getElementById('termModelSelect').value;
+      const selectedTech = document.getElementById('termTechSelect').value;
+
+      // Localiza registro unico
+      const record = rawTelemetry.find(r => r.case_id === selectedCase && r.model_id === selectedModel && r.technique === selectedTech);
+
+      if (currentTerminalView === 'single') {
+        if (record) {
+          document.getElementById('termMetaModel').innerText = record.model_id.split('/')[1] || record.model_id;
+          document.getElementById('termMetaTech').innerText = record.technique;
+          document.getElementById('termMetaTokens').innerText = `${record.prompt_tokens} in / ${record.completion_tokens} out`;
+          document.getElementById('termMetaLatency').innerText = `${(record.latency_ms / 1000).toFixed(2)}s`;
+          document.getElementById('terminalOutputText').innerText = record.output_text;
+        } else {
+          document.getElementById('termMetaModel').innerText = '-';
+          document.getElementById('termMetaTech').innerText = '-';
+          document.getElementById('termMetaTokens').innerText = '-';
+          document.getElementById('termMetaLatency').innerText = '-';
+          document.getElementById('terminalOutputText').innerText = '[Nenhum registro localizado para esta combinacao de parametros]';
+        }
+      } else {
+        // Modo comparativo: Zero-shot vs Compressed para o modelo selecionado
+        const origRecord = rawTelemetry.find(r => r.case_id === selectedCase && r.model_id === selectedModel && r.technique === 'zero_shot');
+        const compRecord = rawTelemetry.find(r => r.case_id === selectedCase && r.model_id === selectedModel && r.technique === 'compressed_llmlingua');
+
+        if (origRecord) {
+          document.getElementById('compOrigMeta').innerText = `${origRecord.prompt_tokens} tokens in | ${(origRecord.latency_ms / 1000).toFixed(1)}s`;
+          document.getElementById('compOrigText').innerText = origRecord.output_text;
+        } else {
+          document.getElementById('compOrigMeta').innerText = 'N/A';
+          document.getElementById('compOrigText').innerText = 'Nenhum registro.';
+        }
+
+        if (compRecord) {
+          document.getElementById('compCompMeta').innerText = `${compRecord.prompt_tokens} tokens in (-${compRecord.token_reduction_pct}%) | ${(compRecord.latency_ms / 1000).toFixed(1)}s`;
+          document.getElementById('compCompText').innerText = compRecord.output_text;
+        } else {
+          document.getElementById('compCompMeta').innerText = 'N/A';
+          document.getElementById('compCompText').innerText = 'Nenhum registro.';
+        }
+      }
+    }
+
+    function copyTerminalText() {
+      const text = document.getElementById('terminalOutputText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtnText');
+        btn.innerText = 'Copiado!';
+        setTimeout(() => { btn.innerText = 'Copiar Saída'; }, 2000);
+      });
+    }
+
+    function copyModalOutputText() {
+      const text = document.getElementById('modalResponseText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Texto da resposta copiado para a área de transferência.');
+      });
+    }
+
+    // INICIALIZAÇÃO DE GRÁFICOS VIA CHART.JS COM TEMA THLOOP
+    function initCharts() {
+      const monoFont = "'IBM Plex Mono', monospace";
+      const displayFont = "'Space Grotesk', sans-serif";
+
+      // Cores ThLoop
+      const colPaper = '#F0EDE6';
+      const colGold = '#C8B560';
+      const colSmoked = '#5C5C5C';
+      const colSubtle = '#353535';
+      const colMuted = '#9B9993';
+
+      // 1. TOKENS COMPARISON
+      new Chart(document.getElementById('tokensChart'), {
+        type: 'bar',
+        data: {
+          labels: ['CASE-01 (Arch)', 'CASE-02 (SQL)', 'CASE-03 (LGPD)'],
+          datasets: [
+            {
+              label: 'Original (Zero-Shot)',
+              data: [364, 355, 258],
+              backgroundColor: colSmoked,
+              borderColor: colSubtle,
+              borderWidth: 1
+            },
+            {
+              label: 'Comprimido (LLMLingua-2)',
+              data: [140, 113, 112],
+              backgroundColor: colGold,
+              borderColor: colGold,
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: colPaper, font: { family: monoFont, size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            },
+            y: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            }
+          }
+        }
+      });
+
+      // 2. LATENCY COMPARISON
+      new Chart(document.getElementById('latencyChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Zero-Shot', 'Few-Shot', 'Compressed'],
+          datasets: [
+            {
+              label: 'GLM-5.3 (CoT)',
+              data: [23.5, 14.6, 13.5],
+              backgroundColor: colSmoked,
+              borderColor: colSubtle,
+              borderWidth: 1
+            },
+            {
+              label: 'DeepSeek-V4 Flash',
+              data: [3.8, 2.9, 1.4],
+              backgroundColor: colPaper,
+              borderColor: colPaper,
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: colPaper, font: { family: monoFont, size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            },
+            y: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            }
+          }
+        }
+      });
+
+      // 3. SEMANTIC RETENTION
+      new Chart(document.getElementById('semanticChart'), {
+        type: 'line',
+        data: {
+          labels: ['1.0x (Original)', '1.5x', '2.0x', '2.5x', '2.72x (Máxima)'],
+          datasets: [
+            {
+              label: 'DeepSeek-V4 Flash Precision',
+              data: [1.0, 0.88, 0.82, 0.80, 0.794],
+              borderColor: colGold,
+              backgroundColor: colGold,
+              borderWidth: 2,
+              pointRadius: 4
+            },
+            {
+              label: 'GLM-5.3 Precision',
+              data: [1.0, 0.81, 0.74, 0.70, 0.690],
+              borderColor: colSmoked,
+              backgroundColor: colSmoked,
+              borderWidth: 2,
+              pointRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: colPaper, font: { family: monoFont, size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            },
+            y: {
+              min: 0.5,
+              max: 1.05,
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            }
+          }
+        }
+      });
+
+      // 4. COST PROJECTION
+      new Chart(document.getElementById('costChart'), {
+        type: 'bar',
+        data: {
+          labels: ['Original (Zero-Shot)', 'Few-Shot', 'LLMLingua-2 Comprimido'],
+          datasets: [
+            {
+              label: 'Custo por 1k Requisições (USD)',
+              data: [0.612, 0.430, 0.220],
+              backgroundColor: [colSmoked, colSmoked, colGold],
+              borderColor: colSubtle,
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            },
+            y: {
+              ticks: { color: colMuted, font: { family: monoFont, size: 11 } },
+              grid: { color: colSubtle }
+            }
+          }
+        }
+      });
+    }
+
+    // RENDERIZAÇÃO DA TABELA DE TELEMETRIA
+    function renderTable(data) {
+      const tbody = document.getElementById('telemetryTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+
+        const modelShort = item.model_id.includes('/') ? item.model_id.split('/')[1] : item.model_id;
+        const statusHtml = item.success ? '<span class="status-badge badge-ok">Concluído</span>' : '<span class="status-badge badge-err">Timeout</span>';
+
+        tr.innerHTML = `
+          <td><strong>${item.case_id}</strong></td>
+          <td><span class="tag-cell">${modelShort}</span></td>
+          <td>${item.technique}</td>
+          <td>${item.prompt_tokens}</td>
+          <td>${item.completion_tokens}</td>
+          <td>${item.token_reduction_pct > 0 ? '-' + item.token_reduction_pct.toFixed(1) + '%' : '0%'}</td>
+          <td>${(item.latency_ms / 1000).toFixed(1)}s</td>
+          <td>$${item.cost_usd.toFixed(6)}</td>
+          <td>${(item.bertscore_p * 100).toFixed(1)}%</td>
+          <td>${statusHtml}</td>
+          <td>
+            <button class="btn-table-action" onclick="openModalById(${item.id})">
+              Ver Saída &rarr;
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('tableCounter').innerText = `${data.length} REGISTROS ENCONTRADOS`;
+    }
+
+    // FILTROS
+    function applyFilters() {
+      const modelVal = document.getElementById('modelFilter').value;
+      const techVal = document.getElementById('techniqueFilter').value;
+      const query = document.getElementById('searchInput').value.toLowerCase();
+
+      const filtered = rawTelemetry.filter(item => {
+        const matchModel = modelVal === 'ALL' || item.model_id === modelVal;
+        const matchTech = techVal === 'ALL' || item.technique === techVal;
+        const matchQuery = item.case_id.toLowerCase().includes(query) ||
+                           item.case_name.toLowerCase().includes(query) ||
+                           item.input_prompt.toLowerCase().includes(query) ||
+                           item.output_text.toLowerCase().includes(query);
+        return matchModel && matchTech && matchQuery;
+      });
+
+      renderTable(filtered);
+    }
+
+    // PROMPT DIFF SWITCHER
+    function switchDiffCase(caseId, btn) {
+      document.querySelectorAll('.diff-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const data = casesDiffData[caseId];
+      if (!data) return;
+
+      document.getElementById('diffCaseTitle').innerText = data.title;
+      document.getElementById('diffCaseDesc').innerText = data.desc;
+      document.getElementById('diffOrigTokens').innerText = `${data.orig_tokens} tokens`;
+      document.getElementById('diffCompTokens').innerText = `${data.comp_tokens} tokens (${data.reduction})`;
+      document.getElementById('diffOrigText').innerText = data.orig_text;
+      document.getElementById('diffCompText').innerText = data.comp_text;
+    }
+
+    // ROI CALCULATOR
+    function updateROI(val) {
+      const reqs = parseInt(val);
+      document.getElementById('volumeVal').innerText = Number(reqs).toLocaleString('pt-BR') + ' reqs';
+
+      const costUncomp = (reqs * 0.000612).toFixed(2);
+      const costComp = (reqs * 0.000220).toFixed(2);
+      const savingsM = (costUncomp - costComp).toFixed(2);
+      const savingsY = (savingsM * 12).toFixed(2);
+
+      document.getElementById('costUncompressed').innerText = '$' + Number(costUncomp).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('costCompressed').innerText = '$' + Number(costComp).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('savingsMonthly').innerText = '$' + Number(savingsM).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      document.getElementById('savingsYearly').innerText = '$' + Number(savingsY).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    // MODAL DE INSPEÇÃO PROFUNDA
+    function openModalById(id) {
+      const item = rawTelemetry.find(r => r.id === id);
+      if (item) openModal(item);
+    }
+
+    function openModal(item) {
+      document.getElementById('modalTitle').innerText = `${item.case_id} — ${item.case_name}`;
+      document.getElementById('modalSubtitle').innerText = `TÉCNICA: ${item.technique.toUpperCase()} | STATUS: ${item.success ? 'SUCESSO' : 'TIMEOUT'}`;
+      document.getElementById('modalModel').innerText = item.model_id;
+      document.getElementById('modalTech').innerText = item.technique;
+      document.getElementById('modalLatency').innerText = `${(item.latency_ms / 1000).toFixed(2)}s`;
+      document.getElementById('modalTokens').innerText = `${item.prompt_tokens} in / ${item.completion_tokens} out`;
+      document.getElementById('modalPromptText').innerText = item.input_prompt;
+      document.getElementById('modalResponseText').innerText = item.output_text;
+
+      document.getElementById('inspectModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('inspectModal').style.display = 'none';
+    }
+
+    function closeModalOnOutside(event) {
+      if (event.target === document.getElementById('inspectModal')) {
+        closeModal();
+      }
+    }
+
+    // EXPORTAÇÃO CSV VIA NAVEGADOR
+    function exportCSV() {
+      const headers = ["id", "case_id", "case_name", "model_id", "technique", "success", "prompt_tokens", "completion_tokens", "latency_ms", "cost_usd", "bertscore_p"];
+      let csv = headers.join(",") + "\n";
+
+      rawTelemetry.forEach(r => {
+        const row = [
+          r.id,
+          r.case_id,
+          `"${r.case_name}"`,
+          r.model_id,
+          r.technique,
+          r.success,
+          r.prompt_tokens,
+          r.completion_tokens,
+          r.latency_ms,
+          r.cost_usd,
+          r.bertscore_p
+        ];
+        csv += row.join(",") + "\n";
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "battle_ia_telemetria_thloop.csv";
+      a.click();
+    }
+
+    // CARREGAMENTO INICIAL
+    window.onload = function() {
+      initCharts();
+      renderTable(rawTelemetry);
+      switchDiffCase('CASE-01-ARCH-QA', document.querySelector('.diff-tab-btn.active'));
+      renderTerminalOutput();
+      updateROI(100000);
+    };
+  </script>
+</body>
+</html>
